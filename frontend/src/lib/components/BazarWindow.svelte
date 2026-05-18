@@ -7,6 +7,7 @@
 	import RarityLevelCategory from './RarityLevelCategory.svelte';
 	import SubCategory from './SubCategory.svelte';
 	import TitleBar from './TitleBar.svelte';
+	import UpgradeLevelCategory from './UpgradeLevelCategory.svelte';
 
 	let category = $state(BazarCategory.All);
 </script>
@@ -34,6 +35,7 @@
 		<SubCategory {category}></SubCategory>
 		<LevelCategory {category}></LevelCategory>
 		<RarityLevelCategory {category}></RarityLevelCategory>
+		<UpgradeLevelCategory {category}></UpgradeLevelCategory>
 	</div>
 </Draggable>
 
