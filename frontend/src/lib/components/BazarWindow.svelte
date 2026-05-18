@@ -1,7 +1,12 @@
 <script lang="ts">
+	import { BazarCategory } from '$lib/types/enums';
 	import BlueButton from './BlueButton.svelte';
+	import Category from './Category.svelte';
 	import Draggable from './Draggable.svelte';
+	import SubCategory from './SubCategory.svelte';
 	import TitleBar from './TitleBar.svelte';
+
+	let category = $state(BazarCategory.All);
 </script>
 
 <Draggable left={200} top={200}>
@@ -16,7 +21,15 @@
 		lobortis luctus. Proin risus dolor, posuere quis porta hendrerit, condimentum non leo. Maecenas
 		rutrum convallis ultrices. Maecenas pretium ullamcorper suscipit. Class aptent taciti sociosqu
 		ad litora torquent per conubia nostra, per inceptos himenaeos.
-		<BlueButton>Test</BlueButton>
+		<BlueButton
+			text="Test"
+			onclick={() => {
+				console.log('Clicked');
+			}}
+		/>
+
+		<Category bind:value={category}></Category>
+		<SubCategory {category}></SubCategory>
 	</div>
 </Draggable>
 

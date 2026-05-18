@@ -1,11 +1,11 @@
 <script lang="ts">
-	let { children } = $props();
+	let { text, onclick } = $props();
 
 	// TODO: Proper style for this button
 </script>
 
-<button class="blue-btn">
-	{@render children?.()}
+<button class="blue-btn" {onclick}>
+	{text}
 </button>
 
 <style>

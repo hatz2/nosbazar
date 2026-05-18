@@ -39,7 +39,7 @@
 <style>
 	.draggable {
 		user-select: none;
-		cursor: move;
+		/* cursor: move; */
 		/* border: solid 1px gray; */
 		position: absolute;
 	}
