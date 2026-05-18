@@ -4,6 +4,7 @@
 	import Category from './Category.svelte';
 	import Draggable from './Draggable.svelte';
 	import LevelCategory from './LevelCategory.svelte';
+	import RarityLevelCategory from './RarityLevelCategory.svelte';
 	import SubCategory from './SubCategory.svelte';
 	import TitleBar from './TitleBar.svelte';
 
@@ -32,6 +33,7 @@
 		<Category bind:value={category}></Category>
 		<SubCategory {category}></SubCategory>
 		<LevelCategory {category}></LevelCategory>
+		<RarityLevelCategory {category}></RarityLevelCategory>
 	</div>
 </Draggable>
 
