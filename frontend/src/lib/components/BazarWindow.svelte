@@ -3,6 +3,7 @@
 	import BlueButton from './BlueButton.svelte';
 	import Category from './Category.svelte';
 	import Draggable from './Draggable.svelte';
+	import LevelCategory from './LevelCategory.svelte';
 	import SubCategory from './SubCategory.svelte';
 	import TitleBar from './TitleBar.svelte';
 
@@ -30,6 +31,7 @@
 
 		<Category bind:value={category}></Category>
 		<SubCategory {category}></SubCategory>
+		<LevelCategory {category}></LevelCategory>
 	</div>
 </Draggable>
 
