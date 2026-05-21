@@ -5,7 +5,7 @@
 <div class="title-bar">{title}</div>
 
 <style>
-	.title-bar {
+	/* .title-bar {
 		font-size: 18px;
 		color: white;
 		background: linear-gradient(
@@ -29,5 +29,5 @@
 			-1px -1px #2a2c30,
 			1px -1px #2a2c30,
 			-1px 1px #2a2c30;
-	}
+	} */
 </style>

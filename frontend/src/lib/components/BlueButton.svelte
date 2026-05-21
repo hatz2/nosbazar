@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { text, onclick } = $props();
+	let { text, onclick} = $props();
 
 	// TODO: Proper style for this button
 </script>
@@ -9,7 +9,7 @@
 </button>
 
 <style>
-	.blue-btn {
+	/* .blue-btn {
 		color: #dcecff;
 		background: linear-gradient(#5aa8d8 0%, #5aa8d8 10%, #3475be 25%, #3475be 85%, #588dc9 100%);
 		border: 1px solid #0e2752;
@@ -32,5 +32,5 @@
 
 	.blue-btn:active {
 		background: linear-gradient(#296fbe 0%, #296fbe 90%, #4ba2d8 100%);
-	}
+	} */
 </style>

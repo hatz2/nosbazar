@@ -2,42 +2,46 @@
 	import { BazarCategory } from '$lib/types/enums';
 	import BlueButton from './BlueButton.svelte';
 	import Category from './Category.svelte';
-	import Draggable from './Draggable.svelte';
+	// import Draggable from './Draggable.svelte';
 	import LevelCategory from './LevelCategory.svelte';
 	import RarityLevelCategory from './RarityLevelCategory.svelte';
 	import SubCategory from './SubCategory.svelte';
 	import TitleBar from './TitleBar.svelte';
+	import Toolbar from './Toolbar.svelte';
 	import UpgradeLevelCategory from './UpgradeLevelCategory.svelte';
+	import ResultsTable from './ResultsTable.svelte';
 
 	let category = $state(BazarCategory.All);
 </script>
 
-<Draggable left={200} top={200}>
+<!-- <Draggable left={200} top={200}> -->
+<div class="content">
 	<TitleBar title="NosBazaar"></TitleBar>
+	<Toolbar>
+		<span>Name</span>
+		<span>Category</span>
+		<span>Subcategory</span>
+		<span></span>
 
-	<div class="content">
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi in velit sit amet augue bibendum
-		convallis. Nam nec imperdiet elit, id sollicitudin quam. Praesent sit amet enim gravida, rutrum
-		velit at, cursus sapien. Nunc a varius tortor. Ut molestie feugiat ante pharetra cursus. Nulla
-		placerat magna finibus dolor ullamcorper suscipit. Morbi nunc diam, aliquet et finibus ut,
-		sodales ut nunc. In elit eros, lobortis quis turpis sed, gravida lacinia urna. Phasellus laoreet
-		lobortis luctus. Proin risus dolor, posuere quis porta hendrerit, condimentum non leo. Maecenas
-		rutrum convallis ultrices. Maecenas pretium ullamcorper suscipit. Class aptent taciti sociosqu
-		ad litora torquent per conubia nostra, per inceptos himenaeos.
-		<BlueButton
-			text="Test"
-			onclick={() => {
-				console.log('Clicked');
-			}}
-		/>
-
+		<input type="text" />
 		<Category bind:value={category}></Category>
 		<SubCategory {category}></SubCategory>
+		<BlueButton text="Search" onclick={() => {}}></BlueButton>
+
+		<span>Level</span>
+		<span>Rarity Level</span>
+		<span>Upgrade Level</span>
+		<span></span>
+
 		<LevelCategory {category}></LevelCategory>
 		<RarityLevelCategory {category}></RarityLevelCategory>
 		<UpgradeLevelCategory {category}></UpgradeLevelCategory>
-	</div>
-</Draggable>
+	</Toolbar>
+
+	<ResultsTable></ResultsTable>
+</div>
+
+<!-- </Draggable> -->
 
 <style>
 	.content {
