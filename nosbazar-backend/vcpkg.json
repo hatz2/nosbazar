@@ -1,6 +1,9 @@
 {
   "dependencies": [
-    "fmt",
-    "spdlog"
+    "crow",
+    "curl",
+    "openssl",
+    "spdlog",
+    "nlohmann-json"
   ]
 }
