@@ -124,3 +124,109 @@ std::expected<Response, Error> nosbazar::net::get(std::string_view url, const st
 
     return response;
 }
+
+nosbazar::net::TCPClient::TCPClient(asio::io_context& context) 
+    : context(context)
+    , socket(context)
+    , read_buffer{}
+{
+}
+
+void nosbazar::net::TCPClient::connect(const std::string& ip, unsigned short port)
+{
+    asio::ip::address addr = asio::ip::make_address(ip);
+    auto endpoint = asio::ip::tcp::endpoint(addr, port);
+
+    asio::error_code ec;
+
+    socket.connect(endpoint, ec);
+
+    if (ec) {
+        SPDLOG_ERROR("TCPClient::connect error: {}", ec.message());
+        observer.on_disconnect();
+        return;
+    }
+
+    do_recv();
+}
+
+void nosbazar::net::TCPClient::send(const std::vector<uint8_t>& data)
+{
+    asio::error_code ec;
+    size_t res = asio::write(socket, asio::buffer(data), ec);
+
+    if (ec) {
+        SPDLOG_ERROR("TCPClient::send error: {}", ec.message());
+    }
+
+    if (res != data.size()) {
+        SPDLOG_ERROR("TCPClient::send tried to write {} bytes but only {} bytes were written", data.size(), res);
+    }
+}
+
+void nosbazar::net::TCPClient::send(const std::string& data)
+{
+    std::vector<uint8_t> raw(data.begin(), data.end());
+    send(std::move(raw));
+}
+
+void nosbazar::net::TCPClient::disconnect()
+{
+    socket.close();
+}
+
+void nosbazar::net::TCPClient::do_recv()
+{
+    socket.async_read_some(asio::buffer(read_buffer), [this](std::error_code ec, std::size_t length) -> void {
+        if (ec) {
+            if (ec != asio::error::eof) {
+                SPDLOG_ERROR("TCPClient::do_recv: {}", ec.message());
+            }
+            
+            observer.on_disconnect();
+        }
+        else {
+            std::vector<uint8_t> data(read_buffer.begin(), read_buffer.end());
+            observer.on_receive(std::move(data));
+            do_recv();
+        }
+    });
+}
+
+nosbazar::net::Session::Session(std::unique_ptr<TCPClient> client) : client(std::move(client))
+{
+    std::function<void()> on_connect_cb = [this]() {
+        on_connect();
+    };
+
+    std::function<void()> on_disconnect_cb = [this]() {
+        on_disconnect();
+    };
+
+    std::function<void(std::vector<uint8_t>)> on_recv_cb = [this](std::vector<uint8_t> data) {
+        on_recv(std::move(data));
+    };
+
+    this->client->observer = {
+        on_connect_cb,
+        on_recv_cb,
+        on_disconnect_cb
+    };
+
+    this->client->send("0\n");
+}
+
+void nosbazar::net::Session::on_connect()
+{
+    SPDLOG_DEBUG("Session::on_connect");
+}
+
+void nosbazar::net::Session::on_disconnect()
+{
+    SPDLOG_DEBUG("Session::on_disconnect");
+}
+
+void nosbazar::net::Session::on_recv(std::vector<uint8_t> data)
+{
+    SPDLOG_DEBUG("Session::on_recv");
+}

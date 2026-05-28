@@ -43,4 +43,16 @@ namespace nosbazar::random {
         bool number = random_bool();
         return number ? random_character('0', '9') : random_character('a', 'f');
     }
+
+    inline std::string random_hex_string(size_t size) {
+        static constexpr char hex_chars[] = "0123456789ABCDEF";
+        constexpr int last_hex_char_idx = 15;
+        std::string result;
+
+        for (size_t i = 0; i < size; ++i) {
+            result += hex_chars[random_int(0, last_hex_char_idx)];
+        }
+
+        return result;
+    }
 }

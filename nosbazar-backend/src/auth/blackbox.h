@@ -13,7 +13,11 @@ namespace nosbazar::auth {
 		std::string encoded() const;
 
 	protected:
-		static inline const std::vector<std::string> fields = { "v", "tz", "osType", "app", "vendor", "mem", "con", "lang", "plugins", "gpu", "fonts", "audioC", "width", "height", "video", "audio", "media", "permissions", "audioFP", "webglFP", "canvasFP", "creation", "uuid", "d", "osVersion", "vector", "userAgent", "serverTimeInMS", "request", "browserEnvMask" };
+		static inline const std::vector<std::string> fields = { "v", "tz", "osType", "app", "vendor", "mem", 
+			"con", "lang", "plugins", "gpu", "fonts", "audioC", "width", "height", "video", "audio", "media", 
+			"permissions", "audioFP", "webglFP", "canvasFP", "creation", "uuid", "d", "osVersion", "vector", 
+			"userAgent", "serverTimeInMS", "request", "browserEnvMask" };
+
 		std::shared_ptr<Identity> identity;
 	};
 

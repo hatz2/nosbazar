@@ -7,14 +7,17 @@
 #include <cctype>
 #include <random/random.h>
 #include <openssl/sha.h>
+#include <unordered_set>
 
 namespace {
     static bool is_unreserved(char c)
     {
         // "-_!~*.'()"
-        if (c == '-' || c == '_' || c == '!' || c == '~' ||
-            c == '*' || c == '.' || c == '\'' || c == '(' || c == ')')
+        const std::unordered_set<char> unreserved = { '-', '_', '!', '~', '*', '.', '\'', '(', ')' };
+
+        if (unreserved.contains(c)) {
             return true;
+        }
 
         return std::isalnum(static_cast<unsigned char>(c));
     }
@@ -23,14 +26,11 @@ namespace {
     {
         std::ostringstream oss;
 
-        for (unsigned char c : input)
-        {
-            if (is_unreserved(c))
-            {
+        for (unsigned char c : input) {
+            if (is_unreserved(c)) {
                 oss << c;
             }
-            else
-            {
+            else {
                 oss << '%' << std::uppercase << std::hex
                     << std::setw(2) << std::setfill('0')
                     << (int)c;
@@ -42,16 +42,18 @@ namespace {
 
     std::string to_url_safe_base64(std::string s)
     {
-        for (char& c : s)
-        {
-            if (c == '/')
+        for (char& c : s) {
+            if (c == '/') {
                 c = '_';
-            else if (c == '+')
+            }
+            else if (c == '+') {
                 c = '-';
+            }
         }
 
-        while (!s.empty() && s.back() == '=')
+        while (!s.empty() && s.back() == '=') {
             s.pop_back();
+        }
 
         return s;
     }

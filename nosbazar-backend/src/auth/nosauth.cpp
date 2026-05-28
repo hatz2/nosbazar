@@ -12,6 +12,10 @@
 
 using json = nlohmann::json;
 
+namespace {
+	constexpr int JSON_INDENT = 4;
+}
+
 nosbazar::auth::NosAuth::NosAuth(std::shared_ptr<Identity> identity) : NosAuth(identity, {})
 {
 
@@ -51,10 +55,12 @@ nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const 
 
 	auto result = net::post(url, body.dump(), headers);
 
+	
+
 	if (result) {
 		auto json_response = json::parse(result->body);
 
-		SPDLOG_DEBUG("authenticate: {}", result->body);
+		SPDLOG_DEBUG("authenticate: {}", json_response.dump(JSON_INDENT));
 
 		if (result->status_code == 409) {
 			const auto& error_types = json_response["errorTypes"];
@@ -103,7 +109,7 @@ json nosbazar::auth::NosAuth::get_accounts() const
 	auto result = net::get(url, headers);
 
 	if (result) {
-		SPDLOG_DEBUG("get_accounts: {}", result->body);
+		SPDLOG_DEBUG("get_accounts: {}", json::parse(result->body).dump(JSON_INDENT));
 
 		if (result->status_code != 200) {
 			return {};
@@ -140,11 +146,12 @@ bool nosbazar::auth::NosAuth::send_iovation(const std::string& account_id) const
 
 	auto reply = net::post(url, content.dump(), headers);
 
-	SPDLOG_DEBUG("send_iovation: {}", reply->body);
-
+	
 	if (!reply) {
 		return false;
 	}
+
+	SPDLOG_DEBUG("send_iovation: {}", json::parse(reply->body).dump(JSON_INDENT));
 
 	if (reply->status_code != 200) {
 		return false;
@@ -185,11 +192,11 @@ std::optional<std::string> nosbazar::auth::NosAuth::get_session_token(const std:
 
 	auto reply = net::post(url, content.dump(4), headers);
 
-	SPDLOG_DEBUG("get_session_token: {}", reply->body);
-
 	if (!reply) {
 		return std::nullopt;
 	}
+
+	SPDLOG_DEBUG("get_session_token: {}", json::parse(reply->body).dump(JSON_INDENT));
 
 	if (reply->status_code != 201) {
 		return std::nullopt;
@@ -259,11 +266,6 @@ void nosbazar::auth::NosAuth::init_gf_version()
 	}
 
 	auto response = json::parse(reply->body);
-
-	//this->chromeVersion = "C" + jsonResponse["version"].toString();
-	//this->version = jsonResponse["version"].toString();
-	//this->gameforgeVersion = jsonResponse["minimumVersionForDelayedUpdate"].toString();
-	//this->frontendVersion = jsonResponse["frontend"].toObject()["version"].toString();
 
 	gf_version = response["minimumVersionForDelayedUpdate"];
 	chrome_version = "C" + response["version"].get<std::string>();

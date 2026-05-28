@@ -2,6 +2,9 @@
 #include <spdlog/spdlog.h>
 #include "auth/nosauth.h"
 #include "dotenv.h"
+#include <asio.hpp>
+#include <random/random.h>
+#include <login_packet.h>
 
 struct Env {
 	std::string identity_path;
@@ -46,5 +49,16 @@ int main(int argc, char** argv) {
 	else {
 		SPDLOG_ERROR("No account!!");
 	}
+
+	asio::io_context context;
+
+	auto client = std::make_unique<nosbazar::net::TCPClient>(context);
+	client->connect("79.110.84.75", 4000);
+
+	nosbazar::net::Session session(std::move(client));
+
+	
+
+	context.run();
 }
 

@@ -2,8 +2,9 @@
   "dependencies": [
     "crow",
     "curl",
+    "nlohmann-json",
     "openssl",
     "spdlog",
-    "nlohmann-json"
+    "asio"
   ]
 }

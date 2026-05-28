@@ -18,6 +18,7 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(Crow CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(asio CONFIG REQUIRED)
 
 
 include_directories("src")
@@ -25,7 +26,7 @@ include_directories("src")
 
 
 # Add source to this project's executable.
-add_executable (nosbazar-backend "src/main.cpp"  "src/noscrypto.h" "src/noscrypto.cpp" "src/net.h" "src/net.cpp" "src/auth/nosauth.h" "src/auth/nosauth.cpp" "src/auth/identity.h" "src/auth/identity.cpp" "src/crypto/base64.h" "src/crypto/base64.cpp" "src/time/timestamp.h" "src/time/datetime.h" "src/random/random.h" "src/auth/blackbox.h" "src/auth/blackbox.cpp" "src/crypto/hash.h" "src/crypto/hash.cpp" "src/crypto/uuid.h" "src/crypto/uuid.cpp" "src/dotenv.h")
+add_executable (nosbazar-backend "src/main.cpp"  "src/noscrypto.h" "src/noscrypto.cpp" "src/net.h" "src/net.cpp" "src/auth/nosauth.h" "src/auth/nosauth.cpp" "src/auth/identity.h" "src/auth/identity.cpp" "src/crypto/base64.h" "src/crypto/base64.cpp" "src/time/timestamp.h" "src/time/datetime.h" "src/random/random.h" "src/auth/blackbox.h" "src/auth/blackbox.cpp" "src/crypto/hash.h" "src/crypto/hash.cpp" "src/crypto/uuid.h" "src/crypto/uuid.cpp" "src/dotenv.h" "src/login_packet.h" "src/login_packet.cpp")
 
 target_compile_definitions(nosbazar-backend PRIVATE
     $<$<CONFIG:Debug>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE>
@@ -37,7 +38,8 @@ target_link_libraries(nosbazar-backend PRIVATE
 	spdlog::spdlog
 	OpenSSL::SSL
 	OpenSSL::Crypto
-	Crow::Crow asio::asio
+	Crow::Crow 
+    asio::asio
 	nlohmann_json::nlohmann_json
 )
 
