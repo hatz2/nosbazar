@@ -6,6 +6,9 @@
 #include <expected>
 #include <vector>
 #include <asio.hpp>
+#include <span>
+#include <queue>
+#include <unordered_map>
 
 namespace nosbazar::net {
 	struct Response {
@@ -21,6 +24,19 @@ namespace nosbazar::net {
 	std::expected<Response, Error> post(std::string_view url, std::string_view body, const std::vector<std::string>& headers = {});
 
 	std::expected<Response, Error> get(std::string_view url, const std::vector<std::string>& headers = {});
+
+	class PacketAcumulator {
+	public:
+		explicit PacketAcumulator(uint8_t delimiter);
+
+		void process(std::span<const uint8_t> data, std::queue<std::vector<uint8_t>>& out_queue);
+
+		void set_delimiter(uint8_t delimiter);
+
+	private:
+		uint8_t delimiter;
+		std::vector<uint8_t> buffer;
+	};
 
 	class TCPClient {
 	public:
@@ -50,17 +66,53 @@ namespace nosbazar::net {
 
 	class Session {
 	public:
+		using PacketHandler = std::function<void(const std::string&)>;
+
 		explicit Session(std::unique_ptr<TCPClient> client);
 
+		virtual void send(const std::string& packet) = 0;
+
+		void subscribe(std::string_view packet_header, PacketHandler handler);
+
+	protected:
 		void on_connect();
-
 		void on_disconnect();
+		virtual void on_recv(std::vector<uint8_t> data) = 0;
+		void on_packet(const std::string& packet);
 
-		void on_recv(std::vector<uint8_t> data);
+		std::unique_ptr<TCPClient> client;
+		std::queue<std::vector<uint8_t>> pending_packets;
 
 	private:
 		TCPClient::Observer observer;
-		std::unique_ptr<TCPClient> client;
+		std::unordered_map< std::string_view, std::vector<PacketHandler>> handlers;
+	};
+
+	class LoginSession : public Session {
+	public:
+		explicit LoginSession(std::unique_ptr<TCPClient> client);
+
+		void send(const std::string& packet) override;
+
+	protected:
+		void on_recv(std::vector<uint8_t> data) override;
+
+	private:
+		PacketAcumulator acumulator;
+	};
+
+	class WorldSession : public Session {
+	public:
+		explicit WorldSession(std::unique_ptr<TCPClient> client, uint32_t session_id);
+
+		void send(const std::string& packet) override;
+
+	protected:
+		void on_recv(std::vector<uint8_t> data) override;
+	private:
+		PacketAcumulator acumulator;
+		bool is_first_packet = true;
+		uint32_t session_id;
 	};
 
 

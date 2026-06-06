@@ -13,5 +13,5 @@ nosbazar::packets::login::NoS0577Packet::NoS0577Packet(std::string session_token
 
 std::string nosbazar::packets::login::NoS0577Packet::string()
 {
-	return fmt::format("NoS0577 {}  {} {} {} \xB {} 0 {}", session_token, installation_id, random::random_hex_string(8), region_code, client_version, client_hash);
+	return fmt::format("NoS0577 {}  {} {} {}\xB{} 0 {}", session_token, installation_id, random::random_hex_string(8), region_code, client_version, client_hash);
 }

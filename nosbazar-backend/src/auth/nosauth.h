@@ -30,7 +30,7 @@ namespace nosbazar::auth {
 
 		[[nodiscard]] nlohmann::json get_accounts() const;
 
-		std::optional<std::string> get_session_token(const std::string& account_id) const;
+		[[nodiscard]] std::optional<std::string> get_session_token(const std::string& account_id) const;
 
 	private:
 		struct UserInfo {
@@ -51,11 +51,12 @@ namespace nosbazar::auth {
 		void init_all_certs();
 		void init_game_session_id();
 		void init_cert();
+		void init_installation_id();
 
 		static constexpr std::string_view game_id = "dd4e22d6-00d1-44b9-8126-d8b40e0cd7c9";
 		std::string locale = "en-US";
 		std::string browser_user_agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36";
-		std::string installation_id = "f4bca3e5-8e1b-4aed-9ea5-5e771cf903bd";
+		std::string installation_id;
 		std::string all_certs;
 		std::string gf_version;
 		std::string chrome_version;

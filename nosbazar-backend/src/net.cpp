@@ -1,5 +1,6 @@
 #include "net.h"
 #include <spdlog/spdlog.h>
+#include <noscrypto.h>
 
 using namespace nosbazar::net;
 
@@ -186,7 +187,7 @@ void nosbazar::net::TCPClient::do_recv()
             observer.on_disconnect();
         }
         else {
-            std::vector<uint8_t> data(read_buffer.begin(), read_buffer.end());
+            std::vector<uint8_t> data(read_buffer.begin(), read_buffer.begin() + length);
             observer.on_receive(std::move(data));
             do_recv();
         }
@@ -212,8 +213,11 @@ nosbazar::net::Session::Session(std::unique_ptr<TCPClient> client) : client(std:
         on_recv_cb,
         on_disconnect_cb
     };
+}
 
-    this->client->send("0\n");
+void nosbazar::net::Session::subscribe(std::string_view packet_header, PacketHandler handler)
+{
+    handlers[packet_header].push_back(handler);
 }
 
 void nosbazar::net::Session::on_connect()
@@ -226,7 +230,121 @@ void nosbazar::net::Session::on_disconnect()
     SPDLOG_DEBUG("Session::on_disconnect");
 }
 
-void nosbazar::net::Session::on_recv(std::vector<uint8_t> data)
+void nosbazar::net::Session::on_packet(const std::string& packet)
 {
-    SPDLOG_DEBUG("Session::on_recv");
+    // TODO: Call handlers depending on packet header
+    std::string header = packet.substr(0, packet.find_first_of(' '));
+
+    if (handlers.contains(header)) {
+        for (auto& handler : handlers[header]) {
+            handler(packet);
+        }
+    }
+}
+
+nosbazar::net::LoginSession::LoginSession(std::unique_ptr<TCPClient> client) 
+    : Session(std::move(client))
+    , acumulator(0xA)
+{
+}
+
+void nosbazar::net::LoginSession::send(const std::string& packet)
+{
+    std::vector<uint8_t> raw(packet.begin(), packet.end());
+    std::vector<uint8_t> encrypted = noscrypto::Client::login_encrypt(raw);
+    client->send(encrypted);
+}
+
+void nosbazar::net::LoginSession::on_recv(std::vector<uint8_t> data)
+{
+    std::vector<uint8_t> decrypted = noscrypto::Client::login_decrypt(data);
+    acumulator.process(decrypted, pending_packets);
+
+    while (!pending_packets.empty()) {
+        auto raw_packet = std::move(pending_packets.front());
+        std::string packet(raw_packet.begin(), raw_packet.end());
+        pending_packets.pop();
+
+        on_packet(packet);
+    }
+}
+
+nosbazar::net::WorldSession::WorldSession(std::unique_ptr<TCPClient> client, uint32_t session_id)
+    : Session(std::move(client))
+    , session_id(session_id)
+    , acumulator(0xFF)
+{
+}
+
+void nosbazar::net::WorldSession::send(const std::string& packet)
+{
+    std::vector<uint8_t> raw(packet.begin(), packet.end());
+    std::vector<uint8_t> encrypted = noscrypto::Client::world_encrypt(raw);
+    client->send(encrypted);
+}
+
+void nosbazar::net::WorldSession::on_recv(std::vector<uint8_t> data)
+{
+    std::vector<uint8_t> xored = noscrypto::Client::world_xor(data, session_id, is_first_packet);
+    acumulator.process(xored, pending_packets);
+
+    while (!pending_packets.empty()) {
+        auto raw_xored_packet = std::move(pending_packets.front());
+        auto unpacked = noscrypto::Client::unpack(raw_xored_packet);
+        std::string packet(unpacked.begin(), unpacked.end());
+        pending_packets.pop();
+
+        on_packet(packet);
+    }
+}
+
+nosbazar::net::PacketAcumulator::PacketAcumulator(uint8_t delimiter) : delimiter(delimiter)
+{
+}
+
+void nosbazar::net::PacketAcumulator::process(std::span<const uint8_t> data, std::queue<std::vector<uint8_t>>& out_queue)
+{
+    auto it = data.begin();
+    auto end = data.end();
+
+    // 1. Complete any pending packet if it exists
+    if (!buffer.empty()) {
+        auto delimiter_it = std::ranges::find(it, end, delimiter);
+
+        if (delimiter_it != end) {
+            // Complete the previously buffered packet
+            buffer.insert(buffer.end(), it, delimiter_it);
+
+            out_queue.emplace(buffer.begin(), buffer.end());
+            buffer.clear();
+
+            it = std::next(delimiter_it);  // advance past the delimiter
+        }
+        else {
+            // Still incomplete, append everything to the buffer
+            buffer.insert(buffer.end(), it, end);
+            return;
+        }
+    }
+
+    // 2. Process complete packets directly from the span
+    while (it != end) {
+        auto delimiter_it = std::ranges::find(it, end, delimiter);
+        if (delimiter_it == end) {
+            break;
+        }
+
+        out_queue.emplace(it, delimiter_it);
+        it = std::next(delimiter_it);
+    }
+
+    // 3. Store remaining incomplete tail
+    if (it != end) {
+        buffer.insert(buffer.end(), it, end);
+    }
+}
+
+void nosbazar::net::PacketAcumulator::set_delimiter(uint8_t delimiter)
+{
+    this->delimiter = delimiter;
 }

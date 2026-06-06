@@ -100,7 +100,7 @@ namespace
 		return output;
 	}
 
-	inline std::vector<uint8_t> unpack(const std::vector<uint8_t>& packet, const std::array<uint8_t, 16>& chars_to_unpack)
+	std::vector<uint8_t> unpack(const std::vector<uint8_t>& packet, const std::array<uint8_t, 16>& chars_to_unpack)
 	{
 		std::vector<uint8_t> output;
 
@@ -161,12 +161,12 @@ std::vector<uint8_t> nosbazar::noscrypto::Client::login_encrypt(std::vector<uint
 {
 	std::vector<uint8_t> output;
 
-	if (packet.empty() || packet.back() != 0x0A) {
-		packet.push_back('\n');
+	if (packet.empty() || packet.back() != 0xA) {
+		packet.push_back(0xA);
 	}
 
 	for (uint8_t b : packet) {
-		uint8_t v = static_cast<uint8_t>((b + 0x0F) & 0xFF);
+		uint8_t v = static_cast<uint8_t>(((b ^ 0xC3) + 0x0F) & 0xFF);
 		output.push_back(v);
 	}
 
@@ -178,7 +178,7 @@ std::vector<uint8_t> nosbazar::noscrypto::Client::login_decrypt(const std::vecto
 	std::vector<uint8_t> output;
 
 	for (uint8_t b : packet) {
-		uint8_t v = static_cast<uint8_t>(((b - 0x0F) ^ 0xC3) & 0xFF);
+		uint8_t v = static_cast<uint8_t>((b - 0x0F) & 0xFF);
 		output.push_back(v);
 	}
 
@@ -193,7 +193,7 @@ std::vector<uint8_t> nosbazar::noscrypto::Client::world_encrypt(const std::vecto
 std::vector<uint8_t> nosbazar::noscrypto::Client::world_decrypt(const std::vector<uint8_t>& packet, uint32_t session, bool is_first_packet)
 {
 	std::vector<uint8_t> xored = world_xor(packet, session, is_first_packet);
-	return unpack(xored, decryption_table);
+	return unpack(xored);
 }
 
 std::vector<uint8_t> nosbazar::noscrypto::Client::world_xor(const std::vector<uint8_t>& packet, uint32_t session, bool is_first_packet)
@@ -231,6 +231,11 @@ std::vector<uint8_t> nosbazar::noscrypto::Client::world_xor(const std::vector<ui
 	}
 
 	return output;
+}
+
+std::vector<uint8_t> nosbazar::noscrypto::Client::unpack(const std::vector<uint8_t>& packet)
+{
+	return ::unpack(packet, decryption_table);
 }
 
 std::vector<uint8_t> nosbazar::noscrypto::Server::login_encrypt(std::vector<uint8_t> packet)

@@ -9,6 +9,7 @@
 #include <crypto/uuid.h>
 #include <crypto/hash.h>
 #include <fstream>
+#include <env.h>
 
 using json = nlohmann::json;
 
@@ -29,6 +30,8 @@ nosbazar::auth::NosAuth::NosAuth(std::shared_ptr<Identity> identity, std::string
 	init_all_certs();
 	init_game_session_id();
 	init_cert();
+	init_installation_id();
+	
 }
 
 nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const AuthParams& params)
@@ -286,4 +289,10 @@ void nosbazar::auth::NosAuth::init_cert()
 	std::ostringstream stream;
 	stream << file.rdbuf();
 	cert = stream.str();
+}
+
+void nosbazar::auth::NosAuth::init_installation_id()
+{
+	Env env;
+	installation_id = env.installation_id;
 }

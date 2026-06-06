@@ -12,14 +12,17 @@ namespace nosbazar::noscrypto {
     {
     public:
 
-        static std::vector<uint8_t> login_encrypt(std::vector<uint8_t> packet);
+        [[nodiscard]] static std::vector<uint8_t> login_encrypt(const std::vector<uint8_t> packet);
 
-        static std::vector<uint8_t> login_decrypt(const std::vector<uint8_t>& packet);
+        [[nodiscard]] static std::vector<uint8_t> login_decrypt(const std::vector<uint8_t>& packet);
 
-        static std::vector<uint8_t> world_encrypt(const std::vector<uint8_t>& packet);
+        [[nodiscard]] static std::vector<uint8_t> world_encrypt(const std::vector<uint8_t>& packet);
 
-        static std::vector<uint8_t> world_decrypt(const std::vector<uint8_t>& packet, uint32_t session, bool is_first_packet = false);
+        [[nodiscard]] static std::vector<uint8_t> world_decrypt(const std::vector<uint8_t>& packet, uint32_t session, bool is_first_packet = false);
 
+        [[nodiscard]] static std::vector<uint8_t> world_xor(const std::vector<uint8_t>& packet, uint32_t session, bool is_first_packet);
+
+        [[nosicard]] static std::vector<uint8_t> unpack(const std::vector<uint8_t>& packet);
     private:
         static inline constexpr std::array<uint8_t, 16> encryption_table =
         {
@@ -36,21 +39,19 @@ namespace nosbazar::noscrypto {
             0x34, 0x35, 0x36, 0x37,
             0x38, 0x39, 0xFF, 0x00
         };
-
-        static std::vector<uint8_t> world_xor(const std::vector<uint8_t>& packet, uint32_t session, bool is_first_packet);
     };
 
     class Server
     {
     public:
 
-        static std::vector<uint8_t> login_encrypt(std::vector<uint8_t> packet);
+        [[nodiscard]] static std::vector<uint8_t> login_encrypt(std::vector<uint8_t> packet);
 
-        static std::vector<uint8_t> login_decrypt(const std::vector<uint8_t>& packet);
+        [[nodiscard]] static std::vector<uint8_t> login_decrypt(const std::vector<uint8_t>& packet);
 
-        static std::vector<uint8_t> world_encrypt(const std::vector<uint8_t>& packet, uint32_t session, bool is_first_packet = false);
+        [[nodiscard]] static std::vector<uint8_t> world_encrypt(const std::vector<uint8_t>& packet, uint32_t session, bool is_first_packet = false);
 
-        static std::vector<uint8_t> world_decrypt(const std::vector<uint8_t>& packet);
+        [[nodiscard]] static std::vector<uint8_t> world_decrypt(const std::vector<uint8_t>& packet);
 
     private:
 
