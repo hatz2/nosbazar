@@ -17,13 +17,13 @@ namespace {
 }
 
 
-std::expected<Response, Error> nosbazar::net::post(std::string_view url, std::string_view body, const std::vector<std::string>& headers)
+std::expected<Response, CurlError> nosbazar::net::post(std::string_view url, std::string_view body, const std::vector<std::string>& headers)
 {
     Response response;
     CURL* curl = curl_easy_init();
 
     if (!curl) {
-        return std::unexpected(Error::curl_init);
+        return std::unexpected(CurlError::curl_init);
     }
 
     std::string response_body;
@@ -58,7 +58,7 @@ std::expected<Response, Error> nosbazar::net::post(std::string_view url, std::st
         curl_slist_free_all(curl_headers);
         curl_easy_cleanup(curl);
 
-        return std::unexpected(Error::curl_easy_perform);
+        return std::unexpected(CurlError::curl_easy_perform);
     }
     else
     {
@@ -73,13 +73,13 @@ std::expected<Response, Error> nosbazar::net::post(std::string_view url, std::st
     return response;
 }
 
-std::expected<Response, Error> nosbazar::net::get(std::string_view url, const std::vector<std::string>& headers)
+std::expected<Response, CurlError> nosbazar::net::get(std::string_view url, const std::vector<std::string>& headers)
 {
     Response response;
     CURL* curl = curl_easy_init();
 
     if (!curl) {
-        return std::unexpected(Error::curl_init);
+        return std::unexpected(CurlError::curl_init);
     }
 
     std::string data;
@@ -112,7 +112,7 @@ std::expected<Response, Error> nosbazar::net::get(std::string_view url, const st
         curl_slist_free_all(curl_headers);
         curl_easy_cleanup(curl);
 
-        return std::unexpected(Error::curl_easy_perform);
+        return std::unexpected(CurlError::curl_easy_perform);
     }
     else
     {

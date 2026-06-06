@@ -32,6 +32,8 @@ namespace nosbazar::auth {
 
 		[[nodiscard]] std::optional<std::string> get_session_token(const std::string& account_id) const;
 
+		void set_login_token(const std::string& token);
+
 	private:
 		struct UserInfo {
 			std::string gf_account_id;

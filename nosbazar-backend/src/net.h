@@ -16,14 +16,14 @@ namespace nosbazar::net {
 		std::string body;
 	};
 
-	enum class Error {
+	enum class CurlError {
 		curl_init,
 		curl_easy_perform,
 	};
 
-	std::expected<Response, Error> post(std::string_view url, std::string_view body, const std::vector<std::string>& headers = {});
+	std::expected<Response, CurlError> post(std::string_view url, std::string_view body, const std::vector<std::string>& headers = {});
 
-	std::expected<Response, Error> get(std::string_view url, const std::vector<std::string>& headers = {});
+	std::expected<Response, CurlError> get(std::string_view url, const std::vector<std::string>& headers = {});
 
 	class PacketAcumulator {
 	public:

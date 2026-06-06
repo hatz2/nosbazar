@@ -8,6 +8,7 @@
 #include <strings/hex.h>
 #include <nosclient.h>
 #include "env.h"
+#include <auth/token_repository.h>
 
 void handle_nstest(const std::string packet) {
 	SPDLOG_DEBUG(packet);
@@ -31,7 +32,26 @@ int main(int argc, char** argv) {
 
 	auto identity = std::make_shared<nosbazar::auth::Identity>(env.identity_path);
 	nosbazar::auth::NosAuth nosauth(identity);
-	auto result = nosauth.authenticate({ .email = env.gf_email, .password = env.gf_password});
+
+	// Check if we already have a login token
+	auto& token_repo = nosbazar::auth::TokenRepository::instance();
+	auto login_token = token_repo.get_token(env.gf_email);
+
+	if (login_token) {
+		nosauth.set_login_token(login_token.value());
+	}
+	else {
+		auto result = nosauth.authenticate({ .email = env.gf_email, .password = env.gf_password });
+
+		if (result == nosbazar::auth::NosAuth::AuthResult::captcha) {
+			// TODO: Solve captcha automatically
+		}
+
+		if (result != nosbazar::auth::NosAuth::AuthResult::ok) {
+			SPDLOG_DEBUG("Auth failed");
+			return EXIT_FAILURE;
+		}
+	}
 
 	auto accs = nosauth.get_accounts();
 

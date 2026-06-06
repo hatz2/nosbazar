@@ -10,6 +10,7 @@
 #include <crypto/hash.h>
 #include <fstream>
 #include <env.h>
+#include "token_repository.h"
 
 using json = nlohmann::json;
 
@@ -85,6 +86,7 @@ nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const 
 		
 		if (result->status_code == 201) {
 			token = json_response["token"];
+			TokenRepository::instance().add_token(params.email, token);
 			return AuthResult::ok;
 		}
 
@@ -213,6 +215,11 @@ std::optional<std::string> nosbazar::auth::NosAuth::get_session_token(const std:
 	else {
 		return std::nullopt;
 	}
+}
+
+void nosbazar::auth::NosAuth::set_login_token(const std::string& token)
+{
+	this->token = token;
 }
 
 std::optional<char> nosbazar::auth::NosAuth::get_first_number(std::string_view uuid) const

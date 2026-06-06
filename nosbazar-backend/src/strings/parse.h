@@ -10,8 +10,8 @@ namespace nosbazar::strings {
 	template<>
 	inline std::string_view token(std::string_view& s, char delim)
 	{
-		auto pos = s.find(delim);
-		auto token = s.substr(0, pos);
+		size_t pos = s.find(delim);
+		std::string_view token = s.substr(0, pos);
 		s.remove_prefix(pos == std::string_view::npos ? s.size() : pos + 1);
 		return token;
 	}
