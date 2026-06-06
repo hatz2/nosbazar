@@ -1,6 +1,7 @@
 #include "net.h"
 #include <spdlog/spdlog.h>
 #include <noscrypto.h>
+#include <strings/parse.h>
 
 using namespace nosbazar::net;
 
@@ -232,8 +233,8 @@ void nosbazar::net::Session::on_disconnect()
 
 void nosbazar::net::Session::on_packet(const std::string& packet)
 {
-    // TODO: Call handlers depending on packet header
-    std::string header = packet.substr(0, packet.find_first_of(' '));
+    std::string_view packet_view = packet;
+    std::string_view header = strings::token<std::string_view>(packet_view, ' ');
 
     if (handlers.contains(header)) {
         for (auto& handler : handlers[header]) {

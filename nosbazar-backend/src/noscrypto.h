@@ -22,7 +22,7 @@ namespace nosbazar::noscrypto {
 
         [[nodiscard]] static std::vector<uint8_t> world_xor(const std::vector<uint8_t>& packet, uint32_t session, bool is_first_packet);
 
-        [[nosicard]] static std::vector<uint8_t> unpack(const std::vector<uint8_t>& packet);
+        [[nodiscard]] static std::vector<uint8_t> unpack(const std::vector<uint8_t>& packet);
     private:
         static inline constexpr std::array<uint8_t, 16> encryption_table =
         {

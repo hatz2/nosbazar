@@ -11,6 +11,10 @@
 
 void handle_nstest(const std::string packet) {
 	SPDLOG_DEBUG(packet);
+	
+	nosbazar::packets::login::NsTeSTPacket nstest(packet);
+
+	auto session_id = nstest.session_id;
 }
 
 
@@ -45,7 +49,7 @@ int main(int argc, char** argv) {
 	asio::io_context context;
 
 	auto client = std::make_unique<nosbazar::net::TCPClient>(context);
-	client->connect("79.110.84.75", 4000);
+	client->connect(env.login_server_ip, env.login_server_port);
 
 	nosbazar::net::LoginSession login_session(std::move(client));
 
