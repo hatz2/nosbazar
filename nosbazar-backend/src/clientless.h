@@ -7,6 +7,7 @@
 #include "env.h"
 #include "packets/packet_publisher.h"
 #include "time/interval_timer.h"
+#include <game/sensors.h>
 
 namespace nosbazar {
 	class Clientless {
@@ -69,6 +70,7 @@ namespace nosbazar {
         std::unique_ptr<nosbazar::time::IntervalTimer> pulse_timer;
 
         // TODO: Add domain specific classes
+        std::unique_ptr<game::Sensors> sensors;
 
 	};
 }

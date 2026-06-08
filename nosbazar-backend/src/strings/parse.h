@@ -38,4 +38,9 @@ namespace nosbazar::strings {
 	inline std::string token(std::string_view& s, char delim) {
 		return std::string(token<std::string_view>(s, delim));
 	}
+
+	template<>
+	inline bool token(std::string_view& s, char delim) {
+		return static_cast<bool>(token<int>(s, delim));
+	}
 }

@@ -14,6 +14,7 @@ nosbazar::Clientless::Clientless(std::string_view account_name, int world_server
 	, world_server_channel(world_server_channel)
 	, identity(std::make_shared<auth::Identity>(env.identity_path))
 	, nosauth(std::make_unique<auth::NosAuth>(identity))
+    , sensors(std::make_unique<game::Sensors>(packet_publisher))
 {
     init_pulse_timer();
 }
