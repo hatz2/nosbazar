@@ -9,7 +9,7 @@
 #include <span>
 #include <queue>
 #include <unordered_map>
-#include <packet_publisher.h>
+#include <packets/packet_publisher.h>
 
 namespace nosbazar::net {
 	struct Response {

@@ -1,17 +1,6 @@
-﻿#include "net.h"
-#include <spdlog/spdlog.h>
-#include "auth/nosauth.h"
-#include "dotenv.h"
-#include <asio.hpp>
-#include <random/random.h>
-#include <login_packet.h>
-#include <strings/hex.h>
-#include <nosclient.h>
-#include "env.h"
-#include <auth/token_repository.h>
-#include <algorithm>
-#include <time/interval_timer.h>
+﻿#include "env.h"
 #include "clientless.h"
+#include <spdlog/spdlog.h>
 
 int main(int argc, char** argv) {
 #ifdef _DEBUG

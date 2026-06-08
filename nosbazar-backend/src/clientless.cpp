@@ -2,7 +2,7 @@
 #include "env.h"
 #include "nosclient.h"
 #include "auth/token_repository.h"
-#include "login_packet.h"
+#include "packets/login_packet.h"
 #include "strings/hex.h"
 #include "strings/parse.h"
 #include <algorithm>

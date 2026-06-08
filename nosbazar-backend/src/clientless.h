@@ -5,7 +5,7 @@
 #include <asio.hpp>
 #include "net.h"
 #include "env.h"
-#include "packet_publisher.h"
+#include "packets/packet_publisher.h"
 #include "time/interval_timer.h"
 
 namespace nosbazar {
