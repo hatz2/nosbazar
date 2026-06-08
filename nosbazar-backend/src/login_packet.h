@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <optional>
 
 namespace nosbazar::packets::login {
 	class NoS0577Packet {
@@ -17,23 +18,26 @@ namespace nosbazar::packets::login {
 		std::string client_hash;
 	};
 
+	struct WorldServer {
+		int id;
+		int channel;
+		int capacity;
+		uint16_t port;
+		std::string ip;
+		std::string name;
+
+		explicit WorldServer(const std::string& data);
+		WorldServer() = delete;
+	};
+
 	class NsTeSTPacket {
 	public:
 		explicit NsTeSTPacket(const std::string& packet);
 
-		struct WorldServer {
-			int id;
-			int channel;
-			int capacity;
-			uint16_t port;
-			std::string ip;
-			std::string name;
-
-			explicit WorldServer(const std::string& data);
-			WorldServer() = delete;
-		};
+		std::optional<WorldServer> find_world_server(int id, int channel);
 
 		std::vector<WorldServer> servers;
 		uint16_t session_id = 0;
+		std::string username;
 	};
 }

@@ -9,6 +9,7 @@
 #include <span>
 #include <queue>
 #include <unordered_map>
+#include <packet_publisher.h>
 
 namespace nosbazar::net {
 	struct Response {
@@ -66,13 +67,9 @@ namespace nosbazar::net {
 
 	class Session {
 	public:
-		using PacketHandler = std::function<void(const std::string&)>;
-
-		explicit Session(std::unique_ptr<TCPClient> client);
+		explicit Session(std::unique_ptr<TCPClient> client, packets::Publisher& publisher);
 
 		virtual void send(const std::string& packet) = 0;
-
-		void subscribe(std::string_view packet_header, PacketHandler handler);
 
 	protected:
 		void on_connect();
@@ -84,13 +81,13 @@ namespace nosbazar::net {
 		std::queue<std::vector<uint8_t>> pending_packets;
 
 	private:
+		packets::Publisher& publisher;
 		TCPClient::Observer observer;
-		std::unordered_map< std::string_view, std::vector<PacketHandler>> handlers;
 	};
 
 	class LoginSession : public Session {
 	public:
-		explicit LoginSession(std::unique_ptr<TCPClient> client);
+		explicit LoginSession(std::unique_ptr<TCPClient> client, packets::Publisher& publisher);
 
 		void send(const std::string& packet) override;
 
@@ -103,16 +100,17 @@ namespace nosbazar::net {
 
 	class WorldSession : public Session {
 	public:
-		explicit WorldSession(std::unique_ptr<TCPClient> client, uint32_t session_id);
+		explicit WorldSession(std::unique_ptr<TCPClient> client, packets::Publisher& publisher, uint16_t session_id);
 
 		void send(const std::string& packet) override;
 
 	protected:
 		void on_recv(std::vector<uint8_t> data) override;
 	private:
+		
 		PacketAcumulator acumulator;
-		bool is_first_packet = true;
-		uint32_t session_id;
+		uint16_t session_id;
+		uint16_t packet_counter;
 	};
 
 

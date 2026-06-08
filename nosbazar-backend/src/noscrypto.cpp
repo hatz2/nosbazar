@@ -82,13 +82,13 @@ namespace
 
 				auto it = std::find(chars_to_pack.begin(), chars_to_pack.end(), packet[pos]);
 
-				uint8_t currentValue = static_cast<uint8_t>(std::distance(chars_to_pack.begin(), it));
+				uint8_t current_value = static_cast<uint8_t>(std::distance(chars_to_pack.begin(), it));
 
 				if ((i % 2) == 0) {
-					output.push_back(static_cast<uint8_t>(currentValue << 4));
+					output.push_back(static_cast<uint8_t>(current_value << 4));
 				}
 				else {
-					output.back() |= currentValue;
+					output.back() |= current_value;
 				}
 
 				++pos;
@@ -131,13 +131,13 @@ namespace
 
 					output.push_back(chars_to_unpack[left_char]);
 
-					uint8_t rightChar = two_chars & 0x0F;
+					uint8_t right_char = two_chars & 0x0F;
 
-					if (rightChar == 0) {
+					if (right_char == 0) {
 						break;
 					}
 
-					output.push_back(chars_to_unpack[rightChar]);
+					output.push_back(chars_to_unpack[right_char]);
 				}
 			}
 			else {
@@ -185,15 +185,15 @@ std::vector<uint8_t> nosbazar::noscrypto::Client::login_decrypt(const std::vecto
 	return output;
 }
 
-std::vector<uint8_t> nosbazar::noscrypto::Client::world_encrypt(const std::vector<uint8_t>& packet)
+std::vector<uint8_t> nosbazar::noscrypto::Client::world_encrypt(const std::vector<uint8_t>& packet, uint16_t session, bool is_first_packet)
 {
-	return pack(packet, encryption_table);
+	auto packed = pack(packet, encryption_table);
+	return world_xor(packed, session, is_first_packet);
 }
 
-std::vector<uint8_t> nosbazar::noscrypto::Client::world_decrypt(const std::vector<uint8_t>& packet, uint32_t session, bool is_first_packet)
+std::vector<uint8_t> nosbazar::noscrypto::Client::world_decrypt(const std::vector<uint8_t>& packet)
 {
-	std::vector<uint8_t> xored = world_xor(packet, session, is_first_packet);
-	return unpack(xored);
+	return unpack(packet);
 }
 
 std::vector<uint8_t> nosbazar::noscrypto::Client::world_xor(const std::vector<uint8_t>& packet, uint32_t session, bool is_first_packet)
@@ -207,23 +207,23 @@ std::vector<uint8_t> nosbazar::noscrypto::Client::world_xor(const std::vector<ui
 
 		switch (stype) {
 		case 0:
-			value = static_cast<uint8_t>((i - key - 0x40) & 0xFF);
-			break;
-
-		case 1:
 			value = static_cast<uint8_t>((i + key + 0x40) & 0xFF);
 			break;
 
+		case 1:
+			value = static_cast<uint8_t>((i - key - 0x40) & 0xFF);
+			break;
+
 		case 2:
-			value = static_cast<uint8_t>(((i - key - 0x40) ^ 0xC3) & 0xFF);
+			value = static_cast<uint8_t>(((i ^ 0xC3) + key + 0x40) & 0xFF);
 			break;
 
 		case 3:
-			value = static_cast<uint8_t>(((i + key + 0x40) ^ 0xC3) & 0xFF);
+			value = static_cast<uint8_t>(((i ^ 0xC3) - key - 0x40) & 0xFF);
 			break;
 
 		default:
-			value = static_cast<uint8_t>((i - 0x0F) & 0xFF);
+			value = static_cast<uint8_t>((i + 0xF) & 0xFF);
 			break;
 		}
 

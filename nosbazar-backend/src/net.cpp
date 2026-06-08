@@ -2,6 +2,7 @@
 #include <spdlog/spdlog.h>
 #include <noscrypto.h>
 #include <strings/parse.h>
+#include <random/random.h>
 
 using namespace nosbazar::net;
 
@@ -132,6 +133,7 @@ nosbazar::net::TCPClient::TCPClient(asio::io_context& context)
     , socket(context)
     , read_buffer{}
 {
+
 }
 
 void nosbazar::net::TCPClient::connect(const std::string& ip, unsigned short port)
@@ -195,7 +197,7 @@ void nosbazar::net::TCPClient::do_recv()
     });
 }
 
-nosbazar::net::Session::Session(std::unique_ptr<TCPClient> client) : client(std::move(client))
+nosbazar::net::Session::Session(std::unique_ptr<TCPClient> client, packets::Publisher& publisher) : client(std::move(client)), publisher(publisher)
 {
     std::function<void()> on_connect_cb = [this]() {
         on_connect();
@@ -216,11 +218,6 @@ nosbazar::net::Session::Session(std::unique_ptr<TCPClient> client) : client(std:
     };
 }
 
-void nosbazar::net::Session::subscribe(std::string_view packet_header, PacketHandler handler)
-{
-    handlers[packet_header].push_back(handler);
-}
-
 void nosbazar::net::Session::on_connect()
 {
     SPDLOG_DEBUG("Session::on_connect");
@@ -233,18 +230,11 @@ void nosbazar::net::Session::on_disconnect()
 
 void nosbazar::net::Session::on_packet(const std::string& packet)
 {
-    std::string_view packet_view = packet;
-    std::string_view header = strings::token<std::string_view>(packet_view, ' ');
-
-    if (handlers.contains(header)) {
-        for (auto& handler : handlers[header]) {
-            handler(packet);
-        }
-    }
+    publisher.publish(packet);
 }
 
-nosbazar::net::LoginSession::LoginSession(std::unique_ptr<TCPClient> client) 
-    : Session(std::move(client))
+nosbazar::net::LoginSession::LoginSession(std::unique_ptr<TCPClient> client, packets::Publisher& publisher)
+    : Session(std::move(client), publisher)
     , acumulator(0xA)
 {
 }
@@ -270,30 +260,40 @@ void nosbazar::net::LoginSession::on_recv(std::vector<uint8_t> data)
     }
 }
 
-nosbazar::net::WorldSession::WorldSession(std::unique_ptr<TCPClient> client, uint32_t session_id)
-    : Session(std::move(client))
+nosbazar::net::WorldSession::WorldSession(std::unique_ptr<TCPClient> client, packets::Publisher& publisher, uint16_t session_id)
+    : Session(std::move(client), publisher)
     , session_id(session_id)
     , acumulator(0xFF)
+    , packet_counter(random::random_int(static_cast<uint16_t>(0), UINT16_MAX))
 {
 }
 
 void nosbazar::net::WorldSession::send(const std::string& packet)
 {
-    std::vector<uint8_t> raw(packet.begin(), packet.end());
-    std::vector<uint8_t> encrypted = noscrypto::Client::world_encrypt(raw);
+    static bool is_first_packet = true;
+
+    std::string packet_with_count = fmt::format("{} {}", packet_counter++, packet);
+    std::vector<uint8_t> raw(packet_with_count.begin(), packet_with_count.end());
+    std::vector<uint8_t> encrypted = noscrypto::Client::world_encrypt(raw, session_id, is_first_packet);
     client->send(encrypted);
+
+    is_first_packet = false;
 }
 
 void nosbazar::net::WorldSession::on_recv(std::vector<uint8_t> data)
 {
-    std::vector<uint8_t> xored = noscrypto::Client::world_xor(data, session_id, is_first_packet);
-    acumulator.process(xored, pending_packets);
+    acumulator.process(data, pending_packets);
 
+    // Process pending packets
     while (!pending_packets.empty()) {
-        auto raw_xored_packet = std::move(pending_packets.front());
-        auto unpacked = noscrypto::Client::unpack(raw_xored_packet);
+        auto raw_packet = std::move(pending_packets.front());
+        auto unpacked = noscrypto::Client::world_decrypt(raw_packet);
         std::string packet(unpacked.begin(), unpacked.end());
         pending_packets.pop();
+
+        if (packet.back() == '\n') {
+            packet.pop_back();
+        }
 
         on_packet(packet);
     }

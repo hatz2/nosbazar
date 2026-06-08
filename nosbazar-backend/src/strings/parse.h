@@ -5,7 +5,7 @@
 
 namespace nosbazar::strings {
 	template<typename T>
-	T token(std::string_view& s, char delim);
+	T token(std::string_view& s, char delim = ' ');
 
 	template<>
 	inline std::string_view token(std::string_view& s, char delim)
