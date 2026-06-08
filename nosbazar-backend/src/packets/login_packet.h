@@ -32,7 +32,7 @@ namespace nosbazar::packets::login {
 
 	class NsTeSTPacket {
 	public:
-		explicit NsTeSTPacket(const std::string& packet);
+		explicit NsTeSTPacket(std::string_view packet);
 
 		std::optional<WorldServer> find_world_server(int id, int channel);
 

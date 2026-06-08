@@ -176,7 +176,7 @@ void nosbazar::Clientless::phase_game()
     // no need to call it again
 }
 
-void nosbazar::Clientless::on_nstest(const std::string& packet)
+void nosbazar::Clientless::on_nstest(std::string_view packet)
 {
     SPDLOG_DEBUG("NsTeST: {}", packet);
 
@@ -204,13 +204,12 @@ void nosbazar::Clientless::on_nstest(const std::string& packet)
     };
 }
 
-void nosbazar::Clientless::on_clist(const std::string& packet)
+void nosbazar::Clientless::on_clist(std::string_view packet)
 {
     SPDLOG_DEBUG("clist: {}", packet);
 
-    std::string_view packet_view;
-    std::string_view header = strings::token<std::string_view>(packet_view);
-    int char_index = strings::token<int>(packet_view);
+    std::string_view header = strings::token<std::string_view>(packet);
+    int char_index = strings::token<int>(packet);
 
     // Save the lowest possible index (first slot character)
     if (first_char_index < 0) {
@@ -221,7 +220,7 @@ void nosbazar::Clientless::on_clist(const std::string& packet)
     }
 }
 
-void nosbazar::Clientless::on_clist_end(const std::string& packet)
+void nosbazar::Clientless::on_clist_end(std::string_view packet)
 {
     if (first_char_index < 0) {
         SPDLOG_ERROR("No character was found in the account");
@@ -237,7 +236,7 @@ void nosbazar::Clientless::on_clist_end(const std::string& packet)
     world_session->send("lbs 0");
 }
 
-void nosbazar::Clientless::on_ok(const std::string& packet)
+void nosbazar::Clientless::on_ok(std::string_view packet)
 {
     SPDLOG_INFO("Server ready - starting game phase");
     phase_game();

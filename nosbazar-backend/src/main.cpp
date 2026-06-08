@@ -11,6 +11,6 @@ int main(int argc, char** argv) {
 
 	Env env;
 	nosbazar::Clientless client(env.account_id, env.world_server_id, env.world_server_channel);
-	client.run();
+	return static_cast<int>(client.run());
 }
 

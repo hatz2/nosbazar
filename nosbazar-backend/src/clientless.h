@@ -33,11 +33,11 @@ namespace nosbazar {
         bool phase_world();
         void phase_game();
 
-        void on_nstest(const std::string& packet);
+        void on_nstest(std::string_view packet);
         
-        void on_clist(const std::string& packet);
-        void on_clist_end(const std::string& packet);
-        void on_ok(const std::string& packet);
+        void on_clist(std::string_view packet);
+        void on_clist_end(std::string_view packet);
+        void on_ok(std::string_view packet);
 
         // Data obtained during the login protocol
         struct LoginResult {

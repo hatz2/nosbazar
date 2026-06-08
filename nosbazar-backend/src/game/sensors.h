@@ -3,6 +3,7 @@
 #include <packets/packet_publisher.h>
 #include <memory>
 #include <unordered_map>
+#include <optional>
 
 namespace nosbazar::game {
 	struct SelfPlayer {
