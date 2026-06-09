@@ -1,30 +1,44 @@
 #include "sensors.h"
+
 #include <packets/in.h>
 #include <packets/c_map.h>
 #include <packets/gp_packet.h>
+#include <packets/at.h>
+#include <packets/cond.h>
+
 #include <spdlog/spdlog.h>
 #include "constants.h"
 
 namespace nosbazar::game {
 	SelfPlayer::SelfPlayer(packets::Publisher& publisher)
 	{
-		
+		publisher.subscribe(packets::At::opcode, [this](auto& packet) { on_at(packet); });
+		publisher.subscribe(packets::Cond::opcode, [this](auto& packet) { on_cond(packet); });
 	}
 
 	void SelfPlayer::on_at(std::string_view packet)
 	{
+		packets::At at_packet(packet);
+		id = at_packet.character_id;
+		x = at_packet.x;
+		y = at_packet.y;
+		map_id = at_packet.map_id;
 	}
 
 	void SelfPlayer::on_cond(std::string_view packet)
 	{
-
+		packets::Cond cond_packet(packet);
+		
+		if (cond_packet.entity_type == game::EntityType::player && cond_packet.entity_id == this->id) {
+			speed = cond_packet.speed;
+		}
 	}
 
 	Scene::Scene(packets::Publisher& publisher)
 	{
-		publisher.subscribe(packets::In::opcode, [this](const std::string& packet) { on_in(packet); });
-		publisher.subscribe(packets::CMap::opcode, [this](const std::string& packet) { on_cmap(packet); });
-		publisher.subscribe(packets::Gp::opcode, [this](const std::string& packet) { on_gp(packet); });
+		publisher.subscribe(packets::In::opcode, [this](auto& packet) { on_in(packet); });
+		publisher.subscribe(packets::CMap::opcode, [this](auto& packet) { on_cmap(packet); });
+		publisher.subscribe(packets::Gp::opcode, [this](auto& packet) { on_gp(packet); });
 	}
 
 	std::optional<Portal> Scene::find_bazar_portal() const
@@ -38,6 +52,19 @@ namespace nosbazar::game {
 		}
 
 		return *it;
+	}
+
+	std::optional<Npc> Scene::find_bazar_npc() const
+	{
+		auto it = std::find_if(npcs.begin(), npcs.end(), [](const std::pair<int, Npc>& npc) {
+			return npc.second.vnum == vnums::bazar_npc;
+		});
+
+		if (it == npcs.end()) {
+			return std::nullopt;
+		}
+
+		return it->second;
 	}
 
 	void Scene::on_in(std::string_view packet)

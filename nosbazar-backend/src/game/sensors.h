@@ -31,9 +31,9 @@ namespace nosbazar::game {
 	};
 
 	struct Portal {
-		int x;
-		int y;
-		int next_map_id;
+		int x{};
+		int y{};
+		int next_map_id{};
 	};
 
 	struct Scene {
@@ -43,6 +43,8 @@ namespace nosbazar::game {
 		explicit Scene(packets::Publisher& publisher);
 
 		std::optional<Portal> find_bazar_portal() const;
+
+		std::optional<Npc> find_bazar_npc() const;
 
 	private:
 		void on_in(std::string_view packet);
