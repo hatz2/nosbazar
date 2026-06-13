@@ -17,10 +17,16 @@ namespace nosbazar::game {
 
 		explicit SelfPlayer(packets::Publisher& publisher);
 
+		bool wants_to_walk() const;
+
+		int walk_step() const;
+
+		bool is_loaded() const;
+
 	private:
 		void on_at(std::string_view packet);
 		void on_cond(std::string_view packet);
-
+		void on_walk(std::string_view packet);
 	};
 
 	struct Npc {

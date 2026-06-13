@@ -1,7 +1,7 @@
 #include "state_machine.h"
 #include <random/random.h>
 
-nosbazar::agent::StateMachine::StateMachine(const std::vector<State>& states)
+nosbazar::agent::StateMachine::StateMachine(const std::vector<std::shared_ptr<State>>& states)
 	: states(states)
 {
 
@@ -10,8 +10,8 @@ nosbazar::agent::StateMachine::StateMachine(const std::vector<State>& states)
 bool nosbazar::agent::StateMachine::act(const game::Sensors& sensors)
 {
 	for (auto& state : states) {
-		if (state.should_execute(sensors)) {
-			state.act(sensors);
+		if (state->should_execute(sensors)) {
+			state->act(sensors);
 			return true;
 		}
 	}

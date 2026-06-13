@@ -2,9 +2,10 @@
 
 #include <packets/in.h>
 #include <packets/c_map.h>
-#include <packets/gp_packet.h>
+#include <packets/gp.h>
 #include <packets/at.h>
 #include <packets/cond.h>
+#include <packets/walk.h>
 
 #include <spdlog/spdlog.h>
 #include "constants.h"
@@ -14,6 +15,30 @@ namespace nosbazar::game {
 	{
 		publisher.subscribe(packets::At::opcode, [this](auto& packet) { on_at(packet); });
 		publisher.subscribe(packets::Cond::opcode, [this](auto& packet) { on_cond(packet); });
+		publisher.subscribe(packets::Walk::opcode, [this](auto& packet) { on_walk(packet); });
+	}
+
+	bool SelfPlayer::wants_to_walk() const
+	{
+		if (!is_loaded()) {
+			return false;
+		}
+
+		if (dest_x != 0 && dest_y != 0) {
+			return x != dest_x || y != dest_y;
+		}
+
+		return false;
+	}
+
+	int SelfPlayer::walk_step() const
+	{
+		return (speed + 1)/ 3;
+	}
+
+	bool SelfPlayer::is_loaded() const
+	{
+		return x && y && id && map_id && speed;
 	}
 
 	void SelfPlayer::on_at(std::string_view packet)
@@ -31,6 +56,18 @@ namespace nosbazar::game {
 		
 		if (cond_packet.entity_type == game::EntityType::player && cond_packet.entity_id == this->id) {
 			speed = cond_packet.speed;
+		}
+	}
+
+	void SelfPlayer::on_walk(std::string_view packet)
+	{
+		packets::Walk walk_packet(packet);
+		x = walk_packet.x;
+		y = walk_packet.y;
+
+		if (x == dest_x && y == dest_y) {
+			dest_x = 0;
+			dest_y = 0;
 		}
 	}
 

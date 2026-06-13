@@ -233,6 +233,11 @@ void nosbazar::net::Session::on_packet(const std::string& packet)
     publisher.publish(packet);
 }
 
+void nosbazar::net::Session::on_send(const std::string& packet)
+{
+    publisher.publish(packet);
+}
+
 nosbazar::net::LoginSession::LoginSession(std::unique_ptr<TCPClient> client, packets::Publisher& publisher)
     : Session(std::move(client), publisher)
     , acumulator(0xA)
@@ -241,6 +246,8 @@ nosbazar::net::LoginSession::LoginSession(std::unique_ptr<TCPClient> client, pac
 
 void nosbazar::net::LoginSession::send(const std::string& packet)
 {
+    on_send(packet);
+
     std::vector<uint8_t> raw(packet.begin(), packet.end());
     std::vector<uint8_t> encrypted = noscrypto::Client::login_encrypt(raw);
     client->send(encrypted);
@@ -271,6 +278,8 @@ nosbazar::net::WorldSession::WorldSession(std::unique_ptr<TCPClient> client, pac
 void nosbazar::net::WorldSession::send(const std::string& packet)
 {
     static bool is_first_packet = true;
+
+    on_send(packet);
 
     std::string packet_with_count = fmt::format("{} {}", packet_counter++, packet);
     std::vector<uint8_t> raw(packet_with_count.begin(), packet_with_count.end());

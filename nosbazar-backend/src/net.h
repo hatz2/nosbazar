@@ -76,6 +76,7 @@ namespace nosbazar::net {
 		void on_disconnect();
 		virtual void on_recv(std::vector<uint8_t> data) = 0;
 		void on_packet(const std::string& packet);
+		void on_send(const std::string& packet);
 
 		std::unique_ptr<TCPClient> client;
 		std::queue<std::vector<uint8_t>> pending_packets;

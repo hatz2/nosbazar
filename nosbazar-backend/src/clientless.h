@@ -8,6 +8,7 @@
 #include "packets/packet_publisher.h"
 #include "time/interval_timer.h"
 #include <game/sensors.h>
+#include <agent/agent.h>
 
 namespace nosbazar {
 	class Clientless {
@@ -60,7 +61,7 @@ namespace nosbazar {
         asio::io_context login_context;
         asio::io_context world_context;
         std::unique_ptr<net::LoginSession> login_session;
-        std::unique_ptr<net::WorldSession> world_session;
+        std::shared_ptr<net::WorldSession> world_session;
 
         std::optional<LoginResult> login_result;
 
@@ -71,6 +72,10 @@ namespace nosbazar {
 
         // TODO: Add domain specific classes
         std::unique_ptr<game::Sensors> sensors;
+
+        std::function<void()> schedule_tick;
+        std::unique_ptr<asio::steady_timer> agent_timer;
+        std::unique_ptr<agent::Agent> agent;
 
 	};
 }

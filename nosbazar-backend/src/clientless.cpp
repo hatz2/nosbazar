@@ -15,6 +15,7 @@ nosbazar::Clientless::Clientless(std::string_view account_name, int world_server
 	, identity(std::make_shared<auth::Identity>(env.identity_path))
 	, nosauth(std::make_unique<auth::NosAuth>(identity))
     , sensors(std::make_unique<game::Sensors>(packet_publisher))
+    , agent(nullptr)
 {
     init_pulse_timer();
 }
@@ -129,7 +130,7 @@ bool nosbazar::Clientless::phase_world()
     auto client = std::make_unique<net::TCPClient>(world_context);
     client->connect(lr.world_ip, lr.world_port);
 
-    world_session = std::make_unique<net::WorldSession>(std::move(client), packet_publisher, lr.session_id);
+    world_session = std::make_shared<net::WorldSession>(std::move(client), packet_publisher, lr.session_id);
 
     // Subscribe to packets
     packet_publisher.subscribe("clist", [this](const std::string& p) { on_clist(p); });
@@ -150,25 +151,27 @@ bool nosbazar::Clientless::phase_world()
 void nosbazar::Clientless::phase_game()
 {
     // Make domain instances
-    //sensors = std::make_unique<GameSensors>(bus);
     //game_state = std::make_unique<GameState>(bus);
-    //agent = std::make_unique<BotAgent>(bus, *sensors, *game_state, *world_session);
+    agent = std::make_unique<agent::Agent>(*world_session);
 
     // Pulse packet keep alive
     pulse_timer->start();
 
     // Agent tick is integrated into io_context to avoid blocking the main thread
-    auto agent_timer = std::make_shared<asio::steady_timer>(world_context);
+    agent_timer = std::make_unique<asio::steady_timer>(world_context);
 
-    std::function<void()> schedule_tick = [&]() {
-        agent_timer->expires_after(std::chrono::milliseconds(100));
+    schedule_tick = [&]() {
+        agent_timer->expires_after(std::chrono::milliseconds(10));
         agent_timer->async_wait([&](const asio::error_code& ec) {
             if (!ec) {
-                //agent->tick();
+                agent->run(*sensors);
                 schedule_tick();
             }
-            });
-        };
+            else {
+                SPDLOG_ERROR(ec.message());
+            }
+        });
+    };
 
     schedule_tick();
 

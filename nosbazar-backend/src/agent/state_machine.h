@@ -27,11 +27,11 @@ namespace nosbazar::agent {
 
 	class StateMachine {
 	public:
-		explicit StateMachine(const std::vector<State>& states);
+		explicit StateMachine(const std::vector<std::shared_ptr<State>>& states);
 		bool act(const game::Sensors& sensors);
 
 	private:
-		std::vector<State> states;
+		std::vector<std::shared_ptr<State>> states;
 	};
 
 	class StateMachineDirector {
