@@ -22,7 +22,7 @@ namespace nosbazar::agent {
 	private:
 		void generate_random_pos_around_npc(const game::Sensors& sensors);
 
-		static constexpr int min_dist = 1;
+		static constexpr int min_dist = 2;
 		bool generated_pos{ false };
 		int move_x{};
 		int move_y{};
