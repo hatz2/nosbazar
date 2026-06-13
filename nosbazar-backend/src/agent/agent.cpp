@@ -1,6 +1,7 @@
 #include "agent.h"
 #include "walk_state.h"
 #include "walk_think_state.h"
+#include "open_bazar_state.h"
 
 nosbazar::agent::Agent::Agent(net::WorldSession& session)
 {
@@ -8,7 +9,8 @@ nosbazar::agent::Agent::Agent(net::WorldSession& session)
 		std::make_shared<WalkState>(session),
 		std::make_shared<BazarPortalEnterState>(session),
 		std::make_shared<BazarNpcWalkState>(),
-		std::make_shared<BazarPortalWalkState>()
+		std::make_shared<BazarPortalWalkState>(),
+		std::make_shared<OpenBazarState>(session)
 	};
 
 	state_machine = std::make_unique<StateMachine>(states);

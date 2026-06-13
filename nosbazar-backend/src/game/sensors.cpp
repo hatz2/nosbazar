@@ -155,7 +155,13 @@ namespace nosbazar::game {
 		: scene(std::make_unique<Scene>(publisher))
 		, self_player(std::make_unique<SelfPlayer>(publisher))
 	{
-		
+		publisher.subscribe("wopen", [this](auto& packet) { on_wopen(packet); });
+	}
+
+	void Sensors::on_wopen(std::string_view packet)
+	{
+		SPDLOG_DEBUG("Bazar opened");
+		is_bazar_opened = true;
 	}
 
 }

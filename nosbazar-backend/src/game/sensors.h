@@ -64,5 +64,9 @@ namespace nosbazar::game {
 
 		std::unique_ptr<Scene> scene;
 		std::unique_ptr<SelfPlayer> self_player;
+		bool is_bazar_opened{ false };
+
+	private:
+		void on_wopen(std::string_view packet);
 	};
 }
