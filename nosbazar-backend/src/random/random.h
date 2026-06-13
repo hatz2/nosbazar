@@ -55,4 +55,14 @@ namespace nosbazar::random {
 
         return result;
     }
+
+    inline std::string random_character_name(size_t size) {
+        std::string result;
+
+        for (size_t i = 0; i < size; ++i) {
+            result += random_character('a', 'z');
+        }
+
+        return result;
+    }
 }

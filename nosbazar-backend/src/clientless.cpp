@@ -7,6 +7,7 @@
 #include "strings/parse.h"
 #include <algorithm>
 #include <spdlog/spdlog.h>
+#include <random/random.h>
 
 nosbazar::Clientless::Clientless(std::string_view account_name, int world_server_id, int world_server_channel)
 	: account_id(account_name)
@@ -133,9 +134,11 @@ bool nosbazar::Clientless::phase_world()
     world_session = std::make_shared<net::WorldSession>(std::move(client), packet_publisher, lr.session_id);
 
     // Subscribe to packets
-    packet_publisher.subscribe("clist", [this](const std::string& p) { on_clist(p); });
-    packet_publisher.subscribe("clist_end", [this](const std::string& p) { on_clist_end(p); });
-    packet_publisher.subscribe("OK", [this](const std::string& p) { on_ok(p); });
+    packet_publisher.subscribe("clist", [this](auto& packet) { on_clist(packet); });
+    packet_publisher.subscribe("clist_end", [this](auto& packet) { on_clist_end(packet); });
+    packet_publisher.subscribe("OK", [this](auto& packet) { on_ok(packet); });
+    packet_publisher.subscribe("infoi", [this](auto& packet) { on_infoi(packet); });
+    packet_publisher.subscribe("success", [this](auto& packet) { on_success(packet); });
 
     // Initial packets sent to the server
     world_session->send(fmt::format("{}", lr.session_id));
@@ -226,10 +229,8 @@ void nosbazar::Clientless::on_clist(std::string_view packet)
 void nosbazar::Clientless::on_clist_end(std::string_view packet)
 {
     if (first_char_index < 0) {
-        SPDLOG_ERROR("No character was found in the account");
-
-        // TODO: Create new character if no characters are in the account
-        world_context.stop();
+        SPDLOG_DEBUG("No character was found in the account");
+        create_character();
         return;
     }
 
@@ -243,6 +244,30 @@ void nosbazar::Clientless::on_ok(std::string_view packet)
 {
     SPDLOG_INFO("Server ready - starting game phase");
     phase_game();
+}
+
+void nosbazar::Clientless::on_infoi(std::string_view packet)
+{
+    std::string_view character_name_already_in_use = "infoi 875 0 0 0";
+
+    if (packet == character_name_already_in_use) {
+        SPDLOG_DEBUG("Character name is already in use");
+        create_character();
+    }
+}
+
+void nosbazar::Clientless::on_success(std::string_view packet)
+{
+    SPDLOG_DEBUG("Character created successfully");
+}
+
+void nosbazar::Clientless::create_character()
+{
+    constexpr size_t name_length = 14;
+    std::string name = random::random_character_name(name_length);
+    world_session->send(fmt::format("Char_NEW {} 0 1 0 9", name));
+
+    SPDLOG_DEBUG("Creating character {}", name);
 }
 
 void nosbazar::Clientless::init_pulse_timer()

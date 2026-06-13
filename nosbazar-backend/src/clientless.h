@@ -39,6 +39,10 @@ namespace nosbazar {
         void on_clist(std::string_view packet);
         void on_clist_end(std::string_view packet);
         void on_ok(std::string_view packet);
+        void on_infoi(std::string_view packet);
+        void on_success(std::string_view packet);
+
+        void create_character();
 
         // Data obtained during the login protocol
         struct LoginResult {
