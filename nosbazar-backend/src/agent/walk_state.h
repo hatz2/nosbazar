@@ -2,8 +2,8 @@
 
 #include "state_machine.h"
 #include <map_grid_repository.h>
-#include <chrono>
 #include <net.h>
+#include <time/elapsed_timer.h>
 
 namespace nosbazar::agent {
 	class WalkState : public State {
@@ -18,7 +18,7 @@ namespace nosbazar::agent {
 		void walk(const game::Sensors& sensors);
 
 		std::vector<nosbazar::MapGrid::Cell> path;
-		std::chrono::steady_clock::time_point last_walk_time;
+		time::ElapsedTimer elapsed_timer;
 		net::WorldSession& session;
 	};
 }

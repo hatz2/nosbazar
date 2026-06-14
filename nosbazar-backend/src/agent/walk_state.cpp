@@ -4,7 +4,6 @@
 
 nosbazar::agent::WalkState::WalkState(net::WorldSession& session) 
 	: session(session)
-	, last_walk_time(std::chrono::steady_clock::now())
 {
 }
 
@@ -58,11 +57,10 @@ void nosbazar::agent::WalkState::walk(const game::Sensors& sensors)
 	}
 
 	constexpr auto walk_time_ms = 750;
-	auto now = std::chrono::steady_clock::now();
-	auto time_diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_walk_time).count();
 
-	if (time_diff > walk_time_ms) {
-		last_walk_time = std::chrono::steady_clock::now();
+	if (elapsed_timer.elapsed() > walk_time_ms) {
+		elapsed_timer.start();
+
 		nosbazar::MapGrid::Cell cell;
 
 		// Skip first STEP - 1 cells

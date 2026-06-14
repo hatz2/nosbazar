@@ -88,8 +88,7 @@ void nosbazar::agent::BazarNpcWalkState::generate_random_pos_around_npc(const ga
 }
 
 nosbazar::agent::BazarPortalEnterState::BazarPortalEnterState(net::WorldSession& session)
-	: last_try(std::chrono::steady_clock::now())
-	, session(session)
+	: session(session)
 {
 }
 
@@ -107,11 +106,9 @@ bool nosbazar::agent::BazarPortalEnterState::should_execute(const game::Sensors&
 void nosbazar::agent::BazarPortalEnterState::act(const game::Sensors& sensors)
 {
 	constexpr int execute_time_ms = 1000;
-	auto now = std::chrono::steady_clock::now();
-	auto time_diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_try).count();
 
-	if (time_diff > execute_time_ms) {
+	if (elapsed_timer.elapsed() > execute_time_ms) {
 		session.send("preq");
-		last_try = now;
+		elapsed_timer.start();
 	}
 }

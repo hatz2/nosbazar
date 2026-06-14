@@ -6,6 +6,7 @@
 #include <map_grid_repository.h>
 #include <chrono>
 #include <net.h>
+#include <time/elapsed_timer.h>
 
 namespace nosbazar::agent {
 	class BazarPortalWalkState : public State {
@@ -35,7 +36,7 @@ namespace nosbazar::agent {
 		void act(const game::Sensors& sensors) override;
 
 	private:
-		std::chrono::steady_clock::time_point last_try;
+		time::ElapsedTimer elapsed_timer;
 		net::WorldSession& session;
 	};
 }
