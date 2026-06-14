@@ -8,6 +8,10 @@ nosbazar::agent::OpenBazarState::OpenBazarState(net::WorldSession& session) : se
 
 bool nosbazar::agent::OpenBazarState::should_execute(const game::Sensors& sensors)
 {
+	if (sensors.is_bazar_opened) {
+		return false;
+	}
+
 	constexpr double distance_to_npc = 2.5;
 	auto bazar_npc = sensors.scene->find_bazar_npc();
 

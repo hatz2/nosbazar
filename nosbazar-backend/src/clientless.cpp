@@ -155,7 +155,7 @@ void nosbazar::Clientless::phase_game()
 {
     // Make domain instances
     //game_state = std::make_unique<GameState>(bus);
-    agent = std::make_unique<agent::Agent>(*world_session);
+    agent = std::make_unique<agent::Agent>(*world_session, packet_publisher, world_server_id);
 
     // Pulse packet keep alive
     pulse_timer->start();
