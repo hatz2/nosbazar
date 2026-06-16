@@ -39,7 +39,7 @@ void nosbazar::agent::SearchBazarState::act(const game::Sensors& sensors)
 
 	timer.start();
 	
-	session.send(task->request.packet);
+	session.send(task->request.search_packet.string());
 }
 
 void nosbazar::agent::SearchBazarState::on_rc_blist(std::string_view packet)

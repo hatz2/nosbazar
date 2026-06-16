@@ -3,13 +3,16 @@
 #include <future>
 #include <mutex>
 #include <queue>
+#include <vector>
+#include <packets/c_blist.h>
 
 namespace nosbazar {
 	using GameServer = int;
 
 	struct BazarRequest {
-		// TODO: Define fields
-		std::string packet;
+		// Actual fields
+		packets::CBlist search_packet;
+
 	};
 
 	struct BazarResponse {
