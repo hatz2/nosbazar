@@ -39,7 +39,7 @@ void nosbazar::io::NSgtdDataReader::read(const std::string& file_path)
 
     io::read_value(file, number_of_files);
 
-    for (unsigned int i = 0; i < number_of_files && !file.eof(); ++i) {
+    for (uint32_t i = 0; i < number_of_files && !file.eof(); ++i) {
         FileData file_info;
 
         io::read_value(file, file_info.file_number);
