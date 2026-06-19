@@ -78,7 +78,7 @@ nosbazar::io::ItemDatParser::ItemDatParser(const std::string& file_content)
 		}
 		else if (key == "END") {
 			// Add the current item
-			items[item.vnum] = item;
+			items.emplace(item.vnum, item);
 		}
 	}
 }

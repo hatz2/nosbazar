@@ -9,6 +9,7 @@
 #include <array>
 #include <vector>
 #include <cstdint>
+#include <string>
 
 namespace nosbazar::io {
     class NosTextDatFileDecryptor {
@@ -17,6 +18,7 @@ namespace nosbazar::io {
 
         std::vector<uint8_t> encrypt(const std::vector<uint8_t>& array);
         std::vector<uint8_t> decrypt(const std::vector<uint8_t>& array);
+        std::string decrypt(const std::string& array);
 
     private:
         std::array<uint8_t, 16> cryptoArray;

@@ -137,6 +137,14 @@ std::vector<uint8_t> nosbazar::io::NosTextDatFileDecryptor::decrypt(const std::v
     return decryptedFile;
 }
 
+std::string nosbazar::io::NosTextDatFileDecryptor::decrypt(const std::string& array)
+{
+    std::vector<uint8_t> raw(array.begin(), array.end());
+    raw = decrypt(std::move(raw));
+    std::string result(raw.begin(), raw.end());
+    return result;
+}
+
 std::vector<uint8_t> nosbazar::io::NosTextDatFileDecryptor::getMask(const std::vector<uint8_t>& array) {
     std::vector<uint8_t> mask(array.size(), 0x30);
 

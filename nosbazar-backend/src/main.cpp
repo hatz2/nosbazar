@@ -5,7 +5,6 @@
 #include <crow.h>
 #include <bazar_search_queue.h>
 #include <packets/c_blist.h>
-#include <io/nsgtd_data_reader.h>
 
 //int main(int argc, char** argv) {
 //#ifdef _DEBUG
@@ -78,9 +77,14 @@
 //}
 
 #include <io/item_dat_parser.h>
+#include <io/nos_file_text_reader.h>
+#include <io/lang_file_parser.h>
 
 int main(int argc, char** argv) {
-    nosbazar::io::NSgtdDataReader reader("C:/Program Files (x86)/Nostale/NostaleData/NSgtdData.NOS");
-    nosbazar::io::ItemDatParser parser(reader.get_item_dat_file());
+    //nosbazar::io::NosFileTextReader reader("C:/Program Files (x86)/Nostale/NostaleData/NSgtdData.NOS");
+    //nosbazar::io::ItemDatParser parser(reader.get_file_content("Item.dat"));
+
+    nosbazar::io::NosFileTextReader reader("C:/Program Files (x86)/Nostale/NostaleData/NSlangData_ES.NOS");
+    nosbazar::io::LangFileParser parser(reader.get_file_content("_code_es_Item.txt"));
 }
 
