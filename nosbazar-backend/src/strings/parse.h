@@ -30,6 +30,14 @@ namespace nosbazar::strings {
 	}
 
 	template<>
+	inline unsigned long long token(std::string_view& s, char delim) {
+		unsigned long long result = 0;
+		std::string_view token_str = token<std::string_view>(s, delim);
+		std::from_chars(token_str.data(), token_str.data() + token_str.size(), result);
+		return result;
+	}
+
+	template<>
 	inline int token(std::string_view& s, char delim) {
 		return static_cast<int>(token<unsigned int>(s, delim));
 	}

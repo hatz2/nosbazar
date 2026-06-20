@@ -6,17 +6,15 @@ namespace nosbazar::io {
 	LangManager::LangFile::LangFile(Language lang)
 	{
 		std::string language = language_string.at(lang);
-		std::string uppercase_lang;
-		std::transform(language.begin(), language.end(), uppercase_lang.begin(), std::toupper);
-		std::string filepath = fmt::format("assets/NostaleData/NSlangData_{}.NOS", uppercase_lang);
+		std::string filepath = fmt::format("assets/NostaleData/NSlangData_{}.NOS", language);
 
-		this->reader = std::make_unique<NosFileTextReader>(filepath);
+		NosFileTextReader reader(filepath);
 
-		std::vector<std::string> filenames = reader->get_filenames();
+		std::vector<std::string> filenames = reader.get_filenames();
 
 		for (const std::string& filename : filenames) {
-			std::string content = reader->get_file_content(filename);
-			LangFileParser parser(content);
+			std::string content = reader.get_file_content(filename);
+			auto parser = std::make_unique<LangFileParser>(content);
 			file_parsers.emplace(filename, std::move(parser));
 		}
 	}
@@ -24,7 +22,7 @@ namespace nosbazar::io {
 	{
 		if (file_parsers.contains(filename)) {
 			auto& parser = file_parsers.at(filename);
-			return parser.translation(code_name);
+			return parser->translation(code_name);
 		}
 		
 		return code_name;
@@ -39,23 +37,21 @@ namespace nosbazar::io {
 	std::string LangManager::get_item_translation(Language lang, const std::string& code_name)
 	{
 		std::string language = language_string.at(lang);
-		std::transform(language.begin(), language.end(), language.begin(), std::tolower);
+		std::transform(language.begin(), language.end(), language.begin(), ::tolower);
 		std::string filename = fmt::format("_code_{}_Item.txt", language);
-		return lang_files.at(lang).translation(filename, code_name);
+		return lang_files.at(lang)->translation(filename, code_name);
 	}
 
 	LangManager::LangManager()
 	{
-		this->lang_files = {
-			{Language::spanish, std::move(LangFile(Language::spanish))},
-			{Language::english, std::move(LangFile(Language::english))},
-			{Language::french, std::move(LangFile(Language::french))},
-			{Language::german, std::move(LangFile(Language::german))},
-			{Language::turkish, std::move(LangFile(Language::turkish))},
-			{Language::italian, std::move(LangFile(Language::italian))},
-			{Language::russian, std::move(LangFile(Language::russian))},
-			{Language::polish, std::move(LangFile(Language::polish))},
-			{Language::czech, std::move(LangFile(Language::czech))},
-		};
+		lang_files.emplace(Language::spanish, std::make_unique<LangFile>(Language::spanish));
+		lang_files.emplace(Language::english, std::make_unique<LangFile>(Language::english));
+		lang_files.emplace(Language::french, std::make_unique<LangFile>(Language::french));
+		lang_files.emplace(Language::german, std::make_unique<LangFile>(Language::german));
+		lang_files.emplace(Language::turkish, std::make_unique<LangFile>(Language::turkish));
+		lang_files.emplace(Language::italian, std::make_unique<LangFile>(Language::italian));
+		lang_files.emplace(Language::russian, std::make_unique<LangFile>(Language::russian));
+		lang_files.emplace(Language::polish, std::make_unique<LangFile>(Language::polish));
+		lang_files.emplace(Language::czech, std::make_unique<LangFile>(Language::czech));
 	}
 }

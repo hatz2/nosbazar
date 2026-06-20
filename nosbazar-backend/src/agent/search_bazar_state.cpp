@@ -1,5 +1,6 @@
 #include "search_bazar_state.h"
 #include <spdlog/spdlog.h>
+#include <packets/rc_blist.h>
 
 nosbazar::agent::SearchBazarState::SearchBazarState(net::WorldSession& session, packets::Publisher& publisher, GameServer server) : session(session), server(server)
 {
@@ -38,6 +39,8 @@ void nosbazar::agent::SearchBazarState::act(const game::Sensors& sensors)
 	}
 
 	timer.start();
+
+	SPDLOG_DEBUG("Sending {}", task->request.search_packet.string());
 	
 	session.send(task->request.search_packet.string());
 }
@@ -52,6 +55,8 @@ void nosbazar::agent::SearchBazarState::on_rc_blist(std::string_view packet)
 
 	// Send back the resposne
 	std::string response(packet);
+
+	packets::RcBlist rc_packet(packet);
 
 	task->response.packet.set_value(response);
 

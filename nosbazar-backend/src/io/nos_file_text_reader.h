@@ -14,7 +14,7 @@ namespace nosbazar::io {
 		uint32_t data_size{};
 		std::string data;
 	};
-#pragma off
+#pragma pack(pop)
 
 	class NosFileTextReader {
 	public:

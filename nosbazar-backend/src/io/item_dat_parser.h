@@ -100,11 +100,17 @@ namespace nosbazar::io {
 	
 	class ItemDatParser {
 	public:
-		ItemDatParser(const std::string& file_content);
+		static ItemDatParser& instance();
+
+		void parse(const std::string& file_content);
 
 		const Item& item_data(uint32_t vnum) const;
 
 	private:
+		ItemDatParser() = default;
+		ItemDatParser(ItemDatParser&) = delete;
+		void operator=(ItemDatParser&) = delete;
+
 		std::unordered_map<uint32_t, Item> items;
 	};
 }

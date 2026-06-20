@@ -3,7 +3,13 @@
 #include <game/enums.h>
 #include <utility>
 
-nosbazar::io::ItemDatParser::ItemDatParser(const std::string& file_content)
+nosbazar::io::ItemDatParser& nosbazar::io::ItemDatParser::instance()
+{
+	static ItemDatParser instance;
+	return instance;
+}
+
+void nosbazar::io::ItemDatParser::parse(const std::string& file_content)
 {
 	std::istringstream iss(file_content);
 

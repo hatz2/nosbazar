@@ -2,7 +2,6 @@
 
 #include "lang_file_parser.h"
 #include "nos_file_text_reader.h"
-#include "lang_file_parser.h"
 
 namespace nosbazar::io {
 	enum Language {
@@ -58,8 +57,7 @@ namespace nosbazar::io {
 			std::string translation(const std::string& filename, const std::string& code_name);
 
 		private:
-			std::unique_ptr<NosFileTextReader> reader;
-			std::unordered_map<std::string /* filename */, LangFileParser> file_parsers;
+			std::unordered_map<std::string /* filename */, std::unique_ptr<LangFileParser>> file_parsers;
 		};
 
 		LangManager();
@@ -67,6 +65,6 @@ namespace nosbazar::io {
 		void operator=(const LangManager& other) = delete;
 
 		
-		std::unordered_map<Language, LangFile> lang_files;
+		std::unordered_map<Language, std::unique_ptr<LangFile>> lang_files;
 	};
 }
