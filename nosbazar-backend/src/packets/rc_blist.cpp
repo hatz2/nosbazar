@@ -34,10 +34,8 @@ namespace nosbazar::packets {
 
 		shells.reserve(shell_count);
 		for (int i = 0; i < shell_count; ++i) {
-			// Get the chunk with the shell effect string data
 			std::string_view shell_effect_data = strings::token<std::string_view>(item_data, data_separator);
-			ShellEffect effect(shell_effect_data);
-			shells.push_back(std::move(effect));
+			shells.emplace_back(ShellEffect(shell_effect_data));
 		}
 
 		unknown_7 = strings::token<int>(item_data, data_separator);
@@ -63,11 +61,8 @@ namespace nosbazar::packets {
 
 		shells.reserve(shell_count);
 		for (int i = 0; i < shell_count; ++i) {
-			// Get the chunk with the shell effect string data
 			std::string_view shell_effect_data = strings::token<std::string_view>(item_data, data_separator);
-			ShellEffect effect(shell_effect_data);
-
-			shells.push_back(std::move(effect));
+			shells.emplace_back(ShellEffect(shell_effect_data));
 		}
 
 		unknown_5 = strings::token<int>(item_data, data_separator);
@@ -110,8 +105,7 @@ namespace nosbazar::packets {
 		price = strings::token<int>(item_data, data_separator);
 
 		for (int i = 0; i < option_count; ++i) {
-			CellonOption option(item_data);
-			options.push_back(std::move(option));
+			options.emplace_back(CellonOption(item_data));
 		}
 
 		unknown_1 = strings::token<int>(item_data, data_separator);
@@ -211,10 +205,8 @@ namespace nosbazar::packets {
 		page_index = strings::token<uint64_t>(packet);
 
 		while (!packet.empty()) {
-			// Get the chunk of data for 1 single item
 			std::string_view item_data = strings::token<std::string_view>(packet);
-			Item item(item_data);
-			items.push_back(std::move(item));
+			items.emplace_back(Item(item_data));
 		}
 	}
 
@@ -250,7 +242,7 @@ namespace nosbazar::packets {
 				.item_subtype = dat_item.item_subtype
 			};
 
-			this->data.fields = ItemDataFieldsFactory::instance().create(key, additional_data);
+			this->data.fields = std::move(ItemDataFieldsFactory::instance().create(key, additional_data));
 		}
 	}
 }
