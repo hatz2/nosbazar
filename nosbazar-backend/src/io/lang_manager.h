@@ -2,6 +2,7 @@
 
 #include "lang_file_parser.h"
 #include "nos_file_text_reader.h"
+#include <nlohmann/json.hpp>
 
 namespace nosbazar::io {
 	enum Language {
@@ -45,6 +46,8 @@ namespace nosbazar::io {
 		static LangManager& get_instance();
 
 		std::string get_item_translation(Language lang, const std::string& code_name);
+
+		nlohmann::json get_all_item_translations(const std::string& code_name);
 
 	private:
 		/**

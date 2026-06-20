@@ -42,6 +42,23 @@ namespace nosbazar::io {
 		return lang_files.at(lang)->translation(filename, code_name);
 	}
 
+	nlohmann::json LangManager::get_all_item_translations(const std::string& code_name)
+	{
+		nlohmann::json translation = {
+			{language_string.at(Language::spanish), get_item_translation(Language::spanish, code_name)},
+			{language_string.at(Language::english), get_item_translation(Language::english, code_name)},
+			{language_string.at(Language::french), get_item_translation(Language::french, code_name)},
+			{language_string.at(Language::german), get_item_translation(Language::german, code_name)},
+			{language_string.at(Language::turkish), get_item_translation(Language::turkish, code_name)},
+			{language_string.at(Language::italian), get_item_translation(Language::italian, code_name)},
+			{language_string.at(Language::russian), get_item_translation(Language::russian, code_name)},
+			{language_string.at(Language::polish), get_item_translation(Language::polish, code_name)},
+			{language_string.at(Language::czech), get_item_translation(Language::czech, code_name)},
+		};
+
+		return translation;
+	}
+
 	LangManager::LangManager()
 	{
 		lang_files.emplace(Language::spanish, std::make_unique<LangFile>(Language::spanish));

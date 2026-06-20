@@ -5,14 +5,15 @@
 #include <queue>
 #include <vector>
 #include <packets/c_blist.h>
+#include <io/lang_manager.h>
 
 namespace nosbazar {
 	using GameServer = int;
 
 	struct BazarRequest {
 		// Actual fields
+		io::Language language;
 		packets::CBlist search_packet;
-
 	};
 
 	struct BazarResponse {

@@ -58,7 +58,11 @@ void nosbazar::agent::SearchBazarState::on_rc_blist(std::string_view packet)
 
 	packets::RcBlist rc_packet(packet);
 
-	task->response.packet.set_value(response);
+	nlohmann::json json_response = rc_packet.json();
+
+	std::string result = json_response.dump(4);
+
+	task->response.packet.set_value(result);
 
 	// Mark task as completed for us
 	task.reset();

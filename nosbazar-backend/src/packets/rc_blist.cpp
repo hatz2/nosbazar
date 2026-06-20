@@ -1,6 +1,56 @@
 #include "rc_blist.h"
 #include <spdlog/spdlog.h>
 
+#include <Windows.h>
+
+std::string cp1250_to_utf8(const std::string& input)
+{
+	if (input.empty())
+		return {};
+
+	int wide_size = MultiByteToWideChar(
+		1250,
+		0,
+		input.data(),
+		static_cast<int>(input.size()),
+		nullptr,
+		0);
+
+	std::wstring wide(wide_size, L'\0');
+
+	MultiByteToWideChar(
+		1250,
+		0,
+		input.data(),
+		static_cast<int>(input.size()),
+		wide.data(),
+		wide_size);
+
+	int utf8_size = WideCharToMultiByte(
+		CP_UTF8,
+		0,
+		wide.data(),
+		static_cast<int>(wide.size()),
+		nullptr,
+		0,
+		nullptr,
+		nullptr);
+
+	std::string utf8(utf8_size, '\0');
+
+	WideCharToMultiByte(
+		CP_UTF8,
+		0,
+		wide.data(),
+		static_cast<int>(wide.size()),
+		utf8.data(),
+		utf8_size,
+		nullptr,
+		nullptr);
+
+	return utf8;
+}
+
 
 namespace nosbazar::packets {
 	nosbazar::packets::RcBlist::ShellEffect::ShellEffect(std::string_view item_data)
@@ -8,10 +58,20 @@ namespace nosbazar::packets {
 		grade = static_cast<ShellGrade>(strings::token<int>(item_data, shell_separator));
 		vnum = strings::token<int>(item_data, shell_separator);
 		value = strings::token<int>(item_data, shell_separator);
-		unknown_3 = strings::token<int>(item_data, shell_separator);
+		upgrade = strings::token<int>(item_data, shell_separator);
 	}
 
-	RcBlist::WeaponDefaultData::WeaponDefaultData(std::string_view item_data)
+	nlohmann::json RcBlist::ShellEffect::json() const
+	{
+		return {
+			{"grade", std::to_underlying(grade)},
+			{"vnum", vnum},
+			{"value", value},
+			{"upgrade", upgrade},
+		};
+	}
+
+	RcBlist::WeaponData::WeaponData(std::string_view item_data)
 	{
 		vnum = strings::token<int>(item_data, data_separator);
 		rare = strings::token<int>(item_data, data_separator);
@@ -41,6 +101,30 @@ namespace nosbazar::packets {
 		unknown_7 = strings::token<int>(item_data, data_separator);
 	}
 
+	nlohmann::json RcBlist::WeaponData::json() const
+	{
+		nlohmann::json result = {
+			{ "vnum", vnum },
+			{ "rare", rare },
+			{ "upgrade", upgrade },
+			{ "fixed_level", fixed_level },
+			{ "required_level", fixed_level },
+			{ "min_dmg", min_dmg },
+			{ "max_dmg", max_dmg },
+			{ "price", price },
+			{ "shell_count", shell_count }
+		};
+
+		nlohmann::json json_shells = nlohmann::json::array();
+		for (const ShellEffect& shell : shells) {
+			json_shells.push_back(shell.json());
+		}
+
+		result["shells"] = json_shells;
+
+		return result;
+	}
+
 	RcBlist::ArmourData::ArmourData(std::string_view item_data)
 	{
 		vnum = strings::token<int>(item_data, data_separator);
@@ -68,6 +152,31 @@ namespace nosbazar::packets {
 		unknown_5 = strings::token<int>(item_data, data_separator);
 	}
 
+	nlohmann::json RcBlist::ArmourData::json() const
+	{
+		nlohmann::json result = {
+			{ "vnum", vnum },
+			{ "rare", rare },
+			{ "upgrade", upgrade },
+			{ "fixed_level", fixed_level },
+			{ "required_level", fixed_level },
+			{ "melee_defence", melee_defence },
+			{ "ranged_defence", ranged_defence },
+			{ "magic_defence", magic_defence },
+			{ "dodge", dodge },
+			{ "price", price },
+		};
+
+		nlohmann::json json_shells = nlohmann::json::array();
+		for (const ShellEffect& shell : shells) {
+			json_shells.push_back(shell.json());
+		}
+
+		result["shells"] = json_shells;
+
+		return result;
+	}
+
 	RcBlist::EquipmentData::EquipmentData(std::string_view item_data)
 	{
 		vnum = strings::token<int>(item_data, data_separator);
@@ -87,11 +196,33 @@ namespace nosbazar::packets {
 		unknown_3 = strings::token<int>(item_data, data_separator);
 	}
 
+	nlohmann::json RcBlist::EquipmentData::json() const
+	{
+		return {
+			{"vnum", vnum },
+			{"required_level", required_level },
+			{"melee_defence", melee_defence },
+			{"ranged_defence", ranged_defence },
+			{"magic_defence", magic_defence },
+			{"dodge", dodge },
+			{"price", price },
+		};
+	}
+
 	RcBlist::CellonOption::CellonOption(std::string_view item_data)
 	{
 		vnum = strings::token<int>(item_data, data_separator);
 		level = strings::token<int>(item_data, data_separator);
 		value = strings::token<int>(item_data, data_separator);
+	}
+
+	nlohmann::json RcBlist::CellonOption::json() const
+	{
+		return {
+			{ "vnum", vnum },
+			{ "level", level },
+			{ "value", value }
+		};
 	}
 
 	RcBlist::AccessoryData::AccessoryData(std::string_view item_data)
@@ -109,6 +240,24 @@ namespace nosbazar::packets {
 		}
 
 		unknown_1 = strings::token<int>(item_data, data_separator);
+	}
+
+	nlohmann::json RcBlist::AccessoryData::json() const
+	{
+		nlohmann::json result = {
+			{ "vnum", vnum },
+			{ "required_level", required_level },
+			{ "max_option_level", max_option_level },
+			{ "max_option_count", max_option_count },
+			{ "price", price },
+		};
+
+		nlohmann::json options_json = nlohmann::json::array();
+		for (const CellonOption& cellon : options) {
+			options_json.push_back(cellon.json());
+		}
+
+		return result;
 	}
 
 	RcBlist::SpecialistData::SpecialistData(std::string_view item_data)
@@ -139,6 +288,38 @@ namespace nosbazar::packets {
 		light_res_perf = strings::token<int>(item_data, data_separator);
 		shadow_res_perf = strings::token<int>(item_data, data_separator);
 		unknown_1 = strings::token<int>(item_data, data_separator);
+	}
+	nlohmann::json RcBlist::SpecialistData::json() const
+	{
+		int level_percentage = exp_points * 100 / max_exp_points ;
+		int new_icon_id = contains_sp ? vnum : icon_id;
+
+		return {
+			{ "icon_id", new_icon_id},
+			{ "contains_sp", contains_sp},
+			{ "vnum", vnum },
+			{ "job_level", job_level },
+			{ "level_percentage", level_percentage },
+			{ "upgrade_level", upgrade_level },
+			{ "attack_points", attack_points },
+			{ "defence_points", defence_points },
+			{ "element_points", element_points },
+			{ "hp_points", hp_points },
+			{ "remaining_points", remaining_points },
+			{ "perfection_level", perfection_level },
+			{ "fire_res", fire_res },
+			{ "water_res", water_res },
+			{ "light_res", light_res },
+			{ "shadow_res", shadow_res },
+			{ "attack_perf", attack_perf },
+			{ "defence_perf", defence_perf },
+			{ "element_perf", element_perf },
+			{ "hp_perf", hp_perf },
+			{ "fire_res_perf", fire_res_perf },
+			{ "water_res_perf", water_res_perf },
+			{ "light_res_perf", light_res_perf },
+			{ "shadow_res_perf", shadow_res_perf },
+		};
 	}
 	RcBlist::ItemDataFieldsFactory& RcBlist::ItemDataFieldsFactory::instance()
 	{
@@ -210,6 +391,19 @@ namespace nosbazar::packets {
 		}
 	}
 
+	nlohmann::json RcBlist::json() const
+	{
+		nlohmann::json result;
+		result["page_index"] = page_index;
+		result["items"] = nlohmann::json::array();
+
+		for (const Item& item : items) {
+			result["items"].push_back(item.json());
+		}
+
+		return result;
+	}
+
 	RcBlist::Item::Item(std::string_view item_data)
 	{
 		this->auction_id = strings::token<int>(item_data, item_fields_separator);
@@ -245,4 +439,69 @@ namespace nosbazar::packets {
 			this->data.fields = std::move(ItemDataFieldsFactory::instance().create(key, additional_data));
 		}
 	}
+	nlohmann::json RcBlist::Item::json() const
+	{
+		nlohmann::json json_data;
+
+		std::visit([&json_data](auto&& data) {
+			json_data = data.json();
+		}, data.fields);
+
+		nlohmann::json result = {
+			{ "owner_name", cp1250_to_utf8(owner_name) },
+			{ "item_vnum", item_vnum },
+			{ "amount", amount },
+			{ "is_package", is_package },
+			{ "bazar_price", bazar_price },
+			{ "minutes_left", minutes_left },
+			{ "data", json_data}
+		};
+
+		return result;
+	}
+	nlohmann::json RcBlist::MeleeWeaponData::json() const
+	{
+		nlohmann::json result = WeaponData::json();
+
+		result["hit_rate"] = hit_rate_concentration;
+		result["critical_rate"] = critical_rate;
+		result["critical_dmg"] = critical_dmg;
+
+		return result;
+	}
+	nlohmann::json RcBlist::RangedWeaponData::json() const
+	{
+		nlohmann::json result = WeaponData::json();
+
+		result["hit_rate"] = hit_rate_concentration;
+		result["critical_rate"] = critical_rate;
+		result["critical_dmg"] = critical_dmg;
+		result["ammo"] = ammo;
+		result["max_ammo"] = max_ammo;
+
+		return result;
+	}
+
+	nlohmann::json RcBlist::MagicWeaponData::json() const
+	{
+		nlohmann::json result = WeaponData::json();
+
+		result["concentration"] = hit_rate_concentration;
+
+		return result;
+	}
+
+	nlohmann::json RcBlist::ResistancesData::json() const
+	{
+		nlohmann::json result = EquipmentData::json();
+
+		result["fire_res"] = fire_res;
+		result["water_res"] = water_res;
+		result["light_res"] = light_res;
+		result["shadow_res"] = shadow_res;
+		result["sum_level"] = sum_level;
+
+		return result;
+	}
+
 }

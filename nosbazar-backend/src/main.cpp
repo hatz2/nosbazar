@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 
 	crow::SimpleApp app;
 
-	CROW_ROUTE(app, "/search").methods("POST"_method)
+	CROW_ROUTE(app, "/search").methods("GET"_method)
 	([](const crow::request& req) {
 		SPDLOG_DEBUG(req.body);
 
@@ -67,6 +67,16 @@ int main(int argc, char** argv) {
 			search_packet.vnums_filter.push_back(vnum.i());
 		}
 
+		nosbazar::io::Language lang;
+		try {
+			lang = nosbazar::io::string_to_lang.at(req.url_params.get("lang"));
+		}
+		catch (const std::exception& e) {
+			SPDLOG_ERROR(e.what());
+			return crow::response(400);
+		}
+
+		task->request.language = lang;
 		task->request.search_packet = std::move(search_packet);
 
 		nosbazar::BazarSearchManager::queue(server).push(task);

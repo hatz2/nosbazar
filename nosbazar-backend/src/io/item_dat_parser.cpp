@@ -26,6 +26,7 @@ void nosbazar::io::ItemDatParser::parse(const std::string& file_content)
 		}
 		else if (key == "INDEX") {
 			iss >> item.inventory_tab;
+			item.inventory_tab %= 4;
 			iss >> item.item_type;
 			iss >> item.item_subtype;
 			iss >> item.equip_slot;
