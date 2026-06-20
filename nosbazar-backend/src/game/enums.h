@@ -11,13 +11,13 @@ namespace nosbazar::game {
 		object = 9
 	};
 
-	enum class InventoryTab : uint8_t {
+	enum class InventoryTab : uint16_t {
 		equip = 0,
 		main = 1,
 		etc = 2,
 	};
 
-	enum class EquipType : uint8_t {
+	enum class EquipType : uint16_t {
 		weapon = 0,
 		armour = 1,
 		equipment = 2,
@@ -27,7 +27,7 @@ namespace nosbazar::game {
 		shell = 6
 	};
 
-	enum class WeaponSubType : uint8_t {
+	enum class WeaponSubType : uint16_t {
 		adventurer_sword = 0,
 		swordsman_sword = 1,
 		dagger = 3,
@@ -40,7 +40,7 @@ namespace nosbazar::game {
 		partner = 12
 	};
 
-	enum class ArmourSubType : uint8_t {
+	enum class ArmourSubType : uint16_t {
 		adventurer = 0,
 		mage = 1,
 		archer = 2,
@@ -49,7 +49,7 @@ namespace nosbazar::game {
 		martial = 5,
 	};
 
-	enum class EquipmentSubType : uint8_t {
+	enum class EquipmentSubType : uint16_t {
 		hat = 0,
 		mask = 1,
 		glove = 2,
@@ -60,7 +60,7 @@ namespace nosbazar::game {
 		costume_wings = 7,
 	};
 
-	enum class AccessorySubType : uint8_t {
+	enum class AccessorySubType : uint16_t {
 		necklace = 0,
 		ring = 1,
 		bracelet = 2,
@@ -69,7 +69,7 @@ namespace nosbazar::game {
 		mini_pet = 5
 	};
 
-	enum class HolderSubType : uint8_t {
+	enum class HolderSubType : uint16_t {
 		pet_bead = 0,
 		partner_bead = 1,
 		sp_card_holder = 2,
@@ -79,16 +79,16 @@ namespace nosbazar::game {
 		partner_card_holder = 6,
 	};
 
-	enum class ShellSubType : uint8_t {
+	enum class ShellSubType : uint16_t {
 		weapon = 0,
 		armour = 1,
 	};
 
-	enum class MainType : uint8_t {
+	enum class MainType : uint16_t {
 
 	};
 
-	enum class EtcType : uint8_t {
+	enum class EtcType : uint16_t {
 
 	};
 }
