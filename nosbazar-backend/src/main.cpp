@@ -6,6 +6,7 @@
 #include <bazar_search_queue.h>
 #include <packets/c_blist.h>
 #include <io/item_dat_parser.h>
+#include <io/bcard_parser.h>
 #include <io/nos_file_text_reader.h>
 
 //int main(int argc, char** argv) {
@@ -31,6 +32,7 @@ int main(int argc, char** argv) {
 
 	nosbazar::io::NosFileTextReader reader("C:/Program Files (x86)/Nostale/NostaleData/NSgtdData.NOS");
 	nosbazar::io::ItemDatParser::instance().parse(reader.get_file_content("Item.dat"));
+	nosbazar::io::BCardParser::instance().parse(reader.get_file_content("BCard.dat"));
 
 	nosbazar::MapGridRepository::instance();
 

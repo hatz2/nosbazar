@@ -49,6 +49,10 @@ namespace nosbazar::io {
 
 		nlohmann::json get_all_item_translations(const std::string& code_name);
 
+		std::string get_translation(Language lang, const std::string& filename, const std::string& code_name);
+
+		nlohmann::json get_all_translations(const std::string& filename_template, const std::string& code_name);
+
 	private:
 		/**
 		 * @brief Helper class that represents a single NSlangData_XX.NOS file.
