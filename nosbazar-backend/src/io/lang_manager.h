@@ -2,6 +2,7 @@
 
 #include "lang_file_parser.h"
 #include "nos_file_text_reader.h"
+#include <strings/encoding.h>
 #include <nlohmann/json.hpp>
 
 namespace nosbazar::io {
@@ -54,6 +55,8 @@ namespace nosbazar::io {
 		nlohmann::json get_all_bcard_translations(const std::string& code_name);
 
 	private:
+
+		static strings::Encoding encoding_for(Language lang);
 
 		std::string get_translation(Language lang, const std::string& filename, const std::string& code_name);
 

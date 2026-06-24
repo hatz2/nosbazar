@@ -6,13 +6,14 @@
 #include <unordered_map>
 #include <variant>
 #include <sstream>
+#include <strings/encoding.h>
 
 namespace nosbazar::io {
 	class LangFileParser {
 	public:
-		LangFileParser(const std::string& file_content);
+		LangFileParser(const std::string& file_content, strings::Encoding encoding);
 
-		std::string translation(const std::string& code_name);
+		const std::string& translation(const std::string& code_name) const;
 
 	private:
 		std::unordered_map<std::string, std::string> translations;

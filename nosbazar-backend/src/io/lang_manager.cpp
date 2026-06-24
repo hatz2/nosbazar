@@ -1,7 +1,6 @@
 #include "lang_manager.h"
 #include <spdlog/spdlog.h>
 #include <algorithm>
-#include <strings/encoding.h>
 
 namespace nosbazar::io {
 	LangManager::LangFile::LangFile(Language lang)
@@ -13,9 +12,11 @@ namespace nosbazar::io {
 
 		std::vector<std::string> filenames = reader.get_filenames();
 
+		strings::Encoding encoding = encoding_for(lang);
+
 		for (const std::string& filename : filenames) {
 			std::string content = reader.get_file_content(filename);
-			auto parser = std::make_unique<LangFileParser>(content);
+			auto parser = std::make_unique<LangFileParser>(content, encoding);
 			file_parsers.emplace(filename, std::move(parser));
 		}
 	}
@@ -35,28 +36,25 @@ namespace nosbazar::io {
 		return instance;
 	}
 
-	std::string LangManager::get_translation(Language lang, const std::string& filename, const std::string& code_name)
+	strings::Encoding LangManager::encoding_for(Language lang)
 	{
-		std::string translation = lang_files.at(lang)->translation(filename, code_name);
-
 		switch (lang) {
 		case Language::russian:
-			translation = strings::convert_to_utf8(translation, strings::Encoding::windows1251);
-			break;
+			return strings::Encoding::windows1251;
 		case Language::spanish:
 		case Language::french:
 		case Language::english:
-			translation = strings::convert_to_utf8(translation, strings::Encoding::windows1252);
-			break;
+			return strings::Encoding::windows1252;
 		case Language::turkish:
-			translation = strings::convert_to_utf8(translation, strings::Encoding::windows1254);
-			break;
+			return strings::Encoding::windows1254;
 		default:
-			translation = strings::convert_to_utf8(translation, strings::Encoding::windows1250);
-			break;
+			return strings::Encoding::windows1250;
 		}
+	}
 
-		return translation;
+	std::string LangManager::get_translation(Language lang, const std::string& filename, const std::string& code_name)
+	{
+		return lang_files.at(lang)->translation(filename, code_name);
 	}
 
 	nlohmann::json LangManager::get_all_translations(const std::string& filename_template, const std::string& code_name)
