@@ -12,7 +12,6 @@ namespace nosbazar {
 
 	struct BazarRequest {
 		// Actual fields
-		io::Language language;
 		packets::CBlist search_packet;
 	};
 

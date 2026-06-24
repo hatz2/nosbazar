@@ -87,6 +87,7 @@ nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const 
 		if (result->status_code == 201) {
 			token = json_response["token"];
 			TokenRepository::instance().add_token(params.email, token);
+			TokenRepository::instance().save();
 			return AuthResult::ok;
 		}
 

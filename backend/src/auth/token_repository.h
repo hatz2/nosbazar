@@ -15,6 +15,8 @@ namespace nosbazar::auth {
 
 		void add_token(const std::string& email, const std::string& token);
 
+		void save() const;
+
 	private:
 		TokenRepository();
 		TokenRepository(const TokenRepository& other) = delete;

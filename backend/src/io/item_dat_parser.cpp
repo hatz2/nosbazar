@@ -3,6 +3,7 @@
 #include <sstream>
 #include <game/enums.h>
 #include <utility>
+#include <spdlog/spdlog.h>
 
 nosbazar::io::ItemDatParser& nosbazar::io::ItemDatParser::instance()
 {
@@ -82,7 +83,10 @@ void nosbazar::io::ItemDatParser::parse(const std::string& file_content)
 		}
 		else if (key == "LINEDESC") {
 			iss >> item.ingame_desc_lines_count;
-			iss >> item.description_code_name;
+
+			if (item.ingame_desc_lines_count) {
+				iss >> item.description_code_name;
+			}
 		}
 		else if (key == "END") {
 			// Add the current item

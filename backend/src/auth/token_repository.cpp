@@ -30,9 +30,7 @@ nosbazar::auth::TokenRepository& nosbazar::auth::TokenRepository::instance()
 
 nosbazar::auth::TokenRepository::~TokenRepository()
 {
-	std::ofstream file(file_name);
-	json json_data = tokens;
-	file << json_data.dump(4);
+	save();
 }
 
 std::optional<std::string> nosbazar::auth::TokenRepository::get_token(const std::string& email) const
@@ -47,4 +45,11 @@ std::optional<std::string> nosbazar::auth::TokenRepository::get_token(const std:
 void nosbazar::auth::TokenRepository::add_token(const std::string& email, const std::string& token)
 {
 	tokens[email] = token;
+}
+
+void nosbazar::auth::TokenRepository::save() const
+{
+	std::ofstream file(file_name);
+	json json_data = tokens;
+	file << json_data.dump(4);
 }
