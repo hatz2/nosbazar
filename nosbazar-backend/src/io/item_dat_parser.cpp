@@ -1,4 +1,5 @@
 #include "item_dat_parser.h"
+#include <io/bcard_parser.h>
 #include <sstream>
 #include <game/enums.h>
 #include <utility>
@@ -155,6 +156,18 @@ nlohmann::json nosbazar::io::Item::json() const {
 		b["effect"] = json{ {"min", buff.effect.min}, {"max", buff.effect.max} };
 		b["bcard_sub"] = buff.bcard_sub;
 		b["target"] = buff.target;
+
+		try {
+			const auto& bcard = BCardParser::instance().bcard_data(buff.vnum);
+			b["bcard_name"] = LangManager::get_instance().get_all_translations(
+				"_code_{}_BCard.txt", bcard.name_code_name);
+			b["bcard_display"] = BCardParser::instance().format_bcard_string(
+				buff.vnum, buff.bcard_sub,
+				static_cast<int32_t>(buff.effect.min),
+				static_cast<int32_t>(buff.effect.max));
+		} catch (const std::out_of_range&) {
+		}
+
 		j_buffs.push_back(b);
 	}
 	json_obj["buffs"] = j_buffs;
