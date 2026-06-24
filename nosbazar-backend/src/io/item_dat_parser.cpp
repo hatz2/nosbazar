@@ -146,21 +146,21 @@ nlohmann::json nosbazar::io::Item::json() const {
 	for (uint16_t d : data) {
 		j_data.push_back(d);
 	}
-	json_obj["data"] = j_data;
+	//json_obj["data"] = j_data;
 
 	// Buffs serialization
 	json j_buffs = json::array();
 	for (const auto& buff : buffs) {
 		json b;
 		b["vnum"] = buff.vnum;
-		b["effect"] = json{ {"val_1", buff.val_1}, {"val_2", buff.val_2} };
-		b["bcard_sub"] = buff.bcard_sub;
-		b["target"] = buff.target;
+		//b["effect"] = json{ {"val_1", buff.val_1}, {"val_2", buff.val_2} };
+		//b["bcard_sub"] = buff.bcard_sub;
+		//b["target"] = buff.target;
 
 		try {
 			const auto& bcard = BCardParser::instance().bcard_data(buff.vnum);
-			b["bcard_name"] = LangManager::get_instance().get_all_bcard_translations(
-				bcard.name_code_name);
+			//b["bcard_name"] = LangManager::get_instance().get_all_bcard_translations(
+			//	bcard.name_code_name);
 			b["bcard_display"] = BCardParser::instance().format_bcard_string(
 				buff.vnum, buff.bcard_sub,
 				buff.val_1, buff.val_2);

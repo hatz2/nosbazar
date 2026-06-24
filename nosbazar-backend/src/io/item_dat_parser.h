@@ -49,7 +49,6 @@ namespace nosbazar::io {
 
 
     // TODO: Parse actual DATA types into the std::variant
-
     struct Item {
         uint32_t vnum{};
         uint32_t price{};

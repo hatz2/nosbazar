@@ -144,17 +144,14 @@ namespace nosbazar::io {
         const BCardEntry& entry = bcards.at(bcard_vnum);
         const BCardRecord& record = entry.records.at(bcard_sub);
 
-        std::string code_name = (effect_val_1 >= 0)
-            ? record.list_code_name_positive
-            : record.list_code_name_negative;
+        std::string code_name = (effect_val_1 >= 0) ? record.list_code_name_positive : record.list_code_name_negative;
 
         auto& lm = LangManager::get_instance();
         nlohmann::json result;
 
         for (const auto& [lang, code] : language_string) {
             std::string raw = lm.get_bcard_translation(lang, code_name);
-            std::string formatted = substitute_variables(
-                record.desc_type, raw, effect_val_1, effect_val_2, bcard_vnum);
+            std::string formatted = substitute_variables(record.desc_type, raw, effect_val_1, effect_val_2, bcard_vnum);
             result[code] = formatted;
         }
 
