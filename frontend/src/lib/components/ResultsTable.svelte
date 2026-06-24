@@ -1,7 +1,14 @@
 <script lang="ts">
+	import type { SearchResult } from '$lib/types/search';
+
+	type Props = {
+		results: SearchResult[];
+	};
+
+	let { results }: Props = $props();
 </script>
 
-<table class="my-table">
+<table>
 	<thead>
 		<tr>
 			<th>Item name</th>
@@ -13,41 +20,15 @@
 	</thead>
 
 	<tbody>
-		<tr>
-			<td>Wooden Stick</td>
-			<td>1</td>
-			<td>2,999,999</td>
-			<td>21 Day(s)</td>
-			<td>Jeremy_Doku</td>
-		</tr>
-		<tr>
-			<td>Wooden Stick</td>
-			<td>1</td>
-			<td>2,999,999</td>
-			<td>21 Day(s)</td>
-			<td>Jeremy_Doku</td>
-		</tr>
-		<tr>
-			<td>Wooden Stick</td>
-			<td>1</td>
-			<td>2,999,999</td>
-			<td>21 Day(s)</td>
-			<td>Jeremy_Doku</td>
-		</tr>
-		<tr>
-			<td>Wooden Stick</td>
-			<td>1</td>
-			<td>2,999,999</td>
-			<td>21 Day(s)</td>
-			<td>Jeremy_Doku</td>
-		</tr>
-		<tr>
-			<td>Wooden Stick</td>
-			<td>1</td>
-			<td>2,999,999</td>
-			<td>21 Day(s)</td>
-			<td>Jeremy_Doku</td>
-		</tr>
+		{#each results as item, i (i)}
+			<tr>
+				<td>{item.item_vnum}</td>
+				<td>{item.amount}</td>
+				<td>{item.bazar_price.toLocaleString()}</td>
+				<td>{item.minutes_left} min</td>
+				<td>{item.owner_name}</td>
+			</tr>
+		{/each}
 	</tbody>
 
 	<tfoot> </tfoot>

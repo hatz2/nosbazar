@@ -8,6 +8,7 @@
 #include <io/item_dat_parser.h>
 #include <io/bcard_parser.h>
 #include <io/nos_file_text_reader.h>
+#include <crow/middlewares/cors.h>
 
 //int main(int argc, char** argv) {
 //#ifdef _DEBUG
@@ -22,6 +23,29 @@
 //	nosbazar::Clientless client(env.account_id, env.world_server_id, env.world_server_channel);
 //	return static_cast<int>(client.run());
 //}
+
+//struct CORSMiddleware {
+//	struct context {};
+//
+//	void before_handle(crow::request& req, crow::response& res, context&)
+//	{
+//		if (req.method == crow::HTTPMethod::Options)
+//		{
+//			res.add_header("Access-Control-Allow-Origin", "*");
+//			res.add_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+//			res.add_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//			res.code = 204;
+//			res.end();
+//			return;
+//		}
+//	}
+//
+//	void after_handle(crow::request&, crow::response& res, context&)
+//	{
+//		res.add_header("Access-Control-Allow-Origin", "*");
+//		res.add_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//	}
+//};
 
 int main(int argc, char** argv) {
 #ifdef _DEBUG
@@ -42,7 +66,8 @@ int main(int argc, char** argv) {
 		return static_cast<int>(client.run());
 	}).detach();
 
-	crow::SimpleApp app;
+	//crow::App<CORSMiddleware> app;
+	crow::App<crow::CORSHandler> app;
 
 	CROW_ROUTE(app, "/search").methods("POST"_method)
 	([](const crow::request& req) {
@@ -68,16 +93,6 @@ int main(int argc, char** argv) {
 			search_packet.vnums_filter.push_back(vnum.i());
 		}
 
-		nosbazar::io::Language lang;
-		try {
-			lang = nosbazar::io::string_to_lang.at(req.url_params.get("lang"));
-		}
-		catch (const std::exception& e) {
-			SPDLOG_ERROR(e.what());
-			return crow::response(400);
-		}
-
-		task->request.language = lang;
 		task->request.search_packet = std::move(search_packet);
 
 		nosbazar::BazarSearchManager::queue(server).push(task);
