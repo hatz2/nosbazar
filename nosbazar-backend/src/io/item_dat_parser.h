@@ -40,13 +40,9 @@ namespace nosbazar::io {
     };
 
     struct BuffEntry {
-        struct Effect {
-            uint32_t min{};
-            uint32_t max{};
-        };
-
         uint32_t vnum{};
-        Effect effect{};
+        int32_t val_1{};
+        int32_t val_2{};
         uint32_t bcard_sub{};
         uint32_t target{};
     };

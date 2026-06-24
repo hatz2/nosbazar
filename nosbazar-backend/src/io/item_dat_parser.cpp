@@ -74,8 +74,8 @@ void nosbazar::io::ItemDatParser::parse(const std::string& file_content)
 			for (size_t i = 0; i < item.buffs.size(); ++i) {
 				BuffEntry& entry = item.buffs[i];
 				iss >> entry.vnum;
-				iss >> entry.effect.min;
-				iss >> entry.effect.max;
+				iss >> entry.val_1;
+				iss >> entry.val_2;
 				iss >> entry.bcard_sub;
 				iss >> entry.target;
 			}
@@ -153,7 +153,7 @@ nlohmann::json nosbazar::io::Item::json() const {
 	for (const auto& buff : buffs) {
 		json b;
 		b["vnum"] = buff.vnum;
-		b["effect"] = json{ {"min", buff.effect.min}, {"max", buff.effect.max} };
+		b["effect"] = json{ {"val_1", buff.val_1}, {"val_2", buff.val_2} };
 		b["bcard_sub"] = buff.bcard_sub;
 		b["target"] = buff.target;
 
@@ -163,8 +163,7 @@ nlohmann::json nosbazar::io::Item::json() const {
 				bcard.name_code_name);
 			b["bcard_display"] = BCardParser::instance().format_bcard_string(
 				buff.vnum, buff.bcard_sub,
-				static_cast<int32_t>(buff.effect.min),
-				static_cast<int32_t>(buff.effect.max));
+				buff.val_1, buff.val_2);
 		} catch (const std::out_of_range&) {
 		}
 
