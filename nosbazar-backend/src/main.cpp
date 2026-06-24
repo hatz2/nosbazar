@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 
 	crow::SimpleApp app;
 
-	CROW_ROUTE(app, "/search").methods("GET"_method)
+	CROW_ROUTE(app, "/search").methods("POST"_method)
 	([](const crow::request& req) {
 		SPDLOG_DEBUG(req.body);
 
