@@ -152,11 +152,7 @@ namespace nosbazar::io {
         nlohmann::json result;
 
         for (const auto& [lang, code] : language_string) {
-            std::string lang_lower = code;
-            std::transform(lang_lower.begin(), lang_lower.end(), lang_lower.begin(), ::tolower);
-            std::string filename = fmt::format("_code_{}_BCard.txt", lang_lower);
-
-            std::string raw = lm.get_translation(lang, filename, code_name);
+            std::string raw = lm.get_bcard_translation(lang, code_name);
             std::string formatted = substitute_variables(
                 record.desc_type, raw, effect_val_1, effect_val_2, bcard_vnum);
             result[code] = formatted;
@@ -169,16 +165,16 @@ namespace nosbazar::io {
         nlohmann::json j;
         j["vnum"] = vnum;
         j["icon"] = icon;
-        j["name"] = LangManager::get_instance().get_all_translations("_code_{}_BCard.txt", name_code_name);
+        j["name"] = LangManager::get_instance().get_all_bcard_translations(name_code_name);
 
         nlohmann::json j_records = nlohmann::json::array();
         for (size_t i = 0; i < BCARD_MAX_RECORDS; ++i) {
             const auto& rec = records[i];
             nlohmann::json jr;
             jr["desc_type"] = rec.desc_type;
-            jr["subject"] = LangManager::get_instance().get_all_translations("_code_{}_BCard.txt", rec.subject_code_name);
-            jr["description_positive"] = LangManager::get_instance().get_all_translations("_code_{}_BCard.txt", rec.list_code_name_positive);
-            jr["description_negative"] = LangManager::get_instance().get_all_translations("_code_{}_BCard.txt", rec.list_code_name_negative);
+            jr["subject"] = LangManager::get_instance().get_all_bcard_translations(rec.subject_code_name);
+            jr["description_positive"] = LangManager::get_instance().get_all_bcard_translations(rec.list_code_name_positive);
+            jr["description_negative"] = LangManager::get_instance().get_all_bcard_translations(rec.list_code_name_negative);
             j_records.push_back(std::move(jr));
         }
         j["records"] = std::move(j_records);

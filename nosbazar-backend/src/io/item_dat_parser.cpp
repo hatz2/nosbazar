@@ -159,8 +159,8 @@ nlohmann::json nosbazar::io::Item::json() const {
 
 		try {
 			const auto& bcard = BCardParser::instance().bcard_data(buff.vnum);
-			b["bcard_name"] = LangManager::get_instance().get_all_translations(
-				"_code_{}_BCard.txt", bcard.name_code_name);
+			b["bcard_name"] = LangManager::get_instance().get_all_bcard_translations(
+				bcard.name_code_name);
 			b["bcard_display"] = BCardParser::instance().format_bcard_string(
 				buff.vnum, buff.bcard_sub,
 				static_cast<int32_t>(buff.effect.min),
