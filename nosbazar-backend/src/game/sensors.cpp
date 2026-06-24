@@ -160,7 +160,7 @@ namespace nosbazar::game {
 
 	void Sensors::on_wopen(std::string_view packet)
 	{
-		SPDLOG_DEBUG("Bazar opened");
+		SPDLOG_INFO("Bazar is opened");
 		is_bazar_opened = true;
 	}
 
