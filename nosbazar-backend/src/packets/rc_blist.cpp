@@ -399,7 +399,7 @@ namespace nosbazar::packets {
 		}, data.fields);
 
 		nlohmann::json result = {
-			{ "owner_name", strings::cp1250_to_utf8(owner_name) },
+			{ "owner_name", strings::convert_to_utf8(owner_name, strings::Encoding::windows1250) },
 			{ "item_vnum", item_vnum },
 			{ "amount", amount },
 			{ "is_package", is_package },

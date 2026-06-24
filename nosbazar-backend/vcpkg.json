@@ -6,6 +6,7 @@
     "nlohmann-json",
     "openssl",
     "spdlog",
-    "zlib"
+    "zlib",
+    "icu"
   ]
 }

@@ -22,7 +22,6 @@
 //	return static_cast<int>(client.run());
 //}
 
-
 int main(int argc, char** argv) {
 #ifdef _DEBUG
 	spdlog::set_level(spdlog::level::trace);
@@ -86,19 +85,40 @@ int main(int argc, char** argv) {
 		return crow::response(result);
 	});
 
+	// GET /items/static/{vnum}: Returns full item details for a given vnum.
+	CROW_ROUTE(app, "/items/static/<uint>").methods("GET"_method)
+	([](const crow::request& req, uint32_t vnum) {
+		try {
+			// Get the item data using the singleton parser instance
+			const nosbazar::io::Item& item = nosbazar::io::ItemDatParser::instance().item_data(vnum);
+
+			// Call the new json() method and serialize to string for Crow response
+			nlohmann::json json_data = item.json();
+			std::string result = json_data.dump(2);
+
+			return crow::response(result);
+		} catch (const std::out_of_range& e) {
+			SPDLOG_WARN("Item not found for vnum: {}", vnum);
+			return crow::response(404, "Item data not found.");
+		} catch (const std::exception& e) {
+			SPDLOG_ERROR("Internal error fetching item data for vnum {} : {}", vnum, e.what());
+			return crow::response(500, "Internal Server Error.");
+		}
+	});
+
 	app.port(8080).multithreaded().run();
-	
+
 }
+
 
 //#include <io/item_dat_parser.h>
 //#include <io/nos_file_text_reader.h>
 //#include <io/lang_file_parser.h>
-//
+
 //int main(int argc, char** argv) {
 //    //nosbazar::io::NosFileTextReader reader("C:/Program Files (x86)/Nostale/NostaleData/NSgtdData.NOS");
 //    //nosbazar::io::ItemDatParser parser(reader.get_file_content("Item.dat"));
-//
+
 //    nosbazar::io::NosFileTextReader reader("C:/Program Files (x86)/Nostale/NostaleData/NSlangData_ES.NOS");
 //    nosbazar::io::LangFileParser parser(reader.get_file_content("_code_es_Item.txt"));
 //}
-

@@ -94,3 +94,74 @@ const nosbazar::io::Item& nosbazar::io::ItemDatParser::item_data(uint32_t vnum) 
 {
 	return items.at(vnum);
 }
+
+nlohmann::json nosbazar::io::Item::json() const {
+	using json = nlohmann::json;
+	json json_obj;
+
+	json_obj["vnum"] = vnum;
+	json_obj["price"] = price;
+	json_obj["name"] = LangManager::get_instance().get_all_item_translations(item_name_code);
+	json_obj["inventory_tab"] = inventory_tab;
+	json_obj["item_type"] = item_type;
+	json_obj["item_subtype"] = item_subtype;
+	json_obj["equip_slot"] = equip_slot;
+	json_obj["icon_id"] = icon_id;
+	json_obj["visual_change_id"] = visual_change_id;
+	json_obj["attack_type"] = attack_type;
+	json_obj["required_class"] = required_class;
+
+	// Flags serialization
+	json j_flags;
+	//j_flags["unknown_1"] = flags.unknown_1;
+	//j_flags["unknown_2"] = flags.unknown_2;
+	//j_flags["unknown_3"] = flags.unknown_3;
+	j_flags["no_selling"] = flags.no_selling;
+	j_flags["no_dropping"] = flags.no_dropping;
+	j_flags["no_trading"] = flags.no_trading;
+	j_flags["miniland_item"] = flags.miniland_item;
+	j_flags["miniland_item_2"] = flags.miniland_item_2;
+	j_flags["show_warning_on_use"] = flags.show_warning_on_use;
+	j_flags["is_time_space_reward_box"] = flags.is_time_space_reward_box;
+	j_flags["show_description_on_hover"] = flags.show_description_on_hover;
+	//j_flags["unknown_4"] = flags.unknown_4;
+	j_flags["follow_mouse_on_use"] = flags.follow_mouse_on_use;
+	j_flags["show_something_on_hover"] = flags.show_something_on_hover;
+	j_flags["can_be_colored"] = flags.can_be_colored;
+	j_flags["female_can_wear"] = flags.female_can_wear;
+	j_flags["male_can_wear"] = flags.male_can_wear;
+	//j_flags["unknown_5"] = flags.unknown_5;
+	j_flags["play_sound_on_pickup"] = flags.play_sound_on_pickup;
+	j_flags["use_reputation_as_price"] = flags.use_reputation_as_price;
+	j_flags["is_champion_equip"] = flags.is_champion_equip;
+	//j_flags["unknown_6"] = flags.unknown_6;
+	j_flags["is_limited"] = flags.is_limited;
+	//j_flags["unknown_7"] = flags.unknown_7;
+	//j_flags["unknown_8"] = flags.unknown_8;
+	json_obj["flags"] = j_flags;
+
+	// Array data
+	json j_data = json::array();
+	for (uint16_t d : data) {
+		j_data.push_back(d);
+	}
+	json_obj["data"] = j_data;
+
+	// Buffs serialization
+	json j_buffs = json::array();
+	for (const auto& buff : buffs) {
+		json b;
+		b["vnum"] = buff.vnum;
+		b["effect"] = json{ {"min", buff.effect.min}, {"max", buff.effect.max} };
+		b["bcard_sub"] = buff.bcard_sub;
+		b["target"] = buff.target;
+		j_buffs.push_back(b);
+	}
+	json_obj["buffs"] = j_buffs;
+
+	// Metadata
+	//json_obj["ingame_desc_lines_count"] = ingame_desc_lines_count;
+	json_obj["description"] = LangManager::get_instance().get_all_item_translations(description_code_name);
+
+	return json_obj;
+}

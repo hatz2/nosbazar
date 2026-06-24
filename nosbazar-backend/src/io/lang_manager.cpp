@@ -1,6 +1,7 @@
 #include "lang_manager.h"
 #include <spdlog/spdlog.h>
 #include <algorithm>
+#include <strings/encoding.h>
 
 namespace nosbazar::io {
 	LangManager::LangFile::LangFile(Language lang)
@@ -39,7 +40,27 @@ namespace nosbazar::io {
 		std::string language = language_string.at(lang);
 		std::transform(language.begin(), language.end(), language.begin(), ::tolower);
 		std::string filename = fmt::format("_code_{}_Item.txt", language);
-		return lang_files.at(lang)->translation(filename, code_name);
+		std::string translation = lang_files.at(lang)->translation(filename, code_name);
+
+		// Convert the translation to utf-8 using the correct encoding
+		switch (lang) {
+		case Language::russian:
+			translation = strings::convert_to_utf8(translation, strings::Encoding::windows1251);
+			break;
+		case Language::spanish:
+		case Language::french:
+		case Language::english:
+			translation = strings::convert_to_utf8(translation, strings::Encoding::windows1252);
+			break;
+		case Language::turkish:
+			translation = strings::convert_to_utf8(translation, strings::Encoding::windows1254);
+			break;
+		default:
+			translation = strings::convert_to_utf8(translation, strings::Encoding::windows1250);
+			break;
+		}
+
+		return translation;;
 	}
 
 	nlohmann::json LangManager::get_all_item_translations(const std::string& code_name)

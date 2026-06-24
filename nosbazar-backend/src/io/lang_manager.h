@@ -19,7 +19,7 @@ namespace nosbazar::io {
 
 	static inline const std::unordered_map<Language, std::string> language_string = {
 		{ Language::spanish, "ES" },
-		{ Language::english, "EN" },
+		{ Language::english, "UK" },
 		{ Language::french, "FR" },
 		{ Language::german, "DE" },
 		{ Language::turkish, "TR" },
@@ -31,7 +31,7 @@ namespace nosbazar::io {
 
 	static inline const std::unordered_map<std::string, Language> string_to_lang = {
 		{ "ES", Language::spanish },
-		{ "EN", Language::english },
+		{ "UK", Language::english },
 		{ "FR", Language::french },
 		{ "DE", Language::german },
 		{ "TR", Language::turkish },

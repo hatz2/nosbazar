@@ -20,6 +20,7 @@ find_package(Crow CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(asio CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(ICU COMPONENTS uc i18n REQUIRED)
 
 
 include_directories("src")
@@ -44,6 +45,8 @@ target_link_libraries(nosbazar-backend PRIVATE
     asio::asio
 	nlohmann_json::nlohmann_json
     ZLIB::ZLIB
+    ICU::uc
+    ICU::i18n
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
