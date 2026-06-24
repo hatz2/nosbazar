@@ -4,17 +4,16 @@
 
 | Directory | Tech | Purpose |
 |-----------|------|---------|
-| `nosbazar-backend/` | C++23 / CMake | Game server bot: clientless Nostale login, bazaar search, HTTP API on `:8080` |
+| `backend/` | C++23 / CMake | Game server bot: clientless Nostale login, bazaar search, HTTP API on `:8080` |
 | `frontend/` | SvelteKit + TS | Web UI (search interface for the backend) |
-| `test/` | Node.js | E2E / integration tests (minimal; check structure before relying) |
 
 ---
 
 ## Backend build system
 
-- **CMake presets** in `nosbazar-backend/CMakePresets.json`. Use preset-driven commands, never raw `cmake ..`.
+- **CMake presets** in `backend/CMakePresets.json`. Use preset-driven commands, never raw `cmake ..`.
 - **vcpkg manifest mode** — dependencies declared in `vcpkg.json` are fetched automatically. No manual install needed on first configure.
-- Build from the root of `nosbazar-backend/`:
+- Build from the root of `backend/`:
 
 ```bash
 # Configure (pick a preset that matches your platform)
