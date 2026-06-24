@@ -1,56 +1,7 @@
 #include "rc_blist.h"
 #include <spdlog/spdlog.h>
 
-#include <Windows.h>
-
-std::string cp1250_to_utf8(const std::string& input)
-{
-	if (input.empty())
-		return {};
-
-	int wide_size = MultiByteToWideChar(
-		1250,
-		0,
-		input.data(),
-		static_cast<int>(input.size()),
-		nullptr,
-		0);
-
-	std::wstring wide(wide_size, L'\0');
-
-	MultiByteToWideChar(
-		1250,
-		0,
-		input.data(),
-		static_cast<int>(input.size()),
-		wide.data(),
-		wide_size);
-
-	int utf8_size = WideCharToMultiByte(
-		CP_UTF8,
-		0,
-		wide.data(),
-		static_cast<int>(wide.size()),
-		nullptr,
-		0,
-		nullptr,
-		nullptr);
-
-	std::string utf8(utf8_size, '\0');
-
-	WideCharToMultiByte(
-		CP_UTF8,
-		0,
-		wide.data(),
-		static_cast<int>(wide.size()),
-		utf8.data(),
-		utf8_size,
-		nullptr,
-		nullptr);
-
-	return utf8;
-}
-
+#include <strings/encoding.h>
 
 namespace nosbazar::packets {
 	nosbazar::packets::RcBlist::ShellEffect::ShellEffect(std::string_view item_data)
@@ -108,7 +59,7 @@ namespace nosbazar::packets {
 			{ "rare", rare },
 			{ "upgrade", upgrade },
 			{ "fixed_level", fixed_level },
-			{ "required_level", fixed_level },
+			{ "required_level", required_level },
 			{ "min_dmg", min_dmg },
 			{ "max_dmg", max_dmg },
 			{ "price", price },
@@ -159,7 +110,7 @@ namespace nosbazar::packets {
 			{ "rare", rare },
 			{ "upgrade", upgrade },
 			{ "fixed_level", fixed_level },
-			{ "required_level", fixed_level },
+			{ "required_level", required_level },
 			{ "melee_defence", melee_defence },
 			{ "ranged_defence", ranged_defence },
 			{ "magic_defence", magic_defence },
@@ -448,7 +399,7 @@ namespace nosbazar::packets {
 		}, data.fields);
 
 		nlohmann::json result = {
-			{ "owner_name", cp1250_to_utf8(owner_name) },
+			{ "owner_name", strings::cp1250_to_utf8(owner_name) },
 			{ "item_vnum", item_vnum },
 			{ "amount", amount },
 			{ "is_package", is_package },
