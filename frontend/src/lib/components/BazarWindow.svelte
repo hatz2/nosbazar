@@ -14,12 +14,12 @@
 	import ResultsTable from './ResultsTable.svelte';
 	import SortByFilter from './SortByFilter.svelte';
 
+	let { server = $bindable(1) } = $props();
 	let category = $state(BazarCategory.All);
 	let subCategory = $state(0);
 	let level = $state(0);
 	let rarityLevel = $state(0);
 	let upgradeLevel = $state(0);
-	let server = $state(1);
 	let order = $state(0);
 	let results = $state<EnrichedSearchResult[]>([]);
 

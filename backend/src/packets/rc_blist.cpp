@@ -242,7 +242,12 @@ namespace nosbazar::packets {
 	}
 	nlohmann::json RcBlist::SpecialistData::json() const
 	{
-		int level_percentage = exp_points * 100 / max_exp_points ;
+		int level_percentage = 0;
+		
+		if (max_exp_points) {
+			level_percentage  = exp_points * 100 / max_exp_points;
+		}
+
 		int new_icon_id = contains_sp ? vnum : icon_id;
 
 		return {

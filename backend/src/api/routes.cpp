@@ -1,4 +1,5 @@
 #include "api/routes.h"
+#include "server_registry.h"
 #include <bazar_search_queue.h>
 #include <packets/c_blist.h>
 #include <io/item_dat_parser.h>
@@ -81,6 +82,18 @@ crow::response handle_icon(const crow::request& req, uint32_t icon_id)
     }
 
     return response;
+}
+
+crow::response handle_servers(const crow::request& req)
+{
+    auto servers = nosbazar::ServerRegistry::instance().get_servers();
+
+    nlohmann::json json_data = nlohmann::json::array();
+    for (const auto& s : servers) {
+        json_data.push_back({{"id", s.id}, {"name", s.name}});
+    }
+
+    return crow::response(json_data.dump());
 }
 
 } // namespace nosbazar::api

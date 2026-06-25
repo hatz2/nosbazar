@@ -1,14 +1,18 @@
 <script lang="ts">
 	import BazarWindow from '$lib/components/BazarWindow.svelte';
 	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
+	import ServerSelector from '$lib/components/ServerSelector.svelte';
+
+	let server = $state(1);
 </script>
 
 <header class="top-bar">
 	<div class="spacer"></div>
+	<ServerSelector bind:value={server} />
 	<LanguageSelector />
 </header>
 
-<BazarWindow></BazarWindow>
+<BazarWindow bind:server={server}></BazarWindow>
 
 <style>
 	.top-bar {

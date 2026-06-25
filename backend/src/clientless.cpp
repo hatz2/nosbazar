@@ -3,6 +3,7 @@
 #include "nosclient.h"
 #include "packets/login_packet.h"
 #include "world_server_assigner.h"
+#include "server_registry.h"
 #include "strings/hex.h"
 #include "strings/parse.h"
 #include <algorithm>
@@ -118,6 +119,8 @@ void nosbazar::Clientless::phase_game()
 {
     // Make domain instances
     //game_state = std::make_unique<GameState>(bus);
+    ServerRegistry::instance().register_server(login_result->world_server_id, login_result->world_server_name);
+
     agent = std::make_unique<agent::Agent>(*world_session, packet_publisher, login_result->world_server_id);
 
     // Pulse packet keep alive
@@ -164,6 +167,7 @@ void nosbazar::Clientless::on_nstest(std::string_view packet)
         .session_id = nstest.session_id,
         .account_name = nstest.username,
         .world_server_id = server.id,
+        .world_server_name = server.name,
     };
 }
 

@@ -51,6 +51,7 @@ namespace nosbazar {
             uint16_t    session_id{};
             std::string account_name;
             int         world_server_id{};
+            std::string world_server_name;
         };
 
         Env env;
