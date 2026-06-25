@@ -58,14 +58,15 @@
 				const vnums = rawItems.map((item: SearchResult) => item.item_vnum);
 				await itemService.fetchMany(vnums);
 
-				// Enrich items with names from the cache synchronously for an atomic update
-				results = rawItems.map((item: SearchResult) => {
-					const staticData = itemService.getSync(item.item_vnum);
-					return {
-						...item,
-						item_name: staticData?.name || { UK: item.item_vnum.toString() }
-					};
-				});
+			// Enrich items with names from the cache synchronously for an atomic update
+			results = rawItems.map((item: SearchResult) => {
+				const staticData = itemService.getSync(item.item_vnum);
+				return {
+					...item,
+					item_name: staticData?.name || { UK: item.item_vnum.toString() },
+					icon_id: staticData?.icon_id
+				};
+			});
 			} else {
 				results = [];
 			}

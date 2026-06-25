@@ -1,6 +1,6 @@
 export interface ItemStaticData {
 	name: Record<string, string>;
-	// Add other properties here if needed in the future
+	icon_id?: number;
 }
 
 const cache = new Map<number, ItemStaticData>();

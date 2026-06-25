@@ -10,5 +10,6 @@ export type SearchResult = {
 
 export type EnrichedSearchResult = SearchResult & {
 	item_name: Record<string, string>;
+	icon_id?: number;
 };
 
