@@ -19,12 +19,11 @@ namespace nosbazar::packets {
 		int upgrade_filter{};
 		int order_filter{};
 		int unknown1{};
-		int unknown2{};
 		std::vector<uint16_t> vnums_filter;
 
 		std::string string() const {
 			std::string packet = fmt::format(
-				"{}  {} {} {} {} {} {} {} {} {} {}",
+				"{}  {} {} {} {} {} {} {} {} {}",
 				opcode,
 				index,
 				type_filter,
@@ -34,7 +33,6 @@ namespace nosbazar::packets {
 				upgrade_filter,
 				order_filter,
 				unknown1,
-				unknown2,
 				vnums_filter.size()
 			);
 

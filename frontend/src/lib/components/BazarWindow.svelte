@@ -12,6 +12,7 @@
 	import Toolbar from './Toolbar.svelte';
 	import UpgradeLevelCategory from './UpgradeLevelCategory.svelte';
 	import ResultsTable from './ResultsTable.svelte';
+	import SortByFilter from './SortByFilter.svelte';
 
 	let category = $state(BazarCategory.All);
 	let subCategory = $state(0);
@@ -62,7 +63,7 @@
 					const staticData = itemService.getSync(item.item_vnum);
 					return {
 						...item,
-						item_name: staticData?.name || { 'UK': item.item_vnum.toString() }
+						item_name: staticData?.name || { UK: item.item_vnum.toString() }
 					};
 				});
 			} else {
@@ -97,6 +98,7 @@
 		<LevelCategory bind:value={level} {category}></LevelCategory>
 		<RarityLevelCategory bind:value={rarityLevel} {category}></RarityLevelCategory>
 		<UpgradeLevelCategory bind:value={upgradeLevel} {category}></UpgradeLevelCategory>
+		<SortByFilter bind:value={order}></SortByFilter>
 	</Toolbar>
 
 	<ResultsTable {results}></ResultsTable>

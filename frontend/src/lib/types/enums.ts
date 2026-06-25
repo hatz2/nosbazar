@@ -158,6 +158,13 @@ enum ConsumerItemSubcategory {
 	Fish = 7
 }
 
+enum SortFilter {
+	PriceAscending = 0,
+	PriceDescending = 1,
+	AmountAscending = 2,
+	AmountDescending = 3
+}
+
 export {
 	BazarCategory,
 	WeaponSubcategory,
@@ -170,5 +177,6 @@ export {
 	StoreMountSubcategory,
 	ShellSubcategory,
 	MainItemSubcategory,
-	ConsumerItemSubcategory
+	ConsumerItemSubcategory,
+	SortFilter
 };
