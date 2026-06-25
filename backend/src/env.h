@@ -7,12 +7,9 @@ struct Env {
 	std::string identity_path;
 	std::string gf_email;
 	std::string gf_password;
-	std::string account_id;
 	std::string installation_id;
 	std::string login_server_ip;
 	uint16_t login_server_port;
-	int world_server_id;
-	int world_server_channel;
 
 	Env() {
 		if (!initialized) {
@@ -23,12 +20,9 @@ struct Env {
 		identity_path = dotenv::get("IDENTITY_PATH").value();
 		gf_email = dotenv::get("GF_EMAIL").value();
 		gf_password = dotenv::get("GF_PASSWORD").value();
-		account_id = dotenv::get("ACCOUNT_ID").value();
 		installation_id = dotenv::get("INSTALLATION_ID").value();
 		login_server_ip = dotenv::get("LOGIN_SERVER_IP").value();
 		login_server_port = std::stoi(dotenv::get("LOGIN_SERVER_PORT").value());
-		world_server_id = std::stoi(dotenv::get("WORLD_SERVER_ID").value());
-		world_server_channel = std::stoi(dotenv::get("WORLD_SERVER_CHANNEL").value());
 	}
 
 private:

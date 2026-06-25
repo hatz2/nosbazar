@@ -22,7 +22,7 @@ namespace nosbazar {
             captcha = 5,
         };
 
-        explicit Clientless(std::string_view account_name, int world_server_id, int world_server_channel);
+        explicit Clientless(std::string account_id, std::shared_ptr<auth::NosAuth> nosauth);
 
         ~Clientless();
 
@@ -50,16 +50,14 @@ namespace nosbazar {
             uint16_t    world_port{};
             uint16_t    session_id{};
             std::string account_name;
+            int         world_server_id{};
         };
 
         Env env;
         packets::Publisher packet_publisher;
         std::string account_id;
-        int world_server_id;
-        int world_server_channel;
 
-        std::shared_ptr<auth::Identity> identity;
-        std::unique_ptr<auth::NosAuth> nosauth;
+        std::shared_ptr<auth::NosAuth> nosauth;
         std::string session_token;
 
         asio::io_context login_context;

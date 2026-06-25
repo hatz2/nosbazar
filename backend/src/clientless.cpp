@@ -1,7 +1,6 @@
 #include "clientless.h"
 #include "env.h"
 #include "nosclient.h"
-#include "auth/token_repository.h"
 #include "packets/login_packet.h"
 #include "strings/hex.h"
 #include "strings/parse.h"
@@ -9,12 +8,9 @@
 #include <spdlog/spdlog.h>
 #include <random/random.h>
 
-nosbazar::Clientless::Clientless(std::string_view account_name, int world_server_id, int world_server_channel)
-	: account_id(account_name)
-	, world_server_id(world_server_id)
-	, world_server_channel(world_server_channel)
-	, identity(std::make_shared<auth::Identity>(env.identity_path))
-	, nosauth(std::make_unique<auth::NosAuth>(identity))
+nosbazar::Clientless::Clientless(std::string account_id, std::shared_ptr<auth::NosAuth> nosauth)
+	: account_id(std::move(account_id))
+	, nosauth(std::move(nosauth))
     , sensors(std::make_unique<game::Sensors>(packet_publisher))
     , agent(nullptr)
 {
@@ -27,8 +23,6 @@ nosbazar::Clientless::~Clientless()
 
 nosbazar::Clientless::ExitCode nosbazar::Clientless::run()
 {
-    nosclient::check_and_download_outdated_files();
-
     if (!phase_authenticate()) {
         return ExitCode::auth_failed;
     }
@@ -48,40 +42,9 @@ nosbazar::Clientless::ExitCode nosbazar::Clientless::run()
 
 bool nosbazar::Clientless::phase_authenticate()
 {
-    // Check if we already have a login token
-    auto& token_repo = nosbazar::auth::TokenRepository::instance();
-    std::optional<std::string> cached = token_repo.get_token(env.gf_email);
-
-    if (cached) {
-        nosauth->set_login_token(cached.value());
-        SPDLOG_DEBUG("Reusing cached token for {}", env.gf_email);
-    }
-    else {
-        auto result = nosauth->authenticate({
-            .email = env.gf_email,
-            .password = env.gf_password
-        });
-
-        if (result == auth::NosAuth::AuthResult::captcha) {
-            SPDLOG_ERROR("Captcha is needed to solve - not implemented yet");
-            return false;  // TODO: automatic captcha solver
-        }
-
-        if (result != auth::NosAuth::AuthResult::ok) {
-            SPDLOG_ERROR("Failed authentication");
-            return false;
-        }
-    }
-
-    auto accounts = nosauth->get_accounts();
-    if (!accounts.contains(account_id)) {
-        SPDLOG_ERROR("Could not find account with id: {}", account_id);
-        return false;
-    }
-
     auto token = nosauth->get_session_token(account_id);
     if (!token) {
-        SPDLOG_ERROR("Could not obtain session token");
+        SPDLOG_ERROR("Could not obtain session token for account {}", account_id);
         return false;
     }
 
@@ -107,11 +70,7 @@ bool nosbazar::Clientless::phase_login()
     login_context.run();  // block untill login session is closed by the remote
 
     if (!login_result) {
-        SPDLOG_ERROR(
-            "NsTeST not received - server not found (id={}, ch={})", 
-            env.world_server_id, 
-            env.world_server_channel
-        );
+        SPDLOG_ERROR("NsTeST not received - no servers available");
         return false;
     }
 
@@ -155,7 +114,7 @@ void nosbazar::Clientless::phase_game()
 {
     // Make domain instances
     //game_state = std::make_unique<GameState>(bus);
-    agent = std::make_unique<agent::Agent>(*world_session, packet_publisher, world_server_id);
+    agent = std::make_unique<agent::Agent>(*world_session, packet_publisher, login_result->world_server_id);
 
     // Pulse packet keep alive
     pulse_timer->start();
@@ -188,25 +147,19 @@ void nosbazar::Clientless::on_nstest(std::string_view packet)
 
     packets::login::NsTeSTPacket nstest(packet);
 
-    auto server = nstest.find_world_server(
-        env.world_server_id,
-        env.world_server_channel
-    );
-
-    if (!server) {
-        SPDLOG_WARN(
-            "Server id={} ch={} not found in NsTeST",
-            env.world_server_id, 
-            env.world_server_channel
-        );
+    if (nstest.servers.empty()) {
+        SPDLOG_WARN("No servers available in NsTeST");
         return;
     }
 
+    auto& server = nstest.servers.front();
+
     login_result = LoginResult{
-        .world_ip = server->ip,
-        .world_port = server->port,
+        .world_ip = server.ip,
+        .world_port = server.port,
         .session_id = nstest.session_id,
         .account_name = nstest.username,
+        .world_server_id = server.id,
     };
 }
 

@@ -1,5 +1,7 @@
 ﻿#include "env.h"
 #include "clientless.h"
+#include "auth/token_repository.h"
+#include "nosclient.h"
 #include <spdlog/spdlog.h>
 #include "map_grid_repository.h"
 #include <crow.h>
@@ -10,43 +12,8 @@
 #include <io/nos_file_text_reader.h>
 #include <crow/middlewares/cors.h>
 #include <io/nsip_data_reader.h>
-
-//int main(int argc, char** argv) {
-//#ifdef _DEBUG
-//	spdlog::set_level(spdlog::level::trace);
-//#else
-//	spdlog::set_level(spdlog::level::info);
-//#endif
-//
-//	nosbazar::MapGridRepository::instance();
-//
-//	Env env;
-//	nosbazar::Clientless client(env.account_id, env.world_server_id, env.world_server_channel);
-//	return static_cast<int>(client.run());
-//}
-
-//struct CORSMiddleware {
-//	struct context {};
-//
-//	void before_handle(crow::request& req, crow::response& res, context&)
-//	{
-//		if (req.method == crow::HTTPMethod::Options)
-//		{
-//			res.add_header("Access-Control-Allow-Origin", "*");
-//			res.add_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-//			res.add_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//			res.code = 204;
-//			res.end();
-//			return;
-//		}
-//	}
-//
-//	void after_handle(crow::request&, crow::response& res, context&)
-//	{
-//		res.add_header("Access-Control-Allow-Origin", "*");
-//		res.add_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//	}
-//};
+#include <thread>
+#include <nlohmann/json.hpp>
 
 int main(int argc, char** argv) {
 #ifdef _DEBUG
@@ -62,13 +29,39 @@ int main(int argc, char** argv) {
 
 	nosbazar::MapGridRepository::instance();
 
-	std::thread([&]() {
-		Env env;
-		nosbazar::Clientless client(env.account_id, env.world_server_id, env.world_server_channel);
-		return static_cast<int>(client.run());
-	}).detach();
+	nosbazar::nosclient::check_and_download_outdated_files();
 
-	//crow::App<CORSMiddleware> app;
+	Env env;
+	auto identity = std::make_shared<nosbazar::auth::Identity>(env.identity_path);
+	auto auth = std::make_shared<nosbazar::auth::NosAuth>(identity);
+
+	auto& token_repo = nosbazar::auth::TokenRepository::instance();
+	auto cached = token_repo.get_token(env.gf_email);
+
+	if (cached) {
+		auth->set_login_token(cached.value());
+		SPDLOG_INFO("Reusing cached token for {}", env.gf_email);
+	} else {
+		auto auth_result = auth->authenticate({env.gf_email, env.gf_password});
+		if (auth_result != nosbazar::auth::NosAuth::AuthResult::ok) {
+			if (auth_result == nosbazar::auth::NosAuth::AuthResult::captcha) {
+				SPDLOG_ERROR("Captcha required - not implemented yet");
+			} else {
+				SPDLOG_ERROR("Authentication failed");
+			}
+			return 1;
+		}
+	}
+
+	auto accounts = auth->get_accounts();
+	for (auto& entry : accounts.items()) {
+		const std::string& id = entry.key();
+		std::thread([id, auth]() {
+			nosbazar::Clientless client(id, auth);
+			return static_cast<int>(client.run());
+		}).detach();
+	}
+
 	crow::App<crow::CORSHandler> app;
 
 	CROW_ROUTE(app, "/search").methods("POST"_method)
@@ -146,16 +139,3 @@ int main(int argc, char** argv) {
 	app.port(8080).multithreaded().run();
 
 }
-
-
-//#include <io/item_dat_parser.h>
-//#include <io/nos_file_text_reader.h>
-//#include <io/lang_file_parser.h>
-
-//int main(int argc, char** argv) {
-//    //nosbazar::io::NosFileTextReader reader("C:/Program Files (x86)/Nostale/NostaleData/NSgtdData.NOS");
-//    //nosbazar::io::ItemDatParser parser(reader.get_file_content("Item.dat"));
-
-//    nosbazar::io::NosFileTextReader reader("C:/Program Files (x86)/Nostale/NostaleData/NSlangData_ES.NOS");
-//    nosbazar::io::LangFileParser parser(reader.get_file_content("_code_es_Item.txt"));
-//}
