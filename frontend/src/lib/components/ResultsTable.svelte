@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { EnrichedSearchResult } from '$lib/types/search';
-	import { language } from '$lib/stores/lang.svelte';
+	import { lang } from '$lib/stores/lang.svelte';
 
 	type Props = {
 		results: EnrichedSearchResult[];
@@ -35,7 +35,7 @@
 	<tbody>
 		{#each results as item, i (i)}
 			<tr>
-				<td>{item.item_name[language] || item.item_name['UK'] || item.item_vnum.toString()}</td>
+				<td>{item.item_name[lang.current] || item.item_name['UK'] || item.item_vnum.toString()}</td>
 				<td>{item.amount}</td>
 				<td>{item.bazar_price.toLocaleString()}</td>
 				<td>{formatTime(item.minutes_left)}</td>
