@@ -277,16 +277,14 @@ nosbazar::net::WorldSession::WorldSession(std::unique_ptr<TCPClient> client, pac
 
 void nosbazar::net::WorldSession::send(const std::string& packet)
 {
-    static bool is_first_packet = true;
-
     on_send(packet);
 
     std::string packet_with_count = fmt::format("{} {}", packet_counter++, packet);
     std::vector<uint8_t> raw(packet_with_count.begin(), packet_with_count.end());
-    std::vector<uint8_t> encrypted = noscrypto::Client::world_encrypt(raw, session_id, is_first_packet);
+    std::vector<uint8_t> encrypted = noscrypto::Client::world_encrypt(raw, session_id, !first_packet_sent);
     client->send(encrypted);
 
-    is_first_packet = false;
+    first_packet_sent = true;
 }
 
 void nosbazar::net::WorldSession::on_recv(std::vector<uint8_t> data)

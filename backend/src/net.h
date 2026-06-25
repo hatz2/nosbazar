@@ -112,6 +112,7 @@ namespace nosbazar::net {
 		PacketAcumulator acumulator;
 		uint16_t session_id;
 		uint16_t packet_counter;
+		bool first_packet_sent{false};
 	};
 
 

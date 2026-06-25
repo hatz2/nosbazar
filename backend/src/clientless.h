@@ -70,6 +70,7 @@ namespace nosbazar {
         int first_char_index{ -1 };
 
         void init_pulse_timer();
+        uint64_t pulse_time{0};
         std::unique_ptr<nosbazar::time::IntervalTimer> pulse_timer;
 
         // TODO: Add domain specific classes

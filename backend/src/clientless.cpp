@@ -24,14 +24,17 @@ nosbazar::Clientless::~Clientless()
 nosbazar::Clientless::ExitCode nosbazar::Clientless::run()
 {
     if (!phase_authenticate()) {
+        SPDLOG_ERROR("Auth phase failed");
         return ExitCode::auth_failed;
     }
 
     if (!phase_login()) {
+        SPDLOG_ERROR("Login phase failed");
         return ExitCode::login_failed;
     }
 
     if (!phase_world()) {
+        SPDLOG_ERROR("World phase failed");
         return ExitCode::world_failed;
     }
 
@@ -226,7 +229,6 @@ void nosbazar::Clientless::create_character()
 void nosbazar::Clientless::init_pulse_timer()
 {
     constexpr int pulse_secs = 60;
-    static uint64_t pulse_time = 0;
 
     pulse_timer = std::make_unique<nosbazar::time::IntervalTimer>(
         world_context,
