@@ -6,6 +6,18 @@
 	};
 
 	let { results }: Props = $props();
+
+	function formatTime(minutes: number) {
+		if (minutes < 60) {
+			return `${minutes} Mins`;
+		} else if (minutes <= 1440) {
+			const hours = Math.round(minutes / 60);
+			return `${hours} Hours`;
+		} else {
+			const days = Math.round(minutes / 1440);
+			return `${days} Day(s)`;
+		}
+	}
 </script>
 
 <table>
@@ -25,7 +37,7 @@
 				<td>{item.item_vnum}</td>
 				<td>{item.amount}</td>
 				<td>{item.bazar_price.toLocaleString()}</td>
-				<td>{item.minutes_left} min</td>
+				<td>{formatTime(item.minutes_left)}</td>
 				<td>{item.owner_name}</td>
 			</tr>
 		{/each}
