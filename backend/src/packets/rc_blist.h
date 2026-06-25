@@ -268,8 +268,8 @@ namespace nosbazar::packets {
 			int item_vnum{};
 			int amount{};
 			bool is_package{};
-			uint64_t bazar_price{};
-			uint64_t minutes_left{};
+			int bazar_price{};
+			int minutes_left{};
 			int unknown_1{};
 			int unknown_2{};
 			int rarity{};

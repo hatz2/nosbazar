@@ -12,6 +12,7 @@
 	import Toolbar from './Toolbar.svelte';
 	import UpgradeLevelCategory from './UpgradeLevelCategory.svelte';
 	import ResultsTable from './ResultsTable.svelte';
+	import ItemDetailWindow from './ItemDetailWindow.svelte';
 	import SortByFilter from './SortByFilter.svelte';
 
 	let { server = $bindable(1) } = $props();
@@ -22,6 +23,7 @@
 	let upgradeLevel = $state(0);
 	let order = $state(0);
 	let results = $state<EnrichedSearchResult[]>([]);
+	let openWindows = $state<{ item: EnrichedSearchResult; left: number; top: number }[]>([]);
 
 	// Reset category-dependent filters when category changes
 	$effect(() => {
@@ -58,15 +60,15 @@
 				const vnums = rawItems.map((item: SearchResult) => item.item_vnum);
 				await itemService.fetchMany(vnums);
 
-			// Enrich items with names from the cache synchronously for an atomic update
-			results = rawItems.map((item: SearchResult) => {
-				const staticData = itemService.getSync(item.item_vnum);
-				return {
-					...item,
-					item_name: staticData?.name || { UK: item.item_vnum.toString() },
-					icon_id: staticData?.icon_id
-				};
-			});
+				// Enrich items with names from the cache synchronously for an atomic update
+				results = rawItems.map((item: SearchResult) => {
+					const staticData = itemService.getSync(item.item_vnum);
+					return {
+						...item,
+						item_name: staticData?.name || { UK: item.item_vnum.toString() },
+						icon_id: staticData?.icon_id
+					};
+				});
 			} else {
 				results = [];
 			}
@@ -102,8 +104,20 @@
 		<SortByFilter bind:value={order}></SortByFilter>
 	</Toolbar>
 
-	<ResultsTable {results}></ResultsTable>
+	<ResultsTable
+		{results}
+		onContextMenu={(item) => {
+			openWindows = [
+				...openWindows,
+				{ item, left: 300 + openWindows.length * 20, top: 100 + openWindows.length * 20 }
+			];
+		}}
+	/>
 </div>
+
+{#each openWindows as window, i (i)}
+	<ItemDetailWindow item={window.item} left={window.left} top={window.top} />
+{/each}
 
 <!-- </Draggable> -->
 

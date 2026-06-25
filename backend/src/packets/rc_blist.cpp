@@ -368,8 +368,8 @@ namespace nosbazar::packets {
 		this->item_vnum = strings::token<int>(item_data, item_fields_separator);
 		this->amount = strings::token<int>(item_data, item_fields_separator);
 		this->is_package = strings::token<bool>(item_data, item_fields_separator);
-		this->bazar_price = strings::token<uint64_t>(item_data, item_fields_separator);
-		this->minutes_left = strings::token<uint64_t>(item_data, item_fields_separator);
+		this->bazar_price = strings::token<int>(item_data, item_fields_separator);
+		this->minutes_left = strings::token<int>(item_data, item_fields_separator);
 		this->unknown_1 = strings::token<int>(item_data, item_fields_separator);
 		this->unknown_2 = strings::token<int>(item_data, item_fields_separator);
 		this->rarity = strings::token<int>(item_data, item_fields_separator);

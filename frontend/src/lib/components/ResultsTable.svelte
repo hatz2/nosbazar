@@ -5,9 +5,10 @@
 
 	type Props = {
 		results: EnrichedSearchResult[];
+		onContextMenu?: (item: EnrichedSearchResult) => void;
 	};
 
-	let { results }: Props = $props();
+	let { results, onContextMenu }: Props = $props();
 
 	function formatTime(minutes: number) {
 		if (minutes < 60) {
@@ -36,7 +37,7 @@
 	<tbody>
 		{#each results as item, i (i)}
 			<tr>
-				<td class="name-cell"><ItemIcon iconId={item.icon_id} />{item.item_name[lang.current] || item.item_name['UK'] || item.item_vnum.toString()}</td>
+				<td class="name-cell"><!-- svelte-ignore a11y_no_static_element_interactions --><span oncontextmenu={(e) => { e.preventDefault(); onContextMenu?.(item); }} style="cursor: pointer"><ItemIcon iconId={item.icon_id} /></span>{item.item_name[lang.current] || item.item_name['UK'] || item.item_vnum.toString()}</td>
 				<td>{item.amount}</td>
 				<td>{item.bazar_price.toLocaleString('en-US')}</td>
 				<td>{formatTime(item.minutes_left)}</td>

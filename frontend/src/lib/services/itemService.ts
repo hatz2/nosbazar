@@ -1,6 +1,43 @@
+export interface ItemBuffEntry {
+	vnum: number;
+	bcard_display?: Record<string, string>;
+}
+
+export interface ItemFlagsData {
+	no_selling: boolean;
+	no_dropping: boolean;
+	no_trading: boolean;
+	miniland_item: boolean;
+	miniland_item_2: boolean;
+	show_warning_on_use: boolean;
+	is_time_space_reward_box: boolean;
+	show_description_on_hover: boolean;
+	follow_mouse_on_use: boolean;
+	show_something_on_hover: boolean;
+	can_be_colored: boolean;
+	female_can_wear: boolean;
+	male_can_wear: boolean;
+	play_sound_on_pickup: boolean;
+	use_reputation_as_price: boolean;
+	is_champion_equip: boolean;
+	is_limited: boolean;
+}
+
 export interface ItemStaticData {
+	vnum: number;
+	price: number;
 	name: Record<string, string>;
-	icon_id?: number;
+	inventory_tab: number;
+	item_type: number;
+	item_subtype: number;
+	equip_slot: number;
+	icon_id: number;
+	visual_change_id: number;
+	attack_type: number;
+	required_class: number;
+	flags: ItemFlagsData;
+	buffs: ItemBuffEntry[];
+	description?: Record<string, string>;
 }
 
 const cache = new Map<number, ItemStaticData>();
@@ -48,7 +85,6 @@ export const itemService = {
 			return new Set(uniqueVnums);
 		}
 
-		// Fetch missing items in parallel
 		await Promise.all(
 			missingVnums.map(async (vnum) => {
 				await this.getItemStaticData(vnum);
