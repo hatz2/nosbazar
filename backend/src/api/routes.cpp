@@ -66,6 +66,10 @@ crow::response handle_icon(const crow::request& req, uint32_t icon_id)
 {
     const std::vector<uint8_t>* data = nosbazar::io::NSipDataReader::instance().get_icon_data(icon_id);
 
+    if (!data) {
+        data = nosbazar::io::NSipDataReader::instance().get_icon_data(0);
+    }
+
     crow::response response;
     response.set_header("Content-Type", "image/png");
 
