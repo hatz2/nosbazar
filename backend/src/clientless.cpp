@@ -2,6 +2,7 @@
 #include "env.h"
 #include "nosclient.h"
 #include "packets/login_packet.h"
+#include "world_server_assigner.h"
 #include "strings/hex.h"
 #include "strings/parse.h"
 #include <algorithm>
@@ -155,7 +156,7 @@ void nosbazar::Clientless::on_nstest(std::string_view packet)
         return;
     }
 
-    auto& server = nstest.servers.front();
+    auto& server = WorldServerAssigner::instance().assign(nstest.servers);
 
     login_result = LoginResult{
         .world_ip = server.ip,
