@@ -38,7 +38,7 @@
 			<tr>
 				<td class="name-cell"><ItemIcon iconId={item.icon_id} />{item.item_name[lang.current] || item.item_name['UK'] || item.item_vnum.toString()}</td>
 				<td>{item.amount}</td>
-				<td>{item.bazar_price.toLocaleString()}</td>
+				<td>{item.bazar_price.toLocaleString('en-US')}</td>
 				<td>{formatTime(item.minutes_left)}</td>
 				<td>{item.owner_name}</td>
 			</tr>

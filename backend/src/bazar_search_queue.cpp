@@ -9,9 +9,14 @@ void nosbazar::BazarSearchQueue::push(std::shared_ptr<BazarSearch> search)
 std::shared_ptr<nosbazar::BazarSearch> nosbazar::BazarSearchQueue::pop()
 {
 	const std::lock_guard<std::mutex> lock(mutex);
-	std::shared_ptr<BazarSearch> search = std::move(queue.front());
-	queue.pop();
-	return search;
+	if (queue.empty()) {
+		return nullptr;
+	}
+	else {
+		std::shared_ptr<BazarSearch> search = std::move(queue.front());
+		queue.pop();
+		return search;
+	}
 }
 
 bool nosbazar::BazarSearchQueue::empty()
