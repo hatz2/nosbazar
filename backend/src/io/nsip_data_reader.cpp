@@ -2,7 +2,11 @@
 #include "nos_zlib_decryptor.h"
 #include <fstream>
 #include <stdexcept>
+#include <cstdlib>
 #include "file_reader.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb/stb_image_write.h"
 
 namespace nosbazar::io {
 
@@ -75,8 +79,45 @@ void NSipDataReader::initialize(const std::filesystem::path& file_path) {
 
         std::vector<uint8_t> decompressed_data = decryptor.decrypt(compressed_data);
 
-        if (!decompressed_data.empty()) {
-            icon_cache[entry.id] = std::move(decompressed_data);
+        if (decompressed_data.size() >= 13) {
+            uint16_t width = decompressed_data[1] | (decompressed_data[2] << 8);
+            uint16_t height = decompressed_data[3] | (decompressed_data[4] << 8);
+
+            if (width > 0 && height > 0) {
+                size_t num_pixels = width * height;
+                size_t expected_pixel_bytes = num_pixels * 2;
+                size_t actual_pixel_bytes = decompressed_data.size() - 13;
+
+                if (actual_pixel_bytes >= expected_pixel_bytes) {
+                    std::vector<uint8_t> rgba(num_pixels * 4);
+
+                    for (size_t i = 0; i < num_pixels; ++i) {
+                        uint8_t gb = decompressed_data[13 + i * 2];
+                        uint8_t ar = decompressed_data[13 + i * 2 + 1];
+
+                        uint8_t r = ar & 0xF;
+                        uint8_t g = gb >> 4;
+                        uint8_t b = gb & 0xF;
+                        uint8_t a = ar >> 4;
+
+                        size_t idx = i * 4;
+                        rgba[idx + 0] = r * 0x11;
+                        rgba[idx + 1] = g * 0x11;
+                        rgba[idx + 2] = b * 0x11;
+                        rgba[idx + 3] = a * 0x11;
+                    }
+
+                    int png_len = 0;
+                    unsigned char* png = stbi_write_png_to_mem(
+                        rgba.data(), width * 4, width, height, 4, &png_len);
+
+                    if (png) {
+                        std::vector<uint8_t> png_buffer(png, png + png_len);
+                        STBIW_FREE(png);
+                        icon_cache[entry.id] = std::move(png_buffer);
+                    }
+                }
+            }
         }
     }
 

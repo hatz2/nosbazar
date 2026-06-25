@@ -93,7 +93,7 @@
 		<span>Level</span>
 		<span>Rarity Level</span>
 		<span>Upgrade Level</span>
-		<span></span>
+		<span>Sort by</span>
 
 		<LevelCategory bind:value={level} {category}></LevelCategory>
 		<RarityLevelCategory bind:value={rarityLevel} {category}></RarityLevelCategory>

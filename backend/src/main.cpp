@@ -125,6 +125,24 @@ int main(int argc, char** argv) {
 		}
 	});
 
+	CROW_ROUTE(app, "/icon/<uint>").methods("GET"_method)
+	([](const crow::request& req, uint32_t icon_id) {
+		const std::vector<uint8_t>* data = nosbazar::io::NSipDataReader::instance().get_icon_data(icon_id);
+
+		crow::response response;
+		response.set_header("Content-Type", "image/png");
+
+		if (data) {
+			response.body.assign(reinterpret_cast<const char*>(data->data()), data->size());
+		}
+		else {
+			response.code = 404;
+			response.body = "Icon not found";
+		}
+
+		return response;
+	});
+
 	app.port(8080).multithreaded().run();
 
 }
