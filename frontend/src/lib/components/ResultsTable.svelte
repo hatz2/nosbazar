@@ -1,8 +1,9 @@
 <script lang="ts">
-	import type { SearchResult } from '$lib/types/search';
+	import type { EnrichedSearchResult } from '$lib/types/search';
+	import { language } from '$lib/stores/lang.svelte';
 
 	type Props = {
-		results: SearchResult[];
+		results: EnrichedSearchResult[];
 	};
 
 	let { results }: Props = $props();
@@ -34,7 +35,7 @@
 	<tbody>
 		{#each results as item, i (i)}
 			<tr>
-				<td>{item.item_vnum}</td>
+				<td>{item.item_name[language] || item.item_name['UK'] || item.item_vnum.toString()}</td>
 				<td>{item.amount}</td>
 				<td>{item.bazar_price.toLocaleString()}</td>
 				<td>{formatTime(item.minutes_left)}</td>

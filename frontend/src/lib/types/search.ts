@@ -7,3 +7,8 @@ export type SearchResult = {
 	minutes_left: number;
 	data: Record<string, unknown>;
 };
+
+export type EnrichedSearchResult = SearchResult & {
+	item_name: Record<string, string>;
+};
+

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { BazarCategory } from '$lib/types/enums';
-	import type { SearchResult } from '$lib/types/search';
+	import type { SearchResult, EnrichedSearchResult } from '$lib/types/search';
+	import { itemService } from '$lib/services/itemService';
 	import BlueButton from './BlueButton.svelte';
 	import Category from './Category.svelte';
 	// import Draggable from './Draggable.svelte';
@@ -19,7 +20,7 @@
 	let upgradeLevel = $state(0);
 	let server = $state(1);
 	let order = $state(0);
-	let results = $state<SearchResult[]>([]);
+	let results = $state<EnrichedSearchResult[]>([]);
 
 	// Reset category-dependent filters when category changes
 	$effect(() => {
@@ -50,7 +51,23 @@
 				})
 			});
 			const data = await response.json();
-			results = data.items ?? [];
+			const rawItems = data.items ?? [];
+
+			if (rawItems.length > 0) {
+				const vnums = rawItems.map((item: SearchResult) => item.item_vnum);
+				await itemService.fetchMany(vnums);
+
+				// Enrich items with names from the cache synchronously for an atomic update
+				results = rawItems.map((item: SearchResult) => {
+					const staticData = itemService.getSync(item.item_vnum);
+					return {
+						...item,
+						item_name: staticData?.name || { 'UK': item.item_vnum.toString() }
+					};
+				});
+			} else {
+				results = [];
+			}
 		} catch (e) {
 			console.error('Search failed', e);
 			results = [];
