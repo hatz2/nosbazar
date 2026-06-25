@@ -29,6 +29,7 @@ namespace {
 	};
 
 	std::string download_file(std::string_view remote_rel_path) {
+		SPDLOG_INFO("Downloading file {}...", remote_rel_path);
 		const std::string url = fmt::format("http://patches.gameforge.com/{}", remote_rel_path);
 		auto reply = nosbazar::net::get(url);
 
@@ -41,6 +42,8 @@ namespace {
 			SPDLOG_DEBUG("download_file status {} body {}", reply->status_code, reply->body);
 			return {};
 		}
+
+		SPDLOG_INFO("Downloaded {} correctly", remote_rel_path);
 
 		return reply->body;
 	}
@@ -76,6 +79,7 @@ namespace {
 
 void nosbazar::nosclient::check_and_download_outdated_files()
 {
+	SPDLOG_INFO("Checking and downloading game files...");
 	std::vector<FileInfo> file_infos = get_remote_client_file_info();
 	std::vector<FileInfo> outdated_files = get_outdated_files(file_infos);
 	download_files(outdated_files);
@@ -83,6 +87,7 @@ void nosbazar::nosclient::check_and_download_outdated_files()
 
 std::vector<nosbazar::nosclient::FileInfo> nosbazar::nosclient::get_outdated_files(std::span<const FileInfo> files_info)
 {
+	SPDLOG_INFO("Searching for outdated files...");
 	std::vector<FileInfo> result;
 
 	for (const auto& file_info : files_info) {
@@ -96,6 +101,7 @@ std::vector<nosbazar::nosclient::FileInfo> nosbazar::nosclient::get_outdated_fil
 		std::string local_sha1 = crypto::sha1(file_content.value());
 
 		if (local_sha1 != file_info.sha1) {
+			SPDLOG_INFO("{} is outdated", file_info.filename);
 			result.emplace_back(file_info);
 		}
 	}
@@ -105,6 +111,7 @@ std::vector<nosbazar::nosclient::FileInfo> nosbazar::nosclient::get_outdated_fil
 
 std::vector<nosbazar::nosclient::FileInfo> nosbazar::nosclient::get_remote_client_file_info()
 {
+	SPDLOG_INFO("Fetching remote files information...");
 	std::string_view url = "https://spark.gameforge.com/api/v1/patching/download/latest/nostale/default?locale=en&architecture=x64&branchToken";
 
 	std::vector<std::string> headers = {
@@ -117,6 +124,8 @@ std::vector<nosbazar::nosclient::FileInfo> nosbazar::nosclient::get_remote_clien
 
 	if (reply) {
 		json response = json::parse(reply->body);
+
+		SPDLOG_INFO("Received remote files information");
 
 		if (response.contains("entries")) {
 			for (const auto& entry : response["entries"]) {

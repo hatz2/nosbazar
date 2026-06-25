@@ -44,6 +44,7 @@ namespace nosbazar::io {
 
 	void NosFileTextReader::read(const std::string& file_path)
 	{
+        SPDLOG_INFO("Reading file {}...", file_path);
         std::ifstream file(file_path, std::fstream::binary);
 
         if (!file.is_open()) {

@@ -76,6 +76,8 @@ nosbazar::MapGridRepository::MapGridRepository()
 {
 	std::filesystem::path directory("assets/maps");
 
+	SPDLOG_INFO("Initializing map grids...");
+
 	try {
 		for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(directory)) {
 			if (entry.is_regular_file()) {

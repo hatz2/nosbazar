@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <cstdlib>
 #include "file_reader.h"
+#include <spdlog/spdlog.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"

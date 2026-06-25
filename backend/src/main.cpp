@@ -29,10 +29,13 @@ void initialize_game_data()
     nosbazar::nosclient::check_and_download_outdated_files();
 
     nosbazar::io::NosFileTextReader reader("assets/NostaleData/NSgtdData.NOS");
+    SPDLOG_INFO("Parsing Item.dat...");
     nosbazar::io::ItemDatParser::instance().parse(reader.get_file_content("Item.dat"));
+    SPDLOG_INFO("Parsing BCard.dat...");
     nosbazar::io::BCardParser::instance().parse(reader.get_file_content("BCard.dat"));
+    SPDLOG_INFO("Parsing NSipData.NOS...");
     nosbazar::io::NSipDataReader::instance().initialize("assets/NostaleData/NSipData.NOS");
-
+    nosbazar::io::LangManager::get_instance();
     nosbazar::MapGridRepository::instance();
 }
 
