@@ -1,5 +1,6 @@
 #include "nosclient.h"
 #include <crypto/hash.h>
+#include <filesystem>
 #include <fstream>
 #include <net.h>
 #include <spdlog/spdlog.h>
@@ -9,7 +10,23 @@
 using json = nlohmann::json;
 
 namespace {
-	const std::unordered_set<std::string> files_to_look = { "NostaleClient.exe", "NostaleClientX.exe" };
+	constexpr std::string_view assets_dir = "assets/NostaleData";
+
+	const std::unordered_set<std::string> files_to_look = {
+		"NostaleClient.exe", 
+		"NostaleClientX.exe",
+		"NSgtdData.NOS", 
+		"NSipData.NOS",
+		"NSlangData_UK.NOS", 
+		"NSlangData_ES.NOS", 
+		"NSlangData_FR.NOS",
+		"NSlangData_DE.NOS", 
+		"NSlangData_TR.NOS", 
+		"NSlangData_IT.NOS",
+		"NSlangData_RU.NOS", 
+		"NSlangData_PL.NOS", 
+		"NSlangData_CZ.NOS",
+	};
 
 	std::string download_file(std::string_view remote_rel_path) {
 		const std::string url = fmt::format("http://patches.gameforge.com/{}", remote_rel_path);
@@ -40,6 +57,21 @@ namespace {
 
 		return content.str();
 	}
+
+	std::string output_path_for(const std::string& filename) {
+		if (filename.ends_with(".NOS")) {
+			return std::string(assets_dir) + "/" + filename;
+		}
+		return filename;
+	}
+
+	std::string basename_from_api_path(const std::string& path) {
+		auto pos = path.find_last_of('\\');
+		if (pos != std::string::npos) {
+			return path.substr(pos + 1);
+		}
+		return path;
+	}
 }
 
 void nosbazar::nosclient::check_and_download_outdated_files()
@@ -54,7 +86,7 @@ std::vector<nosbazar::nosclient::FileInfo> nosbazar::nosclient::get_outdated_fil
 	std::vector<FileInfo> result;
 
 	for (const auto& file_info : files_info) {
-		auto file_content = read_binary_file_content(file_info.filename);
+		auto file_content = read_binary_file_content(file_info.output_path);
 
 		if (!file_content) {
 			result.emplace_back(file_info);
@@ -84,23 +116,25 @@ std::vector<nosbazar::nosclient::FileInfo> nosbazar::nosclient::get_remote_clien
 	std::vector<FileInfo> result;
 
 	if (reply) {
-		SPDLOG_DEBUG("get_remote_nostaleclientx_hash: {}", reply->body);
-		
 		json response = json::parse(reply->body);
 
 		if (response.contains("entries")) {
 			for (const auto& entry : response["entries"]) {
 				std::string file = entry["file"];
+				std::string basename = basename_from_api_path(file);
 
-				if (files_to_look.contains(file)) {
-					result.push_back({
-						.dwnload_rel_path = entry["path"],
-						.sha1 = entry["sha1"],
-						.filename = entry["file"],
-						.flags = entry["flags"],
-						.folder = entry["folder"],
-					});
+				if (!files_to_look.contains(file) && !files_to_look.contains(basename)) {
+					continue;
 				}
+
+				result.push_back({
+					.dwnload_rel_path = entry["path"],
+					.sha1 = entry["sha1"],
+					.filename = basename,
+					.output_path = output_path_for(basename),
+					.flags = entry["flags"],
+					.folder = entry["folder"],
+				});
 			}
 		}
 	}
@@ -117,7 +151,9 @@ void nosbazar::nosclient::download_files(std::span<const FileInfo> files_info)
 			continue;
 		}
 
-		std::ofstream file(info.filename, std::ios_base::binary);
+		std::filesystem::create_directories(std::filesystem::path(info.output_path).parent_path());
+
+		std::ofstream file(info.output_path, std::ios_base::binary);
 		if (file.is_open()) {
 			file.write(file_content.c_str(), file_content.size());
 		}

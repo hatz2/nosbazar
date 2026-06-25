@@ -9,6 +9,7 @@ namespace nosbazar::nosclient {
 		std::string dwnload_rel_path;
 		std::string sha1;
 		std::string filename;
+		std::string output_path;
 		int flags;
 		int size;
 		bool folder;

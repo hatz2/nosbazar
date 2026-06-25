@@ -26,14 +26,14 @@ void setup_log_level()
 
 void initialize_game_data()
 {
-    nosbazar::io::NosFileTextReader reader("C:/Program Files (x86)/Nostale/NostaleData/NSgtdData.NOS");
+    nosbazar::nosclient::check_and_download_outdated_files();
+
+    nosbazar::io::NosFileTextReader reader("assets/NostaleData/NSgtdData.NOS");
     nosbazar::io::ItemDatParser::instance().parse(reader.get_file_content("Item.dat"));
     nosbazar::io::BCardParser::instance().parse(reader.get_file_content("BCard.dat"));
-    nosbazar::io::NSipDataReader::instance().initialize("C:/Program Files (x86)/Nostale/NostaleData/NSipData.NOS");
+    nosbazar::io::NSipDataReader::instance().initialize("assets/NostaleData/NSipData.NOS");
 
     nosbazar::MapGridRepository::instance();
-
-    nosbazar::nosclient::check_and_download_outdated_files();
 }
 
 bool authenticate_and_spawn_clients(Env& env)
