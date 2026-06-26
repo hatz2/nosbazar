@@ -133,8 +133,8 @@ nlohmann::json nosbazar::io::Item::json() const {
 	j_flags["follow_mouse_on_use"] = flags.follow_mouse_on_use;
 	j_flags["show_something_on_hover"] = flags.show_something_on_hover;
 	j_flags["can_be_colored"] = flags.can_be_colored;
-	j_flags["female_can_wear"] = flags.female_can_wear;
-	j_flags["male_can_wear"] = flags.male_can_wear;
+	j_flags["female_can_wear"] = flags.male_can_wear;
+	j_flags["male_can_wear"] = flags.female_can_wear;
 	//j_flags["unknown_5"] = flags.unknown_5;
 	j_flags["play_sound_on_pickup"] = flags.play_sound_on_pickup;
 	j_flags["use_reputation_as_price"] = flags.use_reputation_as_price;
@@ -155,6 +155,10 @@ nlohmann::json nosbazar::io::Item::json() const {
 	// Buffs serialization
 	json j_buffs = json::array();
 	for (const auto& buff : buffs) {
+		if (buff.vnum <= 0) {
+			continue;
+		}
+
 		json b;
 		b["vnum"] = buff.vnum;
 		//b["effect"] = json{ {"val_1", buff.val_1}, {"val_2", buff.val_2} };

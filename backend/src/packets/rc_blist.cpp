@@ -289,7 +289,7 @@ namespace nosbazar::packets {
 			return registry.at(key)(packet_data);
 		}
 
-		return {};
+		return NoData();
 	}
 
 	RcBlist::ItemDataFieldsFactory::ItemDataFieldsFactory()

@@ -200,7 +200,7 @@ namespace nosbazar::packets {
 
 		struct NoData {
 			nlohmann::json json() const {
-				return {};
+				return nlohmann::json::object();
 			}
 		};
 

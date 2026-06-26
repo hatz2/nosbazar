@@ -40,7 +40,7 @@ namespace nosbazar::io {
     };
 
     struct BuffEntry {
-        uint32_t vnum{};
+        int32_t vnum{};
         int32_t val_1{};
         int32_t val_2{};
         uint32_t bcard_sub{};
