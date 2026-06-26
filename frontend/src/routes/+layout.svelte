@@ -12,6 +12,6 @@
 
 <style global>
 	:global(body) {
-		font-family: sans-serif;
+		font-family: Tahoma, Arial, sans-serif;
 	}
 </style>
