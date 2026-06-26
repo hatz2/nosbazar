@@ -1,10 +1,10 @@
 <script lang="ts">
 	import Draggable from './Draggable.svelte';
-	import { formatItemData, formatStaticData, isResistances } from '$lib/types/search';
-	import type { EnrichedSearchResult, FormattedSection } from '$lib/types/search';
+	import type { EnrichedSearchResult } from '$lib/types/search';
 	import { lang } from '$lib/stores/lang.svelte';
 	import { RequiredClass } from '$lib/types/enums';
 	import CloseButton from './CloseButton.svelte';
+	import { isResistances } from '$lib/types/search';
 
 	type Props = {
 		item: EnrichedSearchResult;
@@ -14,9 +14,6 @@
 	};
 
 	let { item, left = 0, top = 0, onclose }: Props = $props();
-
-	const sections: FormattedSection[] = formatItemData(item.data);
-	const staticSections: FormattedSection[] = formatStaticData(item.static_data, lang.current);
 
 	function get_required_class_string(required_class: number | null): string {
 		let result: string = '';
@@ -107,9 +104,8 @@
 				alt="Item icon"
 				style="pointer-events: none;"
 			/>
-			<p class="default-item-name name-center">{item.item_name[lang.current]}</p>
+			<p class="light-orange name-center">{item.item_name[lang.current]}</p>
 		</div>
-		<hr />
 
 		<!-- Gender specific item -->
 		{#if item.static_data}
@@ -137,7 +133,7 @@
 		</p>
 
 		<!-- Flags section -->
-		<p class="dmg-section">
+		<p class="light-orange">
 			{#if item.static_data}
 				{#if 'no_dropping' in item.static_data.flags && item.static_data.flags.no_dropping}
 					[Drop] False<br />
@@ -152,7 +148,7 @@
 		</p>
 
 		<!-- Damage section -->
-		<p class="dmg-section">
+		<p class="light-orange">
 			<!-- Dmg stats -->
 			{#if 'min_dmg' in item.data && 'max_dmg' in item.data}
 				Damage: {item.data.min_dmg}~{item.data.max_dmg}<br />
@@ -177,11 +173,7 @@
 
 		<!-- Resistances for gloves/shoes -->
 		{#if isResistances(item.data)}
-			<!-- <p>Fire Element Resistance: {item.data.fire_res}%</p>
-				<p>Water Element Resistance: {item.data.water_res}%</p>
-				<p>Light Element Resistance: {item.data.light_res}%</p>
-				<p>Shadow Element Resistance: {item.data.shadow_res}%</p> -->
-			<p class="dmg-section">
+			<p class="light-orange">
 				Fire Element Resistance: {item.data.fire_res}%<br />
 				Water Element Resistance: {item.data.water_res}%<br />
 				Light Element Resistance: {item.data.light_res}%<br />
@@ -200,26 +192,6 @@
 			{/each}
 		</p>
 
-		<!-- {#each sections as section, i (i)}
-			<hr />
-			{#each section.fields as field, j (j)}
-				<p class={field.cssClass}>
-					<strong>{field.label}:</strong>
-					{field.value}
-				</p>
-			{/each}
-		{/each}
-
-		{#each staticSections as section, i (i)}
-			<hr />
-			{#each section.fields as field, j (j)}
-				<p class={field.cssClass}>
-					<strong>{field.label}:</strong>
-					{field.value}
-				</p>
-			{/each}
-		{/each} -->
-
 		<p class="description">{item.static_data?.description[lang.current]}</p>
 	</div>
 </Draggable>
@@ -231,7 +203,7 @@
 		background: rgba(27, 27, 27, 0.9);
 		padding: 0.5rem;
 		min-width: 300px;
-		max-width: 350px;
+		max-width: 300px;
 		text-align: center;
 		position: relative;
 	}
@@ -240,12 +212,6 @@
 		position: absolute;
 		top: 0.5rem;
 		right: 0.5rem;
-	}
-
-	hr {
-		border: none;
-		border-top: 1px solid #ddd;
-		margin: 0.4rem 0;
 	}
 
 	.gender-desc {
@@ -271,16 +237,12 @@
 		justify-self: center;
 	}
 
-	.default-item-name {
-		color: #f5c478;
-	}
-
 	.description {
 		color: #edecfd;
 		white-space: pre-line;
 	}
 
-	.dmg-section {
+	.light-orange {
 		color: #f5c478;
 	}
 
@@ -294,95 +256,5 @@
 
 	.bcard-effect {
 		color: #ff862c;
-	}
-
-	.stat-damage {
-		color: #e74c3c;
-	}
-	.stat-hitrate {
-		color: #2ecc71;
-	}
-	.stat-crit {
-		color: #f39c12;
-	}
-	.stat-magic {
-		color: #8e44ad;
-	}
-	.stat-ammo {
-		color: #3498db;
-	}
-	.stat-shell {
-		color: #e67e22;
-	}
-
-	.stat-defense-melee {
-		color: #3498db;
-	}
-	.stat-defense-ranged {
-		color: #2ecc71;
-	}
-	.stat-defense-magic {
-		color: #8e44ad;
-	}
-	.stat-dodge {
-		color: #f1c40f;
-	}
-
-	.stat-res-fire {
-		color: #e74c3c;
-	}
-	.stat-res-water {
-		color: #3498db;
-	}
-	.stat-res-light {
-		color: #f1c40f;
-	}
-	.stat-res-shadow {
-		color: #8e44ad;
-	}
-	.stat-res-total {
-		color: #2c3e50;
-		font-weight: bold;
-	}
-
-	.stat-level {
-		color: #95a5a6;
-	}
-	.stat-price {
-		color: #27ae60;
-	}
-	.stat-accessory {
-		color: #d35400;
-	}
-
-	.stat-rare {
-		color: #e67e22;
-	}
-
-	.stat-specialist-offense {
-		color: #e74c3c;
-	}
-	.stat-specialist-defense {
-		color: #3498db;
-	}
-	.stat-specialist-element {
-		color: #8e44ad;
-	}
-	.stat-specialist-hp {
-		color: #2ecc71;
-	}
-	.stat-specialist-remaining {
-		color: #f1c40f;
-		font-weight: bold;
-	}
-
-	.stat-flag {
-		color: #e74c3c;
-		font-weight: bold;
-	}
-	.stat-desc {
-		color: #7f8c8d;
-		font-style: italic;
-		white-space: pre-wrap;
 	}
 </style>

@@ -13,5 +13,8 @@
 <style global>
 	:global(body) {
 		font-family: Tahoma, Arial, sans-serif;
+		font-size: 10pt;
+		-webkit-font-smoothing: none;
+		font-smooth: never;
 	}
 </style>

@@ -121,8 +121,8 @@
 				...openWindows,
 				{
 					item,
-					left: e.clientX + 35,
-					top: e.clientY - 20,
+					left: e.pageX + 35,
+					top: e.pageY - 20,
 					id: nextWindowId++
 				}
 			];

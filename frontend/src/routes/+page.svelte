@@ -12,12 +12,12 @@
 	<LanguageSelector />
 </header>
 
-<BazarWindow bind:server={server}></BazarWindow>
+<BazarWindow bind:server></BazarWindow>
 
 <style>
 	.top-bar {
 		display: flex;
-		justify-content: flex-end;
+		justify-content: flex-start;
 		padding: 0.5rem 1rem;
 		background: #ffffff;
 		border-bottom: 1px solid #e5e7eb;
