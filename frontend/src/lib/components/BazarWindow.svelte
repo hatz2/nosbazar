@@ -15,6 +15,13 @@
 	import ItemDetailWindow from './ItemDetailWindow.svelte';
 	import SortByFilter from './SortByFilter.svelte';
 
+	type OpenWindow = {
+		item: EnrichedSearchResult;
+		left: number;
+		top: number;
+		id: number;
+	};
+
 	let { server = $bindable(1) } = $props();
 	let category = $state(BazarCategory.All);
 	let subCategory = $state(0);
@@ -23,7 +30,7 @@
 	let upgradeLevel = $state(0);
 	let order = $state(0);
 	let results = $state<EnrichedSearchResult[]>([]);
-	let openWindows = $state<{ item: EnrichedSearchResult; left: number; top: number }[]>([]);
+	let openWindows = $state<OpenWindow[]>([]);
 
 	// Reset category-dependent filters when category changes
 	$effect(() => {
@@ -33,6 +40,8 @@
 		rarityLevel = 0;
 		upgradeLevel = 0;
 	});
+
+	let nextWindowId = $state(0);
 
 	async function on_search_clicked() {
 		try {
@@ -61,12 +70,13 @@
 				await itemService.fetchMany(vnums);
 
 				// Enrich items with names from the cache synchronously for an atomic update
-				results = rawItems.map((item: SearchResult) => {
+				results = rawItems.map((item: SearchResult): EnrichedSearchResult => {
 					const staticData = itemService.getSync(item.item_vnum);
 					return {
 						...item,
 						item_name: staticData?.name || { UK: item.item_vnum.toString() },
-						icon_id: staticData?.icon_id
+						icon_id: staticData?.icon_id,
+						static_data: staticData
 					};
 				});
 			} else {
@@ -106,20 +116,38 @@
 
 	<ResultsTable
 		{results}
-		onContextMenu={(item) => {
+		onContextMenu={(item, e) => {
 			openWindows = [
 				...openWindows,
-				{ item, left: 300 + openWindows.length * 20, top: 100 + openWindows.length * 20 }
+				{
+					item,
+					left: e.clientX + 35,
+					top: e.clientY - 20,
+					id: nextWindowId++
+				}
 			];
 		}}
 	/>
 </div>
 
-{#each openWindows as window, i (i)}
-	<ItemDetailWindow item={window.item} left={window.left} top={window.top} />
+{#each openWindows as window (window.id)}
+	<ItemDetailWindow
+		item={window.item}
+		left={window.left}
+		top={window.top}
+		onclose={() => {
+			openWindows = openWindows.filter((w) => w.id !== window.id);
+		}}
+	/>
 {/each}
 
-<!-- </Draggable> -->
+<svelte:window
+	onkeydown={(e) => {
+		if (e.key === 'Escape') {
+			openWindows = [];
+		}
+	}}
+/>
 
 <style>
 	.content {
