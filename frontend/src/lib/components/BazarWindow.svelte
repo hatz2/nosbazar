@@ -54,7 +54,7 @@
 				})
 			});
 			const data = await response.json();
-			const rawItems = data.items ?? [];
+			const rawItems = (data.items ?? []) as SearchResult[];
 
 			if (rawItems.length > 0) {
 				const vnums = rawItems.map((item: SearchResult) => item.item_vnum);
