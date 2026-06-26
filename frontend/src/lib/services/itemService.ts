@@ -1,6 +1,6 @@
 export interface ItemBuffEntry {
 	vnum: number;
-	bcard_display?: Record<string, string>;
+	bcard_display: Record<string, string>;
 }
 
 export interface ItemFlagsData {
@@ -37,7 +37,19 @@ export interface ItemStaticData {
 	required_class: number;
 	flags: ItemFlagsData;
 	buffs: ItemBuffEntry[];
-	description?: Record<string, string>;
+	description: Record<string, string>;
+}
+
+export function isSingleGenderItem(item_data: ItemStaticData): boolean {
+	if (item_data.flags.female_can_wear && !item_data.flags.male_can_wear) {
+		return true;
+	}
+
+	if (!item_data.flags.female_can_wear && item_data.flags.male_can_wear) {
+		return true;
+	}
+
+	return false;
 }
 
 const cache = new Map<number, ItemStaticData>();
@@ -58,6 +70,7 @@ export const itemService = {
 				return null;
 			}
 			const data = await response.json();
+			console.log(data);
 			cache.set(vnum, data);
 			return data;
 		} catch (error) {

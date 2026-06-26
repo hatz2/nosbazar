@@ -68,8 +68,7 @@ export interface ResistancesData extends EquipmentData {
 	sum_level: number;
 }
 
-export interface EquipmentHatMaskData extends EquipmentData {
-}
+export interface EquipmentHatMaskData extends EquipmentData {}
 
 export interface CellonOption {
 	vnum: number;
@@ -135,9 +134,13 @@ export type SearchResult = {
 	data: SearchResultData;
 };
 
+import type { ItemStaticData, ItemFlagsData } from '$lib/services/itemService';
+import type { LanguageCode } from '$lib/stores/lang.svelte';
+
 export type EnrichedSearchResult = SearchResult & {
 	item_name: Record<string, string>;
 	icon_id?: number;
+	static_data: ItemStaticData | null;
 };
 
 // ---- Type guards for the SearchResultData union ----
@@ -254,9 +257,7 @@ function formatRanged(data: RangedWeaponData): FormattedSection[] {
 		},
 		{
 			name: 'ammo',
-			fields: [
-				{ label: 'Ammo', value: `${data.ammo}/${data.max_ammo}`, cssClass: 'stat-ammo' }
-			]
+			fields: [{ label: 'Ammo', value: `${data.ammo}/${data.max_ammo}`, cssClass: 'stat-ammo' }]
 		}
 	] as FormattedSection[];
 }
@@ -384,7 +385,11 @@ function formatSpecialist(data: SpecialistData): FormattedSection[] {
 				{ label: 'Defence Pts', value: data.defence_points, cssClass: 'stat-specialist-defense' },
 				{ label: 'Element Pts', value: data.element_points, cssClass: 'stat-specialist-element' },
 				{ label: 'HP Pts', value: data.hp_points, cssClass: 'stat-specialist-hp' },
-				{ label: 'Remaining Pts', value: data.remaining_points, cssClass: 'stat-specialist-remaining' }
+				{
+					label: 'Remaining Pts',
+					value: data.remaining_points,
+					cssClass: 'stat-specialist-remaining'
+				}
 			]
 		},
 		{
@@ -418,4 +423,57 @@ export function formatItemData(data: SearchResultData): FormattedSection[] {
 	if (isAccessory(data)) return formatAccessory(data);
 	if (isSpecialist(data)) return formatSpecialist(data);
 	return [];
+}
+
+// ---- Static data formatting ----
+
+const classNames = ['Adventurer', 'Swordsman', 'Archer', 'Mage', 'Martial Artist'];
+
+const flagLabels: [keyof ItemFlagsData, string][] = [
+	['no_selling', 'No Selling'],
+	['no_dropping', 'No Dropping'],
+	['no_trading', 'No Trading'],
+	['show_warning_on_use', 'Warning on Use'],
+	['female_can_wear', 'Female Only'],
+	['male_can_wear', 'Male Only'],
+	['is_champion_equip', 'Champion Only'],
+	['is_limited', 'Limited']
+];
+
+export function formatStaticData(
+	static_data: ItemStaticData | null,
+	langCode: LanguageCode
+): FormattedSection[] {
+	if (!static_data) return [];
+
+	const sections: FormattedSection[] = [];
+
+	// Required class
+	const canUse =
+		classNames.filter((_, i) => static_data.required_class & (1 << i)).join(', ') || 'None';
+
+	sections.push({
+		name: 'requirements',
+		fields: [{ label: '', value: canUse + ' only', cssClass: 'stat-level' }]
+	});
+
+	// Flags (only true)
+	const flagFields = flagLabels
+		.filter(([key]) => static_data.flags[key])
+		.map(([, label]) => ({ label, value: '⚠', cssClass: 'stat-flag' }));
+
+	if (flagFields.length > 0) {
+		sections.push({ name: 'flags', fields: flagFields });
+	}
+
+	// Description
+	// const desc = static_data.description?.[langCode] || static_data.description?.['UK'] || '';
+	// if (desc) {
+	// 	sections.push({
+	// 		name: 'description',
+	// 		fields: [{ label: 'Description', value: desc, cssClass: 'stat-desc' }]
+	// 	});
+	// }
+
+	return sections;
 }

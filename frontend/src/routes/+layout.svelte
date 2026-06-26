@@ -9,3 +9,9 @@
 </svelte:head>
 
 {@render children()}
+
+<style global>
+	:global(body) {
+		font-family: sans-serif;
+	}
+</style>

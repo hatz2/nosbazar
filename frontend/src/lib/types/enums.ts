@@ -165,6 +165,16 @@ enum SortFilter {
 	AmountDescending = 3
 }
 
+enum RequiredClass {
+	All = 0,
+	Adventurer = 1,
+	Swordsman = 2,
+	Archer = 4,
+	Mage = 8,
+	Martial = 16,
+	AllButAdventurer = 30
+}
+
 export {
 	BazarCategory,
 	WeaponSubcategory,
@@ -178,5 +188,6 @@ export {
 	ShellSubcategory,
 	MainItemSubcategory,
 	ConsumerItemSubcategory,
-	SortFilter
+	SortFilter,
+	RequiredClass
 };
