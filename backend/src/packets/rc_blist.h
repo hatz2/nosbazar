@@ -144,8 +144,6 @@ namespace nosbazar::packets {
 			int level{};
 			int value{};
 
-			CellonOption() = default;
-			CellonOption(std::string_view item_data);
 			nlohmann::json json() const;
 		};
 

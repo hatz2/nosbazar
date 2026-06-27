@@ -63,6 +63,7 @@
 				})
 			});
 			const data = await response.json();
+			console.log(data);
 			const rawItems = (data.items ?? []) as SearchResult[];
 
 			if (rawItems.length > 0) {

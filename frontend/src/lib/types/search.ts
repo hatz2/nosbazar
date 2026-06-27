@@ -1,4 +1,4 @@
-import type { ItemStaticData } from '$lib/services/itemService';
+import type { ItemFlagsData, ItemStaticData } from '$lib/services/itemService';
 
 export type SearchResult = {
 	owner_name: string;
@@ -100,6 +100,7 @@ export interface AccessoryData {
 	max_option_level: number;
 	max_option_count: number;
 	price: number;
+	options: CellonOption[];
 }
 
 export interface SpecialistData {
@@ -184,4 +185,8 @@ export function isSpecialist(data: SearchResultData): data is SpecialistData {
 
 export function isNoData(data: SearchResultData): data is NoData {
 	return Object.keys(data).length === 0;
+}
+
+export function itemHasFlagsToDisplay(flags: ItemFlagsData): boolean {
+	return flags.no_dropping || flags.no_selling || flags.no_trading;
 }

@@ -4,7 +4,7 @@
 	import { lang } from '$lib/stores/lang.svelte';
 	import { RequiredClass } from '$lib/types/enums';
 	import CloseButton from './CloseButton.svelte';
-	import { isResistances } from '$lib/types/search';
+	import { isAccessory, isResistances, itemHasFlagsToDisplay } from '$lib/types/search';
 
 	type Props = {
 		item: EnrichedSearchResult;
@@ -128,24 +128,33 @@
 				Rarity level: {item.data.rare}<br />
 			{/if}
 			{#if 'sum_level' in item.data}
-				Combine Times: {item.data.sum_level}
+				<span class="light-orange">Combine Times: {item.data.sum_level}</span><br />
+			{/if}
+			{#if isAccessory(item.data)}
+				<span class="light-orange">Maximum Option Level: {item.data.max_option_level}</span><br />
+				<span class="light-orange"
+					>Maximum Option Piece Number: {item.data.options.length}/{item.data
+						.max_option_count}</span
+				><br />
 			{/if}
 		</p>
 
 		<!-- Flags section -->
-		<p class="light-orange">
-			{#if item.static_data}
-				{#if 'no_dropping' in item.static_data.flags && item.static_data.flags.no_dropping}
-					[Drop] False<br />
-				{/if}
-				{#if 'no_selling' in item.static_data.flags && item.static_data.flags.no_selling}
-					[Sell] False<br />
-				{/if}
-				{#if 'no_trading' in item.static_data.flags && item.static_data.flags.no_trading}
-					[Trade] False<br />
-				{/if}
+		{#if item.static_data}
+			{#if itemHasFlagsToDisplay(item.static_data.flags)}
+				<p class="light-orange">
+					{#if item.static_data.flags.no_dropping}
+						[Drop] False<br />
+					{/if}
+					{#if item.static_data.flags.no_selling}
+						[Sell] False<br />
+					{/if}
+					{#if item.static_data.flags.no_trading}
+						[Trade] False<br />
+					{/if}
+				</p>
 			{/if}
-		</p>
+		{/if}
 
 		<!-- Damage section -->
 		<p class="light-orange">
@@ -163,7 +172,7 @@
 			{/if}
 
 			<!-- Armour stats -->
-			{#if 'melee_defence' in item.data}<br />
+			{#if 'melee_defence' in item.data}
 				Melee Defence: {item.data.melee_defence}<br />
 				Ranged Defence: {item.data.ranged_defence}<br />
 				Magic Defence: {item.data.magic_defence}<br />
@@ -181,8 +190,20 @@
 			</p>
 		{/if}
 
+		<!-- Price -->
 		{#if 'price' in item.data}
 			<p class="price">Price: {item.data.price.toLocaleString('es-ES')}</p>
+		{/if}
+
+		<!-- Cell options -->
+		{#if isAccessory(item.data)}
+			{#if item.data.options.length > 0}
+				<p class="light-orange">
+					{#each item.data.options as option, i (i)}
+						{option.level} Lv {option.vnum} {option.value}<br />
+					{/each}
+				</p>
+			{/if}
 		{/if}
 
 		<!-- Orange bcard bonuses -->

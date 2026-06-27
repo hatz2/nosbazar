@@ -160,13 +160,6 @@ namespace nosbazar::packets {
 		};
 	}
 
-	RcBlist::CellonOption::CellonOption(std::string_view item_data)
-	{
-		vnum = strings::token<int>(item_data, data_separator);
-		level = strings::token<int>(item_data, data_separator);
-		value = strings::token<int>(item_data, data_separator);
-	}
-
 	nlohmann::json RcBlist::CellonOption::json() const
 	{
 		return {
@@ -187,7 +180,12 @@ namespace nosbazar::packets {
 		price = strings::token<int>(item_data, data_separator);
 
 		for (int i = 0; i < option_count; ++i) {
-			options.emplace_back(CellonOption(item_data));
+			CellonOption cellon_option{
+				.vnum = strings::token<int>(item_data, data_separator),
+				.level = strings::token<int>(item_data, data_separator),
+				.value = strings::token<int>(item_data, data_separator),
+			};
+			options.emplace_back(cellon_option);
 		}
 
 		unknown_1 = strings::token<int>(item_data, data_separator);
@@ -207,6 +205,8 @@ namespace nosbazar::packets {
 		for (const CellonOption& cellon : options) {
 			options_json.push_back(cellon.json());
 		}
+
+		result["options"] = options_json;
 
 		return result;
 	}
