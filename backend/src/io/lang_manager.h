@@ -2,46 +2,10 @@
 
 #include "lang_file_parser.h"
 #include "nos_file_text_reader.h"
-#include <strings/encoding.h>
+#include "language.h"
 #include <nlohmann/json.hpp>
 
 namespace nosbazar::io {
-	enum Language {
-		spanish,
-		english,
-		french,
-		german,
-		turkish,
-		italian,
-		russian,
-		polish,
-		czech
-	};
-
-	static inline const std::unordered_map<Language, std::string> language_string = {
-		{ Language::spanish, "ES" },
-		{ Language::english, "UK" },
-		{ Language::french, "FR" },
-		{ Language::german, "DE" },
-		{ Language::turkish, "TR" },
-		{ Language::italian, "IT" },
-		{ Language::russian, "RU" },
-		{ Language::polish, "PL" },
-		{ Language::czech, "CZ" }
-	};
-
-	static inline const std::unordered_map<std::string, Language> string_to_lang = {
-		{ "ES", Language::spanish },
-		{ "UK", Language::english },
-		{ "FR", Language::french },
-		{ "DE", Language::german },
-		{ "TR", Language::turkish },
-		{ "IT", Language::italian },
-		{ "RU", Language::russian },
-		{ "PL", Language::polish },
-		{ "CZ", Language::czech }
-	};
-
 	class LangManager {
 	public:
 		static LangManager& get_instance();
@@ -55,8 +19,6 @@ namespace nosbazar::io {
 		nlohmann::json get_all_bcard_translations(const std::string& code_name);
 
 	private:
-
-		static strings::Encoding encoding_for(Language lang);
 
 		std::string get_translation(Language lang, const std::string& filename, const std::string& code_name);
 

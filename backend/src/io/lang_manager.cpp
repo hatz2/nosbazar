@@ -36,22 +36,6 @@ namespace nosbazar::io {
 		return instance;
 	}
 
-	strings::Encoding LangManager::encoding_for(Language lang)
-	{
-		switch (lang) {
-		case Language::russian:
-			return strings::Encoding::windows1251;
-		case Language::spanish:
-		case Language::french:
-		case Language::english:
-			return strings::Encoding::windows1252;
-		case Language::turkish:
-			return strings::Encoding::windows1254;
-		default:
-			return strings::Encoding::windows1250;
-		}
-	}
-
 	std::string LangManager::get_translation(Language lang, const std::string& filename, const std::string& code_name)
 	{
 		return lang_files.at(lang)->translation(filename, code_name);

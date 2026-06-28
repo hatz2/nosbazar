@@ -26,6 +26,15 @@ namespace {
 		"NSlangData_RU.NOS", 
 		"NSlangData_PL.NOS", 
 		"NSlangData_CZ.NOS",
+		"NScliData_UK.NOS",
+		"NScliData_ES.NOS",
+		"NScliData_FR.NOS",
+		"NScliData_DE.NOS",
+		"NScliData_TR.NOS",
+		"NScliData_IT.NOS",
+		"NScliData_RU.NOS",
+		"NScliData_PL.NOS",
+		"NScliData_CZ.NOS",
 	};
 
 	std::string download_file(std::string_view remote_rel_path) {

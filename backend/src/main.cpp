@@ -10,6 +10,7 @@
 #include <io/nos_file_text_reader.h>
 #include <crow/middlewares/cors.h>
 #include <io/nsip_data_reader.h>
+#include <io/const_string_parser.h>
 #include <thread>
 #include "api/routes.h"
 
@@ -36,6 +37,8 @@ void initialize_game_data()
     SPDLOG_INFO("Parsing NSipData.NOS...");
     nosbazar::io::NSipDataReader::instance().initialize("assets/NostaleData/NSipData.NOS");
     nosbazar::io::LangManager::get_instance();
+    SPDLOG_INFO("Loading NScliData const strings...");
+    nosbazar::io::ConstStringParser::instance();
     nosbazar::MapGridRepository::instance();
 }
 
