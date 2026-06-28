@@ -95,6 +95,7 @@ int main(int argc, char** argv) {
     CROW_ROUTE(app, "/items/static/<uint>").methods("GET"_method)(nosbazar::api::handle_item_static);
     CROW_ROUTE(app, "/icon/<uint>").methods("GET"_method)(nosbazar::api::handle_icon);
     CROW_ROUTE(app, "/servers").methods("GET"_method)(nosbazar::api::handle_servers);
+    CROW_ROUTE(app, "/conststring/<uint>").methods("GET"_method)(nosbazar::api::handle_const_string);
 
     app.port(8080).multithreaded().run();
 }

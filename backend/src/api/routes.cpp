@@ -4,6 +4,7 @@
 #include <packets/c_blist.h>
 #include <io/item_dat_parser.h>
 #include <io/nsip_data_reader.h>
+#include <io/const_string_parser.h>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 #include <memory>
@@ -94,6 +95,15 @@ crow::response handle_servers(const crow::request& req)
     }
 
     return crow::response(json_data.dump());
+}
+
+crow::response handle_const_string(const crow::request& req, uint32_t id)
+{
+	nlohmann::json json_data = nosbazar::io::ConstStringParser::instance().get_translations(static_cast<int>(id));
+	if (json_data.empty()) {
+		return crow::response(404, "Const string not found.");
+	}
+	return crow::response(json_data.dump());
 }
 
 } // namespace nosbazar::api

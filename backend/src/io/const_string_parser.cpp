@@ -74,4 +74,15 @@ nlohmann::json ConstStringParser::get_all_translations() const
 	return result;
 }
 
+nlohmann::json ConstStringParser::get_translations(int id) const
+{
+	nlohmann::json result;
+	for (const auto& [lang, code] : language_string) {
+		if (translations.contains(lang) && translations.at(lang).contains(id)) {
+			result[code] = translations.at(lang).at(id);
+		}
+	}
+	return result;
+}
+
 }

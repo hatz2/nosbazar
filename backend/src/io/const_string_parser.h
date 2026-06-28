@@ -13,6 +13,8 @@ public:
 
 	nlohmann::json get_all_translations() const;
 
+	nlohmann::json get_translations(int id) const;
+
 private:
 	ConstStringParser();
 	ConstStringParser(const ConstStringParser&) = delete;
