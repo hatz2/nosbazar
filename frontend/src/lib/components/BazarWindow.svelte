@@ -14,6 +14,9 @@
 	import ResultsTable from './ResultsTable.svelte';
 	import ItemDetailWindow from './ItemDetailWindow.svelte';
 	import SortByFilter from './SortByFilter.svelte';
+	import { onMount } from 'svelte';
+	import { ConstStringKey } from '$lib/types/constStringKeys';
+	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
 
 	type OpenWindow = {
 		item: EnrichedSearchResult;
@@ -42,6 +45,16 @@
 	});
 
 	let nextWindowId = $state(0);
+
+	onMount(() => {
+		fetchConstString(ConstStringKey.Name);
+		fetchConstString(ConstStringKey.Level);
+		fetchConstString(ConstStringKey.RarityLevel);
+		fetchConstString(ConstStringKey.UpgradeLevel);
+		fetchConstString(ConstStringKey.SortBy);
+		fetchConstString(ConstStringKey.NosBazar);
+		fetchConstString(ConstStringKey.Category);
+	});
 
 	async function on_search_clicked() {
 		try {
@@ -92,11 +105,11 @@
 
 <!-- <Draggable left={200} top={200}> -->
 <div class="content">
-	<TitleBar title="NosBazaar"></TitleBar>
+	<TitleBar title={get_const_string(ConstStringKey.NosBazar)}></TitleBar>
 	<Toolbar>
-		<span>Name</span>
-		<span>Category</span>
-		<span>Subcategory</span>
+		<span>{get_const_string(ConstStringKey.Name)}</span>
+		<span>{get_const_string(ConstStringKey.Category)}</span>
+		<span></span>
 		<span></span>
 
 		<input type="text" />
@@ -104,10 +117,10 @@
 		<SubCategory bind:value={subCategory} {category}></SubCategory>
 		<BlueButton text="Search" onclick={on_search_clicked}></BlueButton>
 
-		<span>Level</span>
-		<span>Rarity Level</span>
-		<span>Upgrade Level</span>
-		<span>Sort by</span>
+		<span>{get_const_string(ConstStringKey.Level)}</span>
+		<span>{get_const_string(ConstStringKey.RarityLevel)}</span>
+		<span>{get_const_string(ConstStringKey.UpgradeLevel)}</span>
+		<span>{get_const_string(ConstStringKey.SortBy)}</span>
 
 		<LevelCategory bind:value={level} {category}></LevelCategory>
 		<RarityLevelCategory bind:value={rarityLevel} {category}></RarityLevelCategory>

@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import * as enums from '$lib/types/enums';
 	import DynamicSelect from './DynamicSelect.svelte';
+	import { ConstStringKey } from '$lib/types/constStringKeys';
+	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
 
 	type Props = {
 		value?: number;
@@ -9,21 +12,32 @@
 
 	let { value = $bindable(0), category }: Props = $props();
 
-	const rarityOptions = [
-		{ label: 'All', value: 0 },
-		{ label: '[0]', value: 1 },
-		{ label: '[1] Useful', value: 2 },
-		{ label: '[2] Good', value: 3 },
-		{ label: '[3] High quality', value: 4 },
-		{ label: '[4] Excellent', value: 5 },
-		{ label: '[5] Ancient', value: 6 },
-		{ label: '[6] Mysterious', value: 7 },
-		{ label: '[7] Legendary', value: 8 },
-		{ label: '[8] Phenomenal', value: 9 }
-	];
+	onMount(() => {
+		fetchConstString(ConstStringKey.BazarRarity0);
+		fetchConstString(ConstStringKey.BazarRarityUseful);
+		fetchConstString(ConstStringKey.BazarRarityGood);
+		fetchConstString(ConstStringKey.BazarRarityHighQuality);
+		fetchConstString(ConstStringKey.BazarRarityExcellent);
+		fetchConstString(ConstStringKey.BazarRarityAncient);
+		fetchConstString(ConstStringKey.BazarRarityMysterious);
+		fetchConstString(ConstStringKey.BazarRarityLegendary);
+	});
+
+	const rarityOptions = $derived([
+		{ label: get_const_string(ConstStringKey.All), value: 0 },
+		{ label: get_const_string(ConstStringKey.BazarRarity0), value: 1 },
+		{ label: get_const_string(ConstStringKey.BazarRarityUseful), value: 2 },
+		{ label: get_const_string(ConstStringKey.BazarRarityGood), value: 3 },
+		{ label: get_const_string(ConstStringKey.BazarRarityHighQuality), value: 4 },
+		{ label: get_const_string(ConstStringKey.BazarRarityExcellent), value: 5 },
+		{ label: get_const_string(ConstStringKey.BazarRarityAncient), value: 6 },
+		{ label: get_const_string(ConstStringKey.BazarRarityMysterious), value: 7 },
+		{ label: get_const_string(ConstStringKey.BazarRarityLegendary), value: 8 },
+		{ label: get_const_string(ConstStringKey.BazarRarityPhenomenal), value: 9 }
+	]);
 
 	const specialistOptions = [
-		{ label: 'All', value: 0 },
+		{ label: get_const_string(ConstStringKey.All), value: 0 },
 		{ label: 'Perfection Lv 1-10', value: 1 },
 		{ label: 'Perfection Lv 11-20', value: 2 },
 		{ label: 'Perfection Lv 21-30', value: 3 },
@@ -36,7 +50,7 @@
 		{ label: 'Perfection Lv 91-100', value: 10 }
 	];
 
-	const optionsByCategory = {
+	const optionsByCategory = $derived({
 		[enums.BazarCategory.All]: [],
 		[enums.BazarCategory.Weapon]: rarityOptions,
 		[enums.BazarCategory.Armour]: rarityOptions,
@@ -50,7 +64,7 @@
 		[enums.BazarCategory.MainItem]: [],
 		[enums.BazarCategory.ConsumerItem]: [],
 		[enums.BazarCategory.Miscellaneous]: []
-	};
+	});
 
 	const options = $derived(optionsByCategory[category]);
 </script>

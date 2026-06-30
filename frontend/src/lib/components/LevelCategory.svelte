@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import * as enums from '$lib/types/enums';
 	import DynamicSelect from './DynamicSelect.svelte';
+	import { ConstStringKey } from '$lib/types/constStringKeys';
+	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
 
 	type Props = {
 		value?: number;
@@ -9,46 +12,60 @@
 
 	let { value = $bindable(0), category }: Props = $props();
 
-	const equipmentOptions = [
-		{ label: 'All', value: 0 },
-		{ label: '1-10', value: 1 },
-		{ label: '11-20', value: 2 },
-		{ label: '21-30', value: 3 },
-		{ label: '31-40', value: 4 },
-		{ label: '41-50', value: 5 },
-		{ label: '51-60', value: 6 },
-		{ label: '61-70', value: 7 },
-		{ label: '71-80', value: 8 },
-		{ label: '81-90', value: 9 },
-		{ label: '91-99', value: 10 },
-		{ label: 'Champion gear', value: 11 },
-		{ label: 'Champion Lv 1-10', value: 12 },
-		{ label: 'Champion Lv 11-20', value: 13 },
-		{ label: 'Champion Lv 21-30', value: 14 },
-		{ label: 'Champion Lv 31-40', value: 15 },
-		{ label: 'Champion Lv 41-50', value: 16 },
-		{ label: 'Champion Lv 51-60', value: 17 },
-		{ label: 'Champion Lv 61-70', value: 18 },
-		{ label: 'Champion Lv 71-80', value: 19 },
-		{ label: 'Champion Lv 81-90', value: 20 },
-		{ label: 'Champion Lv 91-99', value: 21 }
-	];
+	onMount(() => {
+		fetchConstString(ConstStringKey.BazarLevel1_10);
+		fetchConstString(ConstStringKey.BazarLevel11_20);
+		fetchConstString(ConstStringKey.BazarLevel21_30);
+		fetchConstString(ConstStringKey.BazarLevel31_40);
+		fetchConstString(ConstStringKey.BazarLevel41_50);
+		fetchConstString(ConstStringKey.BazarLevel51_60);
+		fetchConstString(ConstStringKey.BazarLevel61_70);
+		fetchConstString(ConstStringKey.BazarLevel71_80);
+		fetchConstString(ConstStringKey.BazarLevel81_90);
+		fetchConstString(ConstStringKey.BazarLevel91_99);
+		fetchConstString(ConstStringKey.All);
+	});
 
-	const normalLevelOptions = [
-		{ label: 'All', value: 0 },
-		{ label: '1-10', value: 1 },
-		{ label: '11-20', value: 2 },
-		{ label: '21-30', value: 3 },
-		{ label: '31-40', value: 4 },
-		{ label: '41-50', value: 5 },
-		{ label: '51-60', value: 6 },
-		{ label: '61-70', value: 7 },
-		{ label: '71-80', value: 8 },
-		{ label: '81-90', value: 9 },
-		{ label: '91-99', value: 10 }
-	];
+	const equipmentOptions = $derived([
+		{ label: get_const_string(ConstStringKey.All), value: 0 },
+		{ label: get_const_string(ConstStringKey.BazarLevel1_10), value: 1 },
+		{ label: get_const_string(ConstStringKey.BazarLevel11_20), value: 2 },
+		{ label: get_const_string(ConstStringKey.BazarLevel21_30), value: 3 },
+		{ label: get_const_string(ConstStringKey.BazarLevel31_40), value: 4 },
+		{ label: get_const_string(ConstStringKey.BazarLevel41_50), value: 5 },
+		{ label: get_const_string(ConstStringKey.BazarLevel51_60), value: 6 },
+		{ label: get_const_string(ConstStringKey.BazarLevel61_70), value: 7 },
+		{ label: get_const_string(ConstStringKey.BazarLevel71_80), value: 8 },
+		{ label: get_const_string(ConstStringKey.BazarLevel81_90), value: 9 },
+		{ label: get_const_string(ConstStringKey.BazarLevel91_99), value: 10 },
+		{ label: get_const_string(ConstStringKey.ChampionGear), value: 11 },
+		{ label: get_const_string(ConstStringKey.ChampionLevel1to10), value: 12 },
+		{ label: get_const_string(ConstStringKey.ChampionLevel10to20), value: 13 },
+		{ label: get_const_string(ConstStringKey.ChampionLevel20to30), value: 14 },
+		{ label: get_const_string(ConstStringKey.ChampionLevel30to40), value: 15 },
+		{ label: get_const_string(ConstStringKey.ChampionLevel40to50), value: 16 },
+		{ label: get_const_string(ConstStringKey.ChampionLevel50to60), value: 17 },
+		{ label: get_const_string(ConstStringKey.ChampionLevel60to70), value: 18 },
+		{ label: get_const_string(ConstStringKey.ChampionLevel70to80), value: 19 },
+		{ label: get_const_string(ConstStringKey.ChampionLevel80to90), value: 20 },
+		{ label: get_const_string(ConstStringKey.ChampionLevel90to100), value: 21 }
+	]);
 
-	const optionsByCategory = {
+	const normalLevelOptions = $derived([
+		{ label: get_const_string(ConstStringKey.All), value: 0 },
+		{ label: get_const_string(ConstStringKey.BazarLevel1_10), value: 1 },
+		{ label: get_const_string(ConstStringKey.BazarLevel11_20), value: 2 },
+		{ label: get_const_string(ConstStringKey.BazarLevel21_30), value: 3 },
+		{ label: get_const_string(ConstStringKey.BazarLevel31_40), value: 4 },
+		{ label: get_const_string(ConstStringKey.BazarLevel41_50), value: 5 },
+		{ label: get_const_string(ConstStringKey.BazarLevel51_60), value: 6 },
+		{ label: get_const_string(ConstStringKey.BazarLevel61_70), value: 7 },
+		{ label: get_const_string(ConstStringKey.BazarLevel71_80), value: 8 },
+		{ label: get_const_string(ConstStringKey.BazarLevel81_90), value: 9 },
+		{ label: get_const_string(ConstStringKey.BazarLevel91_99), value: 10 }
+	]);
+
+	const optionsByCategory = $derived({
 		[enums.BazarCategory.All]: [],
 		[enums.BazarCategory.Weapon]: equipmentOptions,
 		[enums.BazarCategory.Armour]: equipmentOptions,
@@ -62,7 +79,7 @@
 		[enums.BazarCategory.MainItem]: [],
 		[enums.BazarCategory.ConsumerItem]: [],
 		[enums.BazarCategory.Miscellaneous]: []
-	};
+	});
 
 	const options = $derived(optionsByCategory[category]);
 </script>

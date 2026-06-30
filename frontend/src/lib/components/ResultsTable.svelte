@@ -2,6 +2,9 @@
 	import type { EnrichedSearchResult } from '$lib/types/search';
 	import { lang } from '$lib/stores/lang.svelte';
 	import ItemIcon from './ItemIcon.svelte';
+	import { onMount } from 'svelte';
+	import { ConstStringKey } from '$lib/types/constStringKeys';
+	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
 
 	type Props = {
 		results: EnrichedSearchResult[];
@@ -9,6 +12,14 @@
 	};
 
 	let { results, onContextMenu }: Props = $props();
+
+	onMount(() => {
+		fetchConstString(ConstStringKey.Name);
+		fetchConstString(ConstStringKey.Price);
+		fetchConstString(ConstStringKey.Amount);
+		fetchConstString(ConstStringKey.PricePerUnit);
+		fetchConstString(ConstStringKey.TimePeriod);
+	});
 
 	function formatTime(minutes: number) {
 		if (minutes < 60) {
@@ -26,18 +37,26 @@
 <table>
 	<thead>
 		<tr>
-			<th>Item name</th>
-			<th>Amount</th>
-			<th>Price per unit</th>
-			<th>Time period</th>
-			<th>Seller</th>
+			<th>{get_const_string(ConstStringKey.Name)}</th>
+			<th>{get_const_string(ConstStringKey.Amount)}</th>
+			<th>{get_const_string(ConstStringKey.PricePerUnit)}</th>
+			<th>{get_const_string(ConstStringKey.TimePeriod)}</th>
+			<th>{get_const_string(ConstStringKey.Seller)}</th>
 		</tr>
 	</thead>
 
 	<tbody>
 		{#each results as item, i (i)}
 			<tr>
-				<td class="name-cell"><!-- svelte-ignore a11y_no_static_element_interactions --><span oncontextmenu={(e) => { e.preventDefault(); onContextMenu?.(item, e); }} style="cursor: pointer"><ItemIcon iconId={item.icon_id} /></span>{item.item_name[lang.current] || item.item_name['UK'] || item.item_vnum.toString()}</td>
+				<td class="name-cell"
+					><!-- svelte-ignore a11y_no_static_element_interactions --><span
+						oncontextmenu={(e) => {
+							e.preventDefault();
+							onContextMenu?.(item, e);
+						}}
+						style="cursor: pointer"><ItemIcon iconId={item.icon_id} /></span
+					>{item.item_name[lang.current] || item.item_name['UK'] || item.item_vnum.toString()}</td
+				>
 				<td>{item.amount}</td>
 				<td>{item.bazar_price.toLocaleString('en-US')}</td>
 				<td>{formatTime(item.minutes_left)}</td>

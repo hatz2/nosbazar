@@ -5,6 +5,9 @@
 	import { RequiredClass } from '$lib/types/enums';
 	import CloseButton from './CloseButton.svelte';
 	import { isAccessory, isResistances, itemHasFlagsToDisplay } from '$lib/types/search';
+	import { onMount } from 'svelte';
+	import { ConstStringKey } from '$lib/types/constStringKeys';
+	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
 
 	type Props = {
 		item: EnrichedSearchResult;
@@ -14,6 +17,47 @@
 	};
 
 	let { item, left = 0, top = 0, onclose }: Props = $props();
+
+	onMount(() => {
+		fetchConstString(ConstStringKey.Lv);
+		fetchConstString(ConstStringKey.Level);
+		fetchConstString(ConstStringKey.Required);
+		fetchConstString(ConstStringKey.Times);
+		fetchConstString(ConstStringKey.Damage);
+		fetchConstString(ConstStringKey.HitRate);
+		fetchConstString(ConstStringKey.Concentration);
+		fetchConstString(ConstStringKey.Critical);
+		fetchConstString(ConstStringKey.Price);
+		fetchConstString(ConstStringKey.Maximum);
+		fetchConstString(ConstStringKey.Magic);
+		fetchConstString(ConstStringKey.Defence);
+		fetchConstString(ConstStringKey.Dodge);
+		fetchConstString(ConstStringKey.Melee);
+		fetchConstString(ConstStringKey.Ranged);
+		fetchConstString(ConstStringKey.Fire);
+		fetchConstString(ConstStringKey.Water);
+		fetchConstString(ConstStringKey.Light);
+		fetchConstString(ConstStringKey.Shadow);
+		fetchConstString(ConstStringKey.RarityLevel);
+		fetchConstString(ConstStringKey.OnlyForMales);
+		fetchConstString(ConstStringKey.OnlyForFemales);
+		fetchConstString(ConstStringKey.ChampionLevel);
+		fetchConstString(ConstStringKey.CriticalChance);
+		fetchConstString(ConstStringKey.Adventurer);
+		fetchConstString(ConstStringKey.Swordsman);
+		fetchConstString(ConstStringKey.Mage);
+		fetchConstString(ConstStringKey.Archer);
+		fetchConstString(ConstStringKey.MartialArtist);
+		fetchConstString(ConstStringKey.Only);
+		fetchConstString(ConstStringKey.Option);
+		fetchConstString(ConstStringKey.Piece);
+		fetchConstString(ConstStringKey.Sell);
+		fetchConstString(ConstStringKey.Trade);
+		fetchConstString(ConstStringKey.CellonLevel);
+		fetchConstString(ConstStringKey.Drop);
+		fetchConstString(ConstStringKey.False);
+		fetchConstString(ConstStringKey.Number);
+	});
 
 	function get_required_class_string(required_class: number | null): string {
 		let result: string = '';
@@ -38,39 +82,39 @@
 
 		if (single_class) {
 			if (required_class & RequiredClass.Adventurer) {
-				result += 'Adventurer';
+				result += get_const_string(ConstStringKey.Adventurer);
 			}
 			if (required_class & RequiredClass.Swordsman) {
-				result += 'Swordsman';
+				result += get_const_string(ConstStringKey.Swordsman);
 			}
 			if (required_class & RequiredClass.Archer) {
-				result += 'Archer';
+				result += get_const_string(ConstStringKey.Archer);
 			}
 			if (required_class & RequiredClass.Mage) {
-				result += 'Mage';
+				result += get_const_string(ConstStringKey.Mage);
 			}
 			if (required_class & RequiredClass.Martial) {
-				result += 'Martial Artist';
+				result += get_const_string(ConstStringKey.MartialArtist);
 			}
 		} else {
 			if (required_class & RequiredClass.Adventurer) {
-				result += 'Adventurer, ';
+				result += `${get_const_string(ConstStringKey.Adventurer)}, `;
 			}
 			if (required_class & RequiredClass.Swordsman) {
-				result += 'Swordsman, ';
+				result += `${get_const_string(ConstStringKey.Swordsman)}, `;
 			}
 			if (required_class & RequiredClass.Archer) {
-				result += 'Archer, ';
+				result += `${get_const_string(ConstStringKey.Archer)}, `;
 			}
 			if (required_class & RequiredClass.Mage) {
-				result += 'Mage, ';
+				result += `${get_const_string(ConstStringKey.Mage)}, `;
 			}
 			if (required_class & RequiredClass.Martial) {
-				result += 'Martial Artist';
+				result += get_const_string(ConstStringKey.MartialArtist);
 			}
 		}
 
-		result += ' only';
+		result += ` ${get_const_string(ConstStringKey.Only)}`;
 
 		return result;
 	}
@@ -80,12 +124,12 @@
 
 		if ('required_level' in item.data) {
 			if (item.static_data?.flags.is_champion_equip) {
-				result = 'Required Champion Level: ';
+				result = `${get_const_string(ConstStringKey.Required)} ${get_const_string(ConstStringKey.ChampionLevel)}: `;
 			} else {
-				result = 'Required Level: ';
+				result = `${get_const_string(ConstStringKey.Required)} ${get_const_string(ConstStringKey.Level)}: `;
 			}
 
-			result += item.data.required_level + ' Lv';
+			result += `${item.data.required_level} ${get_const_string(ConstStringKey.Lv)}`;
 		}
 
 		return result;
@@ -110,9 +154,9 @@
 		<!-- Gender specific item -->
 		{#if item.static_data}
 			{#if item.static_data.flags.male_can_wear}
-				<p class="gender-desc">Only for females</p>
+				<p class="gender-desc">{get_const_string(ConstStringKey.OnlyForFemales)}</p>
 			{:else if item.static_data.flags.female_can_wear}
-				<p class="gender-desc">Only for males</p>
+				<p class="gender-desc">{get_const_string(ConstStringKey.OnlyForMales)}</p>
 			{/if}
 		{/if}
 
@@ -125,15 +169,24 @@
 				{get_required_level(item)}<br />
 			{/if}
 			{#if 'rare' in item.data}
-				Rarity level: {item.data.rare}<br />
+				{get_const_string(ConstStringKey.RarityLevel)}: {item.data.rare}<br />
 			{/if}
 			{#if 'sum_level' in item.data}
-				<span class="light-orange">Combine Times: {item.data.sum_level}</span><br />
+				<span class="light-orange"
+					>{get_const_string(ConstStringKey.Times)}: {item.data.sum_level}</span
+				><br />
 			{/if}
 			{#if isAccessory(item.data)}
-				<span class="light-orange">Maximum Option Level: {item.data.max_option_level}</span><br />
 				<span class="light-orange"
-					>Maximum Option Piece Number: {item.data.options.length}/{item.data
+					>{get_const_string(ConstStringKey.Maximum)}
+					{get_const_string(ConstStringKey.Option)}
+					{get_const_string(ConstStringKey.CellonLevel)}: {item.data.max_option_level}</span
+				><br />
+				<span class="light-orange"
+					>{get_const_string(ConstStringKey.Maximum)}
+					{get_const_string(ConstStringKey.Option)}
+					{get_const_string(ConstStringKey.Piece)}
+					{get_const_string(ConstStringKey.Number)}: {item.data.options.length}/{item.data
 						.max_option_count}</span
 				><br />
 			{/if}
@@ -144,13 +197,14 @@
 			{#if itemHasFlagsToDisplay(item.static_data.flags)}
 				<p class="light-orange">
 					{#if item.static_data.flags.no_dropping}
-						[Drop] False<br />
+						[{get_const_string(ConstStringKey.Drop)}] {get_const_string(ConstStringKey.False)}<br />
 					{/if}
 					{#if item.static_data.flags.no_selling}
-						[Sell] False<br />
+						[{get_const_string(ConstStringKey.Sell)}] {get_const_string(ConstStringKey.False)}<br />
 					{/if}
 					{#if item.static_data.flags.no_trading}
-						[Trade] False<br />
+						[{get_const_string(ConstStringKey.Trade)}] {get_const_string(ConstStringKey.False)}<br
+						/>
 					{/if}
 				</p>
 			{/if}
@@ -160,39 +214,45 @@
 		<p class="light-orange">
 			<!-- Dmg stats -->
 			{#if 'min_dmg' in item.data && 'max_dmg' in item.data}
-				Damage: {item.data.min_dmg}~{item.data.max_dmg}<br />
+				{get_const_string(ConstStringKey.Damage)}: {item.data.min_dmg}~{item.data.max_dmg}<br />
 				{#if 'hit_rate' in item.data}
-					Hit rate: {item.data.hit_rate}<br />
+					{get_const_string(ConstStringKey.HitRate)}: {item.data.hit_rate}<br />
 				{:else if 'concentration' in item.data}
-					Concentration: {item.data.concentration}<br />
+					{get_const_string(ConstStringKey.Concentration)}: {item.data.concentration}<br />
 				{/if}
 				{#if 'critical_rate' in item.data && 'critical_dmg' in item.data}
-					{item.data.critical_rate}% Chance of {item.data.critical_dmg}% Critical<br />
+					{item.data.critical_rate}% {get_const_string(ConstStringKey.CriticalChance)}
+					{item.data.critical_dmg}% {get_const_string(ConstStringKey.Critical)}<br />
 				{/if}
 			{/if}
 
 			<!-- Armour stats -->
 			{#if 'melee_defence' in item.data}
-				Melee Defence: {item.data.melee_defence}<br />
-				Ranged Defence: {item.data.ranged_defence}<br />
-				Magic Defence: {item.data.magic_defence}<br />
-				Dodge: {item.data.dodge}
+				{get_const_string(ConstStringKey.Melee)}
+				{get_const_string(ConstStringKey.Defence)}: {item.data.melee_defence}<br />
+				{get_const_string(ConstStringKey.Ranged)}
+				{get_const_string(ConstStringKey.Defence)}: {item.data.ranged_defence}<br />
+				{get_const_string(ConstStringKey.Magic)}
+				{get_const_string(ConstStringKey.Defence)}: {item.data.magic_defence}<br />
+				{get_const_string(ConstStringKey.Dodge)}: {item.data.dodge}
 			{/if}
 		</p>
 
 		<!-- Resistances for gloves/shoes -->
 		{#if isResistances(item.data)}
 			<p class="light-orange">
-				Fire Element Resistance: {item.data.fire_res}%<br />
-				Water Element Resistance: {item.data.water_res}%<br />
-				Light Element Resistance: {item.data.light_res}%<br />
-				Shadow Element Resistance: {item.data.shadow_res}%
+				{get_const_string(ConstStringKey.Fire)} Element Resistance: {item.data.fire_res}%<br />
+				{get_const_string(ConstStringKey.Water)} Element Resistance: {item.data.water_res}%<br />
+				{get_const_string(ConstStringKey.Light)} Element Resistance: {item.data.light_res}%<br />
+				{get_const_string(ConstStringKey.Shadow)} Element Resistance: {item.data.shadow_res}%
 			</p>
 		{/if}
 
 		<!-- Price -->
 		{#if 'price' in item.data}
-			<p class="price">Price: {item.data.price.toLocaleString('es-ES')}</p>
+			<p class="price">
+				{get_const_string(ConstStringKey.Price)}: {item.data.price.toLocaleString('es-ES')}
+			</p>
 		{/if}
 
 		<!-- Cell options -->
@@ -200,7 +260,7 @@
 			{#if item.data.options.length > 0}
 				<p class="light-orange">
 					{#each item.data.options as option, i (i)}
-						{option.level} Lv {option.vnum} {option.value}<br />
+						{option.level} {get_const_string(ConstStringKey.Lv)} {option.vnum} {option.value}<br />
 					{/each}
 				</p>
 			{/if}
