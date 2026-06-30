@@ -19,6 +19,7 @@
 		fetchConstString(ConstStringKey.Amount);
 		fetchConstString(ConstStringKey.PricePerUnit);
 		fetchConstString(ConstStringKey.TimePeriod);
+		fetchConstString(ConstStringKey.NoItemHasBeenFound);
 	});
 
 	function formatTime(minutes: number) {
@@ -46,27 +47,32 @@
 	</thead>
 
 	<tbody>
-		{#each results as item, i (i)}
-			<tr>
-				<td class="name-cell"
-					><!-- svelte-ignore a11y_no_static_element_interactions --><span
-						oncontextmenu={(e) => {
-							e.preventDefault();
-							onContextMenu?.(item, e);
-						}}
-						style="cursor: pointer"><ItemIcon iconId={item.icon_id} /></span
-					>{item.item_name[lang.current] || item.item_name['UK'] || item.item_vnum.toString()}</td
-				>
-				<td>{item.amount}</td>
-				<td>{item.bazar_price.toLocaleString('en-US')}</td>
-				<td>{formatTime(item.minutes_left)}</td>
-				<td>{item.owner_name}</td>
-			</tr>
-		{/each}
+		{#if results.length > 0}
+			{#each results as item, i (i)}
+				<tr>
+					<td class="name-cell"
+						><!-- svelte-ignore a11y_no_static_element_interactions --><span
+							oncontextmenu={(e) => {
+								e.preventDefault();
+								onContextMenu?.(item, e);
+							}}
+							style="cursor: pointer"><ItemIcon iconId={item.icon_id} /></span
+						>{item.item_name[lang.current] || item.item_name['UK'] || item.item_vnum.toString()}</td
+					>
+					<td>{item.amount}</td>
+					<td>{item.bazar_price.toLocaleString('en-US')}</td>
+					<td>{formatTime(item.minutes_left)}</td>
+					<td>{item.owner_name}</td>
+				</tr>
+			{/each}
+		{/if}
 	</tbody>
 
 	<tfoot> </tfoot>
 </table>
+{#if results.length == 0}
+	<p>{get_const_string(ConstStringKey.NoItemHasBeenFound)}</p>
+{/if}
 
 <style>
 	table {
@@ -85,5 +91,10 @@
 
 	.name-cell {
 		text-align: left;
+	}
+
+	p {
+		text-align: center;
+		font-size: large;
 	}
 </style>

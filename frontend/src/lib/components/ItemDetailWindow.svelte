@@ -4,9 +4,14 @@
 	import { lang } from '$lib/stores/lang.svelte';
 	import { RequiredClass } from '$lib/types/enums';
 	import CloseButton from './CloseButton.svelte';
-	import { isAccessory, isResistances, itemHasFlagsToDisplay } from '$lib/types/search';
+	import {
+		formatCellonOptionString,
+		isAccessory,
+		isResistances,
+		itemHasFlagsToDisplay
+	} from '$lib/types/search';
 	import { onMount } from 'svelte';
-	import { ConstStringKey } from '$lib/types/constStringKeys';
+	import { CellonOptionsConstStrings, ConstStringKey } from '$lib/types/constStringKeys';
 	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
 
 	type Props = {
@@ -57,6 +62,12 @@
 		fetchConstString(ConstStringKey.Drop);
 		fetchConstString(ConstStringKey.False);
 		fetchConstString(ConstStringKey.Number);
+		fetchConstString(ConstStringKey.CellonHpMaxIncrease);
+		fetchConstString(ConstStringKey.CellonMpMaxIncrease);
+		fetchConstString(ConstStringKey.CellonHpRecovery);
+		fetchConstString(ConstStringKey.CellonMpRecovery);
+		fetchConstString(ConstStringKey.CellonCritDmgReduction);
+		fetchConstString(ConstStringKey.CellonMpConsumptionReduction);
 	});
 
 	function get_required_class_string(required_class: number | null): string {
@@ -260,7 +271,10 @@
 			{#if item.data.options.length > 0}
 				<p class="light-orange">
 					{#each item.data.options as option, i (i)}
-						{option.level} {get_const_string(ConstStringKey.Lv)} {option.vnum} {option.value}<br />
+						{formatCellonOptionString(option)}<br />
+						<!-- {option.level}{get_const_string(ConstStringKey.Lv)}
+						{get_const_string(CellonOptionsConstStrings[option.vnum])}
+						{option.value}<br /> -->
 					{/each}
 				</p>
 			{/if}

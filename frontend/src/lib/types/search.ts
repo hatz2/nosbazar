@@ -1,4 +1,6 @@
+import { get_const_string } from '$lib/services/constStringService.svelte';
 import type { ItemFlagsData, ItemStaticData } from '$lib/services/itemService';
+import { CellonOptionsConstStrings, ConstStringKey } from './constStringKeys';
 
 export type SearchResult = {
 	owner_name: string;
@@ -189,4 +191,17 @@ export function isNoData(data: SearchResultData): data is NoData {
 
 export function itemHasFlagsToDisplay(flags: ItemFlagsData): boolean {
 	return flags.no_dropping || flags.no_selling || flags.no_trading;
+}
+
+export function formatCellonOptionString(cellonOption: CellonOption): string {
+	let option: string = `${cellonOption.level}${get_const_string(ConstStringKey.Lv)} ${get_const_string(CellonOptionsConstStrings[cellonOption.vnum])}`;
+
+	const new_type_str = '<NEW_TYPE><0>';
+	if (option.includes(new_type_str)) {
+		option = option.replace(new_type_str, '');
+		option = option.replace('%s%', `${cellonOption.value}`);
+	} else {
+		option += ` ${cellonOption.value}`;
+	}
+	return option;
 }

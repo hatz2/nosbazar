@@ -219,4 +219,20 @@ export enum ConstStringKey {
 	Sale = 2616,
 	Trade = 3192,
 	Sell = 21,
+	CellonHpMaxIncrease = 484,
+	CellonMpMaxIncrease = 485,
+	CellonHpRecovery = 486,
+	CellonMpRecovery = 487,
+	CellonCritDmgReduction = 2316,
+	CellonMpConsumptionReduction = 2315,
+	NoItemHasBeenFound = 3451
 }
+
+export const CellonOptionsConstStrings: Record<number, ConstStringKey> = {
+	0: ConstStringKey.CellonHpMaxIncrease,
+	1: ConstStringKey.CellonMpMaxIncrease,
+	2: ConstStringKey.CellonHpRecovery,
+	3: ConstStringKey.CellonMpRecovery,
+	4: ConstStringKey.CellonMpConsumptionReduction,
+	5: ConstStringKey.CellonCritDmgReduction
+};
