@@ -3,7 +3,7 @@
 	"configurations": [
 		{
 			"name": "Debug Svelte",
-			"type": "msedge",
+			"type": "editor-browser",
 			"request": "launch",
 			"url": "http://localhost:5173",
 			"webRoot": "${workspaceFolder}/src"
