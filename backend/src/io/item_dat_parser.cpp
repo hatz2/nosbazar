@@ -181,7 +181,13 @@ nlohmann::json nosbazar::io::Item::json() const {
 
 	// Metadata
 	//json_obj["ingame_desc_lines_count"] = ingame_desc_lines_count;
-	json_obj["description"] = LangManager::get_instance().get_all_item_translations(description_code_name);
+	if (ingame_desc_lines_count > 0) {
+		json_obj["description"] = LangManager::get_instance().get_all_item_translations(description_code_name);
+	}
+	else {
+		json_obj["description"] = "";
+	}
+	
 
 	return json_obj;
 }
