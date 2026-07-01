@@ -443,7 +443,7 @@
 		{ label: get_const_string(ConstStringKey.PartnerMagic), value: enums.PartnerSubcategory.Magic }
 	]);
 
-	const storeMountOptions = [
+	const storeMountOptions = $derived([
 		{ label: get_const_string(ConstStringKey.All), value: enums.StoreMountSubcategory.All },
 		{
 			label: get_const_string(ConstStringKey.EmptyMountBead),
@@ -453,7 +453,7 @@
 			label: get_const_string(ConstStringKey.MountBead),
 			value: enums.StoreMountSubcategory.MountBead
 		}
-	];
+	]);
 
 	const shellOptions = $derived([
 		{ label: get_const_string(ConstStringKey.All), value: enums.ShellSubcategory.All },
