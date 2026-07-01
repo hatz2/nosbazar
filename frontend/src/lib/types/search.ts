@@ -1,6 +1,4 @@
-import { get_const_string } from '$lib/services/constStringService.svelte';
 import type { ItemFlagsData, ItemStaticData } from '$lib/services/itemService';
-import { CellonOptionsConstStrings, ConstStringKey } from './constStringKeys';
 
 export type SearchResult = {
 	owner_name: string;
@@ -14,8 +12,8 @@ export type SearchResult = {
 
 export type EnrichedSearchResult = SearchResult & {
 	item_name: Record<string, string>;
-	icon_id?: number;
 	static_data: ItemStaticData | null;
+	contained_item_static_data?: ItemStaticData;
 };
 
 export interface ShellEffect {
@@ -130,6 +128,7 @@ export interface SpecialistData {
 	water_res_perf: number;
 	light_res_perf: number;
 	shadow_res_perf: number;
+	price: number;
 }
 
 export type NoData = Record<string, never>;
@@ -193,15 +192,6 @@ export function itemHasFlagsToDisplay(flags: ItemFlagsData): boolean {
 	return flags.no_dropping || flags.no_selling || flags.no_trading;
 }
 
-export function formatCellonOptionString(cellonOption: CellonOption): string {
-	let option: string = `${cellonOption.level}${get_const_string(ConstStringKey.Lv)} ${get_const_string(CellonOptionsConstStrings[cellonOption.vnum])}`;
-
-	const new_type_str = '<NEW_TYPE><0>';
-	if (option.includes(new_type_str)) {
-		option = option.replace(new_type_str, '');
-		option = option.replace('%s%', `${cellonOption.value}`);
-	} else {
-		option += ` ${cellonOption.value}`;
-	}
-	return option;
+export function get_display_icon_id(item: EnrichedSearchResult): number {
+	return item.contained_item_static_data?.icon_id ?? item.static_data?.icon_id ?? 0;
 }

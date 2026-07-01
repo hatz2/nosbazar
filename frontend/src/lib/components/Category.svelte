@@ -16,7 +16,7 @@
 		fetchConstString(ConstStringKey.BazarCategoryArmour);
 		fetchConstString(ConstStringKey.BazarCategoryEquipment);
 		fetchConstString(ConstStringKey.BazarCategoryAccessories);
-		fetchConstString(ConstStringKey.BazarCategorySpecialist);
+		fetchConstString(ConstStringKey.Specialist);
 		fetchConstString(ConstStringKey.BazarCategoryPet);
 		fetchConstString(ConstStringKey.BazarCategoryPartner);
 		fetchConstString(ConstStringKey.BazarCategoryShell);
@@ -40,9 +40,7 @@
 	<option value={BazarCategory.Accessories}
 		>{get_const_string(ConstStringKey.BazarCategoryAccessories)}</option
 	>
-	<option value={BazarCategory.Specialist}
-		>{get_const_string(ConstStringKey.BazarCategorySpecialist)}</option
-	>
+	<option value={BazarCategory.Specialist}>{get_const_string(ConstStringKey.Specialist)}</option>
 	<option value={BazarCategory.Pet}>{get_const_string(ConstStringKey.BazarCategoryPet)}</option>
 	<option value={BazarCategory.Partner}
 		>{get_const_string(ConstStringKey.BazarCategoryPartner)}</option

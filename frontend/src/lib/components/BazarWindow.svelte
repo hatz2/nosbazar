@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { BazarCategory } from '$lib/types/enums';
-	import type { SearchResult, EnrichedSearchResult } from '$lib/types/search';
+	import {
+		type SearchResult,
+		type EnrichedSearchResult,
+		isSpecialist
+	} from '$lib/types/search';
 	import { itemService } from '$lib/services/itemService';
 	import BlueButton from './BlueButton.svelte';
 	import Category from './Category.svelte';
@@ -79,18 +83,25 @@
 			console.log(data);
 			const rawItems = (data.items ?? []) as SearchResult[];
 
-			if (rawItems.length > 0) {
-				const vnums = rawItems.map((item: SearchResult) => item.item_vnum);
-				await itemService.fetchMany(vnums);
+		if (rawItems.length > 0) {
+			const allVnums = rawItems.map((item: SearchResult) => item.item_vnum);
+			for (const item of rawItems) {
+				if (isSpecialist(item.data) && item.data.contains_sp) {
+					allVnums.push(item.data.vnum);
+				}
+			}
+			await itemService.fetchMany(allVnums);
 
-				// Enrich items with names from the cache synchronously for an atomic update
 				results = rawItems.map((item: SearchResult): EnrichedSearchResult => {
 					const staticData = itemService.getSync(item.item_vnum);
+					const containedData = isSpecialist(item.data) && item.data.contains_sp
+						? itemService.getSync(item.data.vnum) ?? undefined
+						: undefined;
 					return {
 						...item,
 						item_name: staticData?.name || { UK: item.item_vnum.toString() },
-						icon_id: staticData?.icon_id,
-						static_data: staticData
+						static_data: staticData,
+						contained_item_static_data: containedData
 					};
 				});
 			} else {

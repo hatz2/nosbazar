@@ -44,7 +44,7 @@ export enum ConstStringKey {
 	BazarCategoryArmour = 3303,
 	BazarCategoryEquipment = 3304,
 	BazarCategoryAccessories = 3305,
-	BazarCategorySpecialist = 3306,
+	Specialist = 3306,
 	BazarCategoryPet = 3307,
 	BazarCategoryPartner = 3308,
 	BazarCategoryShell = 3309,
@@ -225,7 +225,21 @@ export enum ConstStringKey {
 	CellonMpRecovery = 487,
 	CellonCritDmgReduction = 2316,
 	CellonMpConsumptionReduction = 2315,
-	NoItemHasBeenFound = 3451
+	NoItemHasBeenFound = 3451,
+	Card = 2755,
+	InCustody = 2234,
+	ExperiencePoints = 2235,
+	UpgradingGrade = 2775,
+	LevelOfPerfection = 3831,
+	SpAttackStat = 3832,
+	SpDefStat = 3833,
+	SpEleStat = 3834,
+	SpHpMpStat = 3835,
+	SpFireResStat = 3836,
+	SpWaterResStat = 3837,
+	SpLightResStat = 3838,
+	SpShadowResStat = 3839,
+	RemainingPoints = 3074
 }
 
 export const CellonOptionsConstStrings: Record<number, ConstStringKey> = {

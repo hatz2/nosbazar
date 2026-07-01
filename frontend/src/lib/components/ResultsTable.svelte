@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { EnrichedSearchResult } from '$lib/types/search';
+	import { get_display_icon_id, type EnrichedSearchResult } from '$lib/types/search';
 	import { lang } from '$lib/stores/lang.svelte';
 	import ItemIcon from './ItemIcon.svelte';
 	import { onMount } from 'svelte';
@@ -56,7 +56,7 @@
 								e.preventDefault();
 								onContextMenu?.(item, e);
 							}}
-							style="cursor: pointer"><ItemIcon iconId={item.icon_id} /></span
+							style="cursor: pointer"><ItemIcon iconId={get_display_icon_id(item)} /></span
 						>{item.item_name[lang.current] || item.item_name['UK'] || item.item_vnum.toString()}</td
 					>
 					<td>{item.amount}</td>

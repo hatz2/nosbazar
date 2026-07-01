@@ -189,7 +189,7 @@ namespace nosbazar::packets {
 			int water_res_perf{};
 			int light_res_perf{};
 			int shadow_res_perf{};
-			int unknown_1{};
+			int price{};
 
 			SpecialistData() = default;
 			SpecialistData(std::string_view item_data);

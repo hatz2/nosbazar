@@ -238,7 +238,7 @@ namespace nosbazar::packets {
 		water_res_perf = strings::token<int>(item_data, data_separator);
 		light_res_perf = strings::token<int>(item_data, data_separator);
 		shadow_res_perf = strings::token<int>(item_data, data_separator);
-		unknown_1 = strings::token<int>(item_data, data_separator);
+		price = strings::token<int>(item_data, data_separator);
 	}
 	nlohmann::json RcBlist::SpecialistData::json() const
 	{
@@ -275,6 +275,7 @@ namespace nosbazar::packets {
 			{ "water_res_perf", water_res_perf },
 			{ "light_res_perf", light_res_perf },
 			{ "shadow_res_perf", shadow_res_perf },
+			{ "price", price}
 		};
 	}
 	RcBlist::ItemDataFieldsFactory& RcBlist::ItemDataFieldsFactory::instance()

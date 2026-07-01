@@ -6,7 +6,21 @@
 			"type": "editor-browser",
 			"request": "launch",
 			"url": "http://localhost:5173",
-			"webRoot": "${workspaceFolder}/src"
+			"webRoot": "${workspaceFolder}/src",
+			"sourceMapPathOverrides": {
+				"vite:///src/*": "${webRoot}/*"
+			}
+		},
+		{
+			"name": "Debug Brave",
+			"type": "chrome",
+			"request": "launch",
+			"url": "http://localhost:5173",
+			"webRoot": "${workspaceFolder}/src",
+			"sourceMapPathOverrides": {
+				"vite:///src/*": "${webRoot}/*"
+			},
+			"runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
 		}
 	]
 }
