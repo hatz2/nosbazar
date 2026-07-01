@@ -49,7 +49,7 @@
 		{ label: get_const_string(ConstStringKey.Upgrade13), value: 14 }
 	]);
 
-	const specialistOptions = [
+	const specialistOptions = $derived([
 		{ label: get_const_string(ConstStringKey.All), value: 0 },
 		{ label: '+0', value: 1 },
 		{ label: '+1', value: 2 },
@@ -72,9 +72,9 @@
 		{ label: '+18', value: 19 },
 		{ label: '+19', value: 20 },
 		{ label: '+20', value: 21 }
-	];
+	]);
 
-	const petOptions = [
+	const petOptions = $derived([
 		{ label: get_const_string(ConstStringKey.All), value: 0 },
 		{ label: '+0', value: 1 },
 		{ label: '+1', value: 2 },
@@ -83,7 +83,7 @@
 		{ label: '+4', value: 5 },
 		{ label: '+5', value: 6 },
 		{ label: '+6', value: 7 }
-	];
+	]);
 
 	const optionsByCategory = $derived({
 		[enums.BazarCategory.All]: [],

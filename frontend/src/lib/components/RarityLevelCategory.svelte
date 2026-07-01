@@ -36,7 +36,7 @@
 		{ label: get_const_string(ConstStringKey.BazarRarityPhenomenal), value: 9 }
 	]);
 
-	const specialistOptions = [
+	const specialistOptions = $derived([
 		{ label: get_const_string(ConstStringKey.All), value: 0 },
 		{ label: 'Perfection Lv 1-10', value: 1 },
 		{ label: 'Perfection Lv 11-20', value: 2 },
@@ -48,7 +48,7 @@
 		{ label: 'Perfection Lv 71-80', value: 8 },
 		{ label: 'Perfection Lv 81-90', value: 9 },
 		{ label: 'Perfection Lv 91-100', value: 10 }
-	];
+	]);
 
 	const optionsByCategory = $derived({
 		[enums.BazarCategory.All]: [],
