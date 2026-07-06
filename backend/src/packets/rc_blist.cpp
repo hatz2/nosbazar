@@ -328,7 +328,8 @@ namespace nosbazar::packets {
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::accessory), std::to_underlying(AccessorySubType::necklace)}] = [](auto data) { return AccessoryData(data); };
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::accessory), std::to_underlying(AccessorySubType::ring)}] = [](auto data) { return AccessoryData(data); };
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::accessory), std::to_underlying(AccessorySubType::bracelet)}] = [](auto data) { return AccessoryData(data); };
-		// TODO: Add the rest of accessory types (amulet, fairy, minipet)
+		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::accessory), std::to_underlying(AccessorySubType::amulet)}] = [](auto data) { return AmuletData(data); };
+		// TODO: Add the rest of accessory types (fairy, minipet)
 
 		// Holders
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::sp_card_holder)}] = [](auto data) { return SpecialistData(data); };
@@ -459,6 +460,58 @@ namespace nosbazar::packets {
 		result["sum_level"] = sum_level;
 
 		return result;
+	}
+
+	RcBlist::CostumeData::CostumeData(std::string_view item_data)
+	{
+		vnum = strings::token<int>(item_data, data_separator);
+		required_level = strings::token<int>(item_data), data_separator;
+		unknown_1 = strings::token<int>(item_data, data_separator);
+		unknown_2 = strings::token<int>(item_data, data_separator);
+		unknown_3 = strings::token<int>(item_data, data_separator);
+		unknown_4 = strings::token<int>(item_data, data_separator);
+		unknown_5 = strings::token<int>(item_data, data_separator);
+		unknown_6 = strings::token<int>(item_data, data_separator);
+		unknown_7 = strings::token<int>(item_data, data_separator);
+		unknown_8 = strings::token<int>(item_data, data_separator);
+		price = strings::token<int>(item_data, data_separator);
+		unknown_9 = strings::token<int>(item_data, data_separator);
+		unknown_10 = strings::token<int>(item_data, data_separator);
+		remaining_time_in_hours = strings::token<int>(item_data, data_separator);
+		unknown_11 = strings::token<int>(item_data, data_separator);
+		unknown_12 = strings::token<int>(item_data, data_separator);
+	}
+
+	nlohmann::json RcBlist::CostumeData::json() const
+	{
+		return {
+			{"vnum", vnum},
+			{"required_level", required_level},
+			{"price", price},
+			{"remaining_time_in_hours", remaining_time_in_hours}
+		};
+	}
+
+	RcBlist::AmuletData::AmuletData(std::string_view item_data)
+	{
+		vnum = strings::token<int>(item_data, data_separator);
+		required_level = strings::token<int>(item_data, data_separator);
+		remaining_time_in_secs = strings::token<int>(item_data, data_separator);
+		unknown_1 = strings::token<int>(item_data, data_separator);
+		unknown_2 = strings::token<int>(item_data, data_separator);
+		price = strings::token<int>(item_data, data_separator);
+		unknown_3 = strings::token<int>(item_data, data_separator);
+		unknown_4 = strings::token<int>(item_data, data_separator);
+	}
+
+	nlohmann::json RcBlist::AmuletData::json() const
+	{
+		return {
+			{"vnum", vnum},
+			{"required_level", required_level},
+			{"price", price},
+			{"remaining_time_in_secs", remaining_time_in_secs}
+		};
 	}
 
 }

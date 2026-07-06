@@ -128,6 +128,44 @@ namespace nosbazar::packets {
 			virtual nlohmann::json json() const;
 		};
 
+		struct CostumeData {
+			int vnum{};
+			int required_level{};
+			int unknown_1{};
+			int unknown_2{};
+			int unknown_3{};
+			int unknown_4{};
+			int unknown_5{};
+			int unknown_6{};
+			int unknown_7{};
+			int unknown_8{};
+			int price{};
+			int unknown_9{};
+			int unknown_10{};
+			int remaining_time_in_hours{};
+			int unknown_11{};
+			int unknown_12{};
+
+			CostumeData() = default;
+			CostumeData(std::string_view item_data);
+			nlohmann::json json() const;
+		};
+
+		struct AmuletData {
+			int vnum{};
+			int required_level{};
+			int remaining_time_in_secs{};
+			int unknown_1{};
+			int unknown_2{};
+			int price{};
+			int unknown_3{};
+			int unknown_4{};
+
+			AmuletData() = default;
+			AmuletData(std::string_view item_data);
+			nlohmann::json json() const;
+		};
+
 		// Gloves and shoes
 		struct ResistancesData : EquipmentData {
 			ResistancesData(std::string_view item_data) : EquipmentData(item_data) {};
@@ -211,7 +249,9 @@ namespace nosbazar::packets {
 			ResistancesData,
 			EquipmentHatMaskData,
 			AccessoryData, 
-			SpecialistData
+			SpecialistData,
+			CostumeData,
+			AmuletData
 		>;
 
 		/**

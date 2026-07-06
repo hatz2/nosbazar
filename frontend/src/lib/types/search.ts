@@ -78,6 +78,13 @@ interface EquipmentData {
 	price: number;
 }
 
+interface AmuletData {
+	vnum: number;
+	required_level: number;
+	price: number;
+	remaining_time_in_secs: number;
+}
+
 export interface ResistancesData extends EquipmentData {
 	fire_res: number;
 	water_res: number;
@@ -142,6 +149,7 @@ export type SearchResultData =
 	| EquipmentHatMaskData
 	| AccessoryData
 	| SpecialistData
+	| AmuletData
 	| NoData;
 
 // ---- Type guards for the SearchResultData union ----

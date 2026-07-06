@@ -181,6 +181,13 @@
 			{#if 'required_level' in item.data}
 				{get_required_level(item)}<br />
 			{/if}
+			{#if 'remaining_time_in_secs' in item.data}
+				<span class="light-orange">
+					{get_const_string(ConstStringKey.AmuletRemaining)}
+					{get_const_string(ConstStringKey.AmuletHours)}: {item.data.remaining_time_in_secs}
+					{get_const_string(ConstStringKey.Seconds)}
+				</span>
+			{/if}
 			{#if 'rare' in item.data}
 				{get_const_string(ConstStringKey.RarityLevel)}: {item.data.rare}<br />
 			{/if}
