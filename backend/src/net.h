@@ -15,6 +15,7 @@ namespace nosbazar::net {
 	struct Response {
 		int status_code;
 		std::string body;
+		std::unordered_map<std::string, std::string> headers;
 	};
 
 	enum class CurlError {

@@ -15,6 +15,27 @@ namespace {
 
         return total_size;
     }
+
+    size_t header_callback(void* contents, size_t size, size_t nmemb, void* userp)
+    {
+        size_t total_size = size * nmemb;
+        auto* headers = static_cast<std::unordered_map<std::string, std::string>*>(userp);
+        std::string line(static_cast<char*>(contents), total_size);
+
+        auto colon = line.find(':');
+        if (colon != std::string::npos) {
+            std::string key = line.substr(0, colon);
+            std::string value = line.substr(colon + 1);
+
+            key.erase(key.find_last_not_of(" \t\r\n") + 1);
+            value.erase(0, value.find_first_not_of(" \t\r\n"));
+            value.erase(value.find_last_not_of(" \t\r\n") + 1);
+
+            (*headers)[key] = value;
+        }
+
+        return total_size;
+    }
 }
 
 
@@ -45,9 +66,13 @@ std::expected<Response, CurlError> nosbazar::net::post(std::string_view url, std
     }
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, curl_headers);
 
-    // Callback response
+    // Callback response body
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_body);
+
+    // Callback response headers
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response.headers);
 
     // Execute request
     CURLcode res = curl_easy_perform(curl);
@@ -99,9 +124,13 @@ std::expected<Response, CurlError> nosbazar::net::get(std::string_view url, cons
 
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, curl_headers);
 
-    // Callback response
+    // Callback response body
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
+
+    // Callback response headers
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response.headers);
 
     // Execute request
     CURLcode res = curl_easy_perform(curl);
