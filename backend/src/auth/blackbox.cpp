@@ -109,7 +109,7 @@ nosbazar::auth::EncryptedBlackbox::EncryptedBlackbox(std::shared_ptr<Identity> i
         {"session", gsid.substr(0, gsid.find_last_of('-'))}
     };
 
-    identity->set_request(request.dump());
+    identity->set_request(request);
 }
 
 std::string nosbazar::auth::EncryptedBlackbox::encrypted() const

@@ -46,12 +46,8 @@ nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const 
 		fmt::format("gf-installation-id: {}", installation_id),
 	};
 
-	identity->update();
-	identity->set_request(nullptr);
-	Blackbox blackbox(identity);
-
 	json body = {
-		{"blackbox", blackbox.encoded()},
+		{"blackbox", create_blackbox()},
 		{"email", params.email},
 		{"locale", locale},
 		{"password", params.password}
@@ -98,17 +94,21 @@ nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const 
 	}
 }
 
-json nosbazar::auth::NosAuth::get_accounts() const
+json nosbazar::auth::NosAuth::get_accounts()
 {
-	std::string_view url = "https://spark.gameforge.com/api/v1/user/accounts";
-
 	if (token.empty()) {
 		return {};
 	}
 
+	if (!get_user_information()) {
+		return {};
+	}
+
+	std::string_view url = "https://spark.gameforge.com/api/v1/user/accounts";
+
 	std::vector<std::string> headers = {
 		fmt::format("User-Agent: {}", browser_user_agent),
-		fmt::format("tnt-installation-id: {}", installation_id),
+		fmt::format("TNT-Installation-Id: {}", installation_id),
 		fmt::format("Authorization: Bearer {}", token),
 	};
 
@@ -128,9 +128,32 @@ json nosbazar::auth::NosAuth::get_accounts() const
 	}
 }
 
-nosbazar::auth::NosAuth::UserInfo nosbazar::auth::NosAuth::get_user_information()
+bool nosbazar::auth::NosAuth::get_user_information()
 {
-	return UserInfo();
+	if (token.empty()) {
+		return false;
+	}
+
+	std::string_view url = "https://spark.gameforge.com/api/v1/user/me";
+
+	std::vector<std::string> headers = {
+		fmt::format("User-Agent: {}", browser_user_agent),
+		fmt::format("TNT-Installation-Id: {}", installation_id),
+		fmt::format("Authorization: Bearer {}", token),
+	};
+
+	auto result = net::get(url, headers);
+
+	if (!result || result->status_code != 200) {
+		return false;
+	}
+
+	auto response = json::parse(result->body);
+	user_info.gf_account_id = response["id"].get<std::string>();
+	user_info.locale = response.value("locale", locale);
+	user_info.email = response.value("email", std::string());
+
+	return true;
 }
 
 bool nosbazar::auth::NosAuth::send_iovation(const std::string& account_id) const
@@ -140,13 +163,13 @@ bool nosbazar::auth::NosAuth::send_iovation(const std::string& account_id) const
 	std::vector<std::string> headers = {
 		"Content-Type: application/json",
 		fmt::format("User-Agent: {}", browser_user_agent),
-		fmt::format("tnt-installation-id: {}", installation_id),
+		fmt::format("TNT-Installation-Id: {}", installation_id),
 		fmt::format("Authorization: Bearer {}", token),
 	};
 
 	json content = {
 		{"accountId", account_id},
-		{"blackbox", json::object()},
+		{"blackbox", create_blackbox()},
 		{"type", "play_now"}
 	};
 
@@ -168,35 +191,45 @@ bool nosbazar::auth::NosAuth::send_iovation(const std::string& account_id) const
 	return response["status"] == "ok";
 }
 
-std::optional<std::string> nosbazar::auth::NosAuth::get_session_token(const std::string& account_id) const
+std::optional<std::string> nosbazar::auth::NosAuth::get_session_token(const std::string& account_id)
 {
+	std::lock_guard<std::mutex> lock(session_mutex);
+
 	std::string_view url = "https://spark.gameforge.com/api/v1/auth/thin/codes";
 
 	if (token.empty()) {
 		return std::nullopt;
 	}
 
+	init_game_session_id();
+
 	if (!send_iovation(account_id)) {
 		return std::nullopt;
 	}
+
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	std::vector<std::string> headers = {
 		"Content-Type: application/json",
 		fmt::format("User-Agent: Chrome/{} ({})", chrome_version, generate_third_type_user_agent_magic(account_id)),
 		fmt::format("Authorization: Bearer {}", token),
-		fmt::format("tnt-installation-id: {}", installation_id),
+		fmt::format("tnt-installation-id: {}", installation_id)
 	};
 
 	std::string gsid = fmt::format("{}-{}", game_session_id, random::random_int(1000, 9999));
+	identity->update();
+	EncryptedBlackbox blackbox(identity, account_id, gsid, installation_id);
 
 	json content = {
 		{"platformGameAccountId", account_id},
 		{"gsid", gsid},
-		{"blackbox", json::object()},
+		{"blackbox", blackbox.encrypted()},
 		{"gameId", game_id}
 	};
 
 	auto reply = net::post(url, content.dump(4), headers);
+
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	if (!reply) {
 		return std::nullopt;
@@ -221,6 +254,14 @@ std::optional<std::string> nosbazar::auth::NosAuth::get_session_token(const std:
 void nosbazar::auth::NosAuth::set_login_token(const std::string& token)
 {
 	this->token = token;
+}
+
+std::string nosbazar::auth::NosAuth::create_blackbox() const
+{
+	identity->update();
+	identity->set_request(nullptr);
+	Blackbox blackbox(identity);
+	return blackbox.encoded();
 }
 
 std::optional<char> nosbazar::auth::NosAuth::get_first_number(std::string_view uuid) const
@@ -265,8 +306,6 @@ void nosbazar::auth::NosAuth::init_gf_version()
 	std::string_view url = "http://dl.tnt.gameforge.com/tnt/final-ms3/clientversioninfo.json";
 
 	auto reply = net::get(url);
-
-	SPDLOG_DEBUG("init_gf_version: {}", reply->body);
 
 	if (!reply) {
 		return;

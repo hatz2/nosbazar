@@ -5,6 +5,7 @@
 #include <optional>
 #include <cstdint>
 #include <vector>
+#include <mutex>
 #include "identity.h"
 #include <nlohmann/json.hpp>
 
@@ -28,9 +29,9 @@ namespace nosbazar::auth {
 
 		AuthResult authenticate(const AuthParams& params);
 
-		[[nodiscard]] nlohmann::json get_accounts() const;
+		[[nodiscard]] nlohmann::json get_accounts();
 
-		[[nodiscard]] std::optional<std::string> get_session_token(const std::string& account_id) const;
+		[[nodiscard]] std::optional<std::string> get_session_token(const std::string& account_id);
 
 		void set_login_token(const std::string& token);
 
@@ -41,9 +42,11 @@ namespace nosbazar::auth {
 			std::string email;
 		};
 
-		UserInfo get_user_information();
+		bool get_user_information();
 
 		bool send_iovation(const std::string& account_id) const;
+
+		std::string create_blackbox() const;
 
 		std::optional<char> get_first_number(std::string_view uuid) const;
 
@@ -67,5 +70,6 @@ namespace nosbazar::auth {
 		std::string cert;
 		UserInfo user_info;
 		std::shared_ptr<Identity> identity;
+		mutable std::mutex session_mutex;
 	};
 }
