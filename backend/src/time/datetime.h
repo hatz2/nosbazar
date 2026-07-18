@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include <array>
+#include <algorithm>
 
 namespace nosbazar::time {
     inline std::string current_datetime_iso8601_utc_ms()
@@ -34,6 +36,21 @@ namespace nosbazar::time {
             << ms.count()
             << 'Z';
 
+        return oss.str();
+    }
+
+    inline std::string parse_http_date(const std::string& date_str)
+    {
+        std::tm tm{};
+        std::istringstream ss(date_str);
+        ss.imbue(std::locale::classic());
+        ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S");
+        if (ss.fail()) {
+            return current_datetime_iso8601_utc_ms();
+        }
+
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%Y-%m-%dT%H:%M:%S") << ".000Z";
         return oss.str();
     }
 }

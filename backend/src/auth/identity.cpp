@@ -27,17 +27,13 @@ namespace nosbazar::auth {
 		file.close();
 	}
 
-	Identity::~Identity()
-	{
-		save();
-	}
-
 	void Identity::update()
 	{
 		update_vector();
 		update_server_time();
 		update_creation();
 		update_timings();
+		save();
 	}
 
 	void Identity::update_vector()
@@ -117,8 +113,18 @@ namespace nosbazar::auth {
 	}
 	std::string Identity::get_server_date() const
 	{
-		// TODO: Implement this with the actual server date
-		return time::current_datetime_iso8601_utc_ms();
+		auto result = net::get("https://gameforge.com/tra/game1.js");
+		if (!result) {
+			return time::current_datetime_iso8601_utc_ms();
+		}
+
+		auto& response = *result;
+		auto date_str = response.headers["Date"];
+		if (date_str.empty()) {
+			return time::current_datetime_iso8601_utc_ms();
+		}
+
+		return time::parse_http_date(date_str);
 	}
 	std::string Identity::random_string(int size) const
 	{

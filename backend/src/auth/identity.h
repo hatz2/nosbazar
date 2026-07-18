@@ -7,7 +7,6 @@ namespace nosbazar::auth {
 	class Identity {
 	public:
 		explicit Identity(const std::string& file_path);
-		~Identity();
 
 		void update();
 
