@@ -247,6 +247,11 @@ export enum ConstStringKey {
 	RemainingPoints = 3074,
 	StrengthensElementBy = 649,
 	MonstersRequiredForNextFairyLevel = 4789,
+	FairyNoElement = 294,
+	FairyFireElement = 295,
+	FairyWaterElement = 296,
+	FairyLightElement = 297,
+	FairyShadowElement = 298
 }
 
 export const CellonOptionsConstStrings: Record<number, ConstStringKey> = {

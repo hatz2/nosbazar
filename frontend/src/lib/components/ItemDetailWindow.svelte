@@ -153,15 +153,15 @@
 		if ('element_type' in item.data) {
 			switch (item.data.element_type) {
 				case Element.NoElement:
-					return get_const_string(ConstStringKey.NoElement);
+					return get_const_string(ConstStringKey.FairyNoElement);
 				case Element.Fire:
-					return get_const_string(ConstStringKey.Fire);
+					return get_const_string(ConstStringKey.FairyFireElement);
 				case Element.Water:
-					return get_const_string(ConstStringKey.Water);
+					return get_const_string(ConstStringKey.FairyWaterElement);
 				case Element.Light:
-					return get_const_string(ConstStringKey.Light);
+					return get_const_string(ConstStringKey.FairyLightElement);
 				case Element.Shadow:
-					return get_const_string(ConstStringKey.Shadow);
+					return get_const_string(ConstStringKey.FairyShadowElement);
 			}
 		}
 		return '';
@@ -191,13 +191,6 @@
 					)}
 				{/if}
 			</p>
-
-			{#if 'monster_to_level_up' in item.data}
-				<p class="white-color">
-					{get_const_string(ConstStringKey.MonstersRequiredForNextFairyLevel)}:
-					{item.data.monster_to_level_up}
-				</p>
-			{/if}
 
 			<!-- Gender specific item -->
 			{#if item.static_data}
@@ -332,6 +325,14 @@
 						{/if}
 					</p>
 				{/if}
+			{/if}
+
+			<!-- Monsters to level up for fairies -->
+			{#if 'monster_to_level_up' in item.data}
+				<p class="white-color">
+					{get_const_string(ConstStringKey.MonstersRequiredForNextFairyLevel)}:
+					{item.data.monster_to_level_up}
+				</p>
 			{/if}
 
 			<!-- Damage section -->
