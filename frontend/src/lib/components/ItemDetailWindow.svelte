@@ -212,7 +212,7 @@
 				{#if 'remaining_time_in_secs' in item.data}
 					<span class="light-orange">
 						{get_const_string(ConstStringKey.AmuletRemaining)}
-						{get_const_string(ConstStringKey.AmuletHours)}: {item.data.remaining_time_in_secs}
+						{get_const_string(ConstStringKey.Hours)}: {item.data.remaining_time_in_secs}
 						{get_const_string(ConstStringKey.Seconds)}
 					</span>
 				{/if}
@@ -309,8 +309,8 @@
 
 			<!-- Flags section -->
 			{#if item.static_data}
-				{#if itemHasFlagsToDisplay(item.static_data.flags)}
-					<p class="light-orange">
+				<p class="light-orange">
+					{#if itemHasFlagsToDisplay(item.static_data.flags)}
 						{#if item.static_data.flags.no_dropping}
 							[{get_const_string(ConstStringKey.Drop)}] {get_const_string(ConstStringKey.False)}<br
 							/>
@@ -323,8 +323,19 @@
 							[{get_const_string(ConstStringKey.Trade)}] {get_const_string(ConstStringKey.False)}<br
 							/>
 						{/if}
-					</p>
-				{/if}
+					{/if}
+					{#if 'cannot_trade_after_equip' in item.data && item.data.cannot_trade_after_equip}
+						[{get_const_string(ConstStringKey.TradeIsAllowed)}]<br />
+						{get_const_string(ConstStringKey.IfEquipedItWontBeTradable)}<br />
+					{/if}
+					{#if 'remaining_time_in_hours' in item.data && item.data.remaining_time_in_hours > 0}
+						<span class="price"
+							>{get_const_string(ConstStringKey.RemainingTime)}
+							{item.data.remaining_time_in_hours / 24}
+							{get_const_string(ConstStringKey.Day)}</span
+						>
+					{/if}
+				</p>
 			{/if}
 
 			<!-- Monsters to level up for fairies -->

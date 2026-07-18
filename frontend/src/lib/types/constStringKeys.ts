@@ -25,7 +25,7 @@ export enum ConstStringKey {
 	Shadow = 79,
 	NoElement = 80,
 	AmuletRemaining = 715,
-	AmuletHours = 716,
+	Hours = 716,
 	RarityLevel = 165,
 	OnlyForMales = 2807,
 	OnlyForFemales = 2808,
@@ -251,7 +251,13 @@ export enum ConstStringKey {
 	FairyFireElement = 295,
 	FairyWaterElement = 296,
 	FairyLightElement = 297,
-	FairyShadowElement = 298
+	FairyShadowElement = 298,
+	TradeIsAllowed = 2619,
+	IfEquipedItWontBeTradable = 2618,
+	DayS = 677,
+	Minutes = 589,
+	Day = 2815,
+	RemainingTime = 3919
 }
 
 export const CellonOptionsConstStrings: Record<number, ConstStringKey> = {

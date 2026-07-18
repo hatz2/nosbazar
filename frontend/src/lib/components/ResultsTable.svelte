@@ -24,13 +24,13 @@
 
 	function formatTime(minutes: number) {
 		if (minutes < 60) {
-			return `${minutes} Mins`;
+			return `${minutes} ${get_const_string(ConstStringKey.Minutes)}`;
 		} else if (minutes <= 1440) {
 			const hours = Math.round(minutes / 60);
-			return `${hours} Hours`;
+			return `${hours} ${get_const_string(ConstStringKey.Hours)}`;
 		} else {
 			const days = Math.round(minutes / 1440);
-			return `${days} Day(s)`;
+			return `${days} ${get_const_string(ConstStringKey.DayS)}`;
 		}
 	}
 </script>

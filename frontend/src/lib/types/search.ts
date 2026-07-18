@@ -147,6 +147,14 @@ export interface FairyData {
 	monsters_to_level_up: number;
 }
 
+export interface MiniPetData {
+	vnum: number;
+	required_level: number;
+	remaining_time_in_hours: number;
+	cannot_trade_after_equip: boolean;
+	price: number;
+}
+
 export type NoData = Record<string, never>;
 
 export type SearchResultData =
@@ -160,6 +168,7 @@ export type SearchResultData =
 	| SpecialistData
 	| AmuletData
 	| FairyData
+	| MiniPetData
 	| NoData;
 
 // ---- Type guards for the SearchResultData union ----
