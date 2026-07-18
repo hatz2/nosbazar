@@ -1,10 +1,8 @@
 <script lang="ts">
-	let { text, onclick} = $props();
-
-	// TODO: Proper style for this button
+	let { text, onclick, disabled = false } = $props();
 </script>
 
-<button class="blue-btn" {onclick}>
+<button class="blue-btn" {onclick} {disabled}>
 	{text}
 </button>
 

@@ -37,6 +37,7 @@
 	let upgradeLevel = $state(0);
 	let order = $state(0);
 	let pageIndex = $state(0);
+	let isCooldown = $state(false);
 	let results = $state<EnrichedSearchResult[]>([]);
 	let openWindows = $state<OpenWindow[]>([]);
 
@@ -62,7 +63,9 @@
 		fetchConstString(ConstStringKey.Category);
 	});
 
-	async function on_search_clicked() {
+	async function do_search() {
+		if (isCooldown) return;
+		isCooldown = true;
 		try {
 			const response = await fetch('http://localhost:8080/search', {
 				method: 'POST',
@@ -113,17 +116,24 @@
 		} catch (e) {
 			console.error('Search failed', e);
 			results = [];
+		} finally {
+			setTimeout(() => { isCooldown = false; }, 4000);
 		}
+	}
+
+	async function on_search_clicked() {
+		pageIndex = 0;
+		await do_search();
 	}
 
 	function go_next_page() {
 		pageIndex++;
-		on_search_clicked();
+		do_search();
 	}
 
 	function go_previous_page() {
 		if (pageIndex > 0) pageIndex--;
-		on_search_clicked();
+		do_search();
 	}
 </script>
 
@@ -139,7 +149,7 @@
 		<input type="text" />
 		<Category bind:value={category}></Category>
 		<SubCategory bind:value={subCategory} {category}></SubCategory>
-		<BlueButton text="Search" onclick={on_search_clicked}></BlueButton>
+		<BlueButton text="Search" onclick={on_search_clicked} disabled={isCooldown}></BlueButton>
 
 		<span>{get_const_string(ConstStringKey.Level)}</span>
 		<span>{get_const_string(ConstStringKey.RarityLevel)}</span>
@@ -168,9 +178,16 @@
 	/>
 
 	<div class="pagination">
-		<BlueButton text="< Previous" onclick={go_previous_page} />
-		<span>Page {pageIndex + 1}</span>
-		<BlueButton text="Next >" onclick={go_next_page} />
+		<BlueButton text="< Previous" onclick={go_previous_page} disabled={isCooldown} />
+		<input
+			type="number"
+			bind:value={pageIndex}
+			min="0"
+			onchange={() => do_search()}
+			class="page-input"
+			disabled={isCooldown}
+		/>
+		<BlueButton text="Next >" onclick={go_next_page} disabled={isCooldown} />
 	</div>
 </div>
 
@@ -209,8 +226,8 @@
 		padding: 8px 0;
 	}
 
-	.pagination span {
-		color: #ffffff;
-		font-size: 14px;
+	.pagination .page-input {
+		width: 50px;
+		text-align: center;
 	}
 </style>
