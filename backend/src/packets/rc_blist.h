@@ -142,7 +142,7 @@ namespace nosbazar::packets {
 			int price{};
 			int unknown_9{};
 			int unknown_10{};
-			int remaining_time_in_hours{};
+			int costume_remaining_time_in_hours{};
 			int unknown_11{};
 			int unknown_12{};
 
@@ -254,6 +254,21 @@ namespace nosbazar::packets {
 			nlohmann::json json() const;
 		};
 
+		struct MiniPetData {
+			int vnum{};
+			int required_level{};
+			int remaining_time_in_hours{};
+			int unknown_1{};
+			int unknown_2{};
+			int price{};
+			bool cannot_trade_after_equip{};
+			int unknown_3{};
+
+			MiniPetData() = default;
+			MiniPetData(std::string_view item_data);
+			nlohmann::json json() const;
+		};
+
 		struct NoData {
 			nlohmann::json json() const {
 				return nlohmann::json::object();
@@ -272,7 +287,8 @@ namespace nosbazar::packets {
 			SpecialistData,
 			CostumeData,
 			AmuletData,
-			FairyData
+			FairyData,
+			MiniPetData
 		>;
 
 		/**

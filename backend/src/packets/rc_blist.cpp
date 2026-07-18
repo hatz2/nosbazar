@@ -330,7 +330,7 @@ namespace nosbazar::packets {
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::accessory), std::to_underlying(AccessorySubType::bracelet)}] = [](auto data) { return AccessoryData(data); };
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::accessory), std::to_underlying(AccessorySubType::amulet)}] = [](auto data) { return AmuletData(data); };
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::accessory), std::to_underlying(AccessorySubType::fairy)}] = [](auto data) { return FairyData(data); };
-		// TODO: Add the rest of accessory types (fairy, minipet)
+		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::accessory), std::to_underlying(AccessorySubType::mini_pet)}] = [](auto data) { return MiniPetData(data); };
 
 		// Holders
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::sp_card_holder)}] = [](auto data) { return SpecialistData(data); };
@@ -478,7 +478,7 @@ namespace nosbazar::packets {
 		price = strings::token<int>(item_data, data_separator);
 		unknown_9 = strings::token<int>(item_data, data_separator);
 		unknown_10 = strings::token<int>(item_data, data_separator);
-		remaining_time_in_hours = strings::token<int>(item_data, data_separator);
+		costume_remaining_time_in_hours = strings::token<int>(item_data, data_separator);
 		unknown_11 = strings::token<int>(item_data, data_separator);
 		unknown_12 = strings::token<int>(item_data, data_separator);
 	}
@@ -489,7 +489,7 @@ namespace nosbazar::packets {
 			{"vnum", vnum},
 			{"required_level", required_level},
 			{"price", price},
-			{"remaining_time_in_hours", remaining_time_in_hours}
+			{"costume_remaining_time_in_hours", costume_remaining_time_in_hours}
 		};
 	}
 
@@ -540,6 +540,29 @@ namespace nosbazar::packets {
 			{"fairy_level_percent", fairy_level_percent},
 			{"cannot_trade_after_equip", cannot_trade_after_equip},
 			{"monster_to_level_up", monster_to_level_up}
+		};
+	}
+
+	RcBlist::MiniPetData::MiniPetData(std::string_view item_data)
+	{
+		vnum = strings::token<int>(item_data, data_separator);
+		required_level = strings::token<int>(item_data, data_separator);
+		remaining_time_in_hours = strings::token<int>(item_data, data_separator);
+		unknown_1 = strings::token<int>(item_data, data_separator);
+		unknown_2 = strings::token<int>(item_data, data_separator);
+		price = strings::token<int>(item_data, data_separator);
+		cannot_trade_after_equip = strings::token<bool>(item_data, data_separator);
+		unknown_3 = strings::token<int>(item_data, data_separator);
+	}
+
+	nlohmann::json RcBlist::MiniPetData::json() const
+	{
+		return {
+			{"vnum", vnum},
+			{"required_level", required_level},
+			{"remaining_time_in_hours", remaining_time_in_hours},
+			{"cannot_trade_after_equip", cannot_trade_after_equip},
+			{"price", price}
 		};
 	}
 

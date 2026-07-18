@@ -107,7 +107,7 @@ namespace nosbazar::auth {
 			return;
 		}
 
-		auto content = fingerprint.dump();
+		auto content = fingerprint.dump(4);
 		file.write(content.c_str(), content.size());
 		file.close();
 	}
