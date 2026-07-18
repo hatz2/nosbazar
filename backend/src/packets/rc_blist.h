@@ -269,6 +269,22 @@ namespace nosbazar::packets {
 			nlohmann::json json() const;
 		};
 
+		struct PetBeadData {
+			int vnum{};
+			bool has_pet_inside{};
+			int pet_vnum{};
+			int level{};
+			int exp_points{};
+			int max_exp_points{};
+			int attack_level{};
+			int defence_level{};
+			int stars{};
+
+			PetBeadData() = default;
+			PetBeadData(std::string_view item_data);
+			nlohmann::json json() const;
+		};
+
 		struct NoData {
 			nlohmann::json json() const {
 				return nlohmann::json::object();
@@ -288,7 +304,8 @@ namespace nosbazar::packets {
 			CostumeData,
 			AmuletData,
 			FairyData,
-			MiniPetData
+			MiniPetData,
+			PetBeadData
 		>;
 
 		/**

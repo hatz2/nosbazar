@@ -334,6 +334,8 @@ namespace nosbazar::packets {
 
 		// Holders
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::sp_card_holder)}] = [](auto data) { return SpecialistData(data); };
+		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::pet_bead)}] = [](auto data) { return PetBeadData(data); };
+
 		// TODO: Add the rest of holder types
 
 		// TODO: Add shells
@@ -563,6 +565,43 @@ namespace nosbazar::packets {
 			{"remaining_time_in_hours", remaining_time_in_hours},
 			{"cannot_trade_after_equip", cannot_trade_after_equip},
 			{"price", price}
+		};
+	}
+
+	RcBlist::PetBeadData::PetBeadData(std::string_view item_data)
+	{
+		vnum = strings::token<int>(item_data, data_separator);
+		has_pet_inside = strings::token<bool>(item_data, data_separator);
+		pet_vnum = strings::token<int>(item_data, data_separator);
+
+		if (has_pet_inside) {
+			level = strings::token<int>(item_data, data_separator);
+			exp_points = strings::token<int>(item_data, data_separator);
+			max_exp_points = strings::token<int>(item_data, data_separator);
+			attack_level = strings::token<int>(item_data, data_separator);
+			defence_level = strings::token<int>(item_data, data_separator);
+			stars = strings::token<int>(item_data, data_separator);
+		}
+	}
+
+	nlohmann::json RcBlist::PetBeadData::json() const
+	{
+		int level_percentage = 0;
+
+		if (max_exp_points) {
+			level_percentage = exp_points * 100 / max_exp_points;
+		}
+
+		return {
+			{"vnum", vnum},
+			{"has_pet_inside", has_pet_inside},
+			{"pet_vnum", pet_vnum},
+			{"level", level},
+			{"level_percentage", level_percentage},
+			{"attack_level", attack_level},
+			{"defence_level", defence_level},
+			{"stars", stars},
+			{"price", 0},
 		};
 	}
 

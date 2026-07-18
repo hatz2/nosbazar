@@ -3,7 +3,8 @@
 	import {
 		type SearchResult,
 		type EnrichedSearchResult,
-		isSpecialist
+		isSpecialist,
+		isPetBeadItem
 	} from '$lib/types/search';
 	import { itemService } from '$lib/services/itemService';
 	import BlueButton from './BlueButton.svelte';
@@ -89,19 +90,22 @@
 			pageIndex = data.page_index ?? pageIndex;
 			const rawItems = (data.items ?? []) as SearchResult[];
 
-		if (rawItems.length > 0) {
-			const allVnums = rawItems.map((item: SearchResult) => item.item_vnum);
-			for (const item of rawItems) {
-				if (isSpecialist(item.data) && item.data.contains_sp) {
-					allVnums.push(item.data.vnum);
+			if (rawItems.length > 0) {
+				const allVnums = rawItems.map((item: SearchResult) => item.item_vnum);
+				for (const item of rawItems) {
+					if (isSpecialist(item.data) && item.data.contains_sp) {
+						allVnums.push(item.data.vnum);
+					}
 				}
-			}
-			await itemService.fetchMany(allVnums);
+				await itemService.fetchMany(allVnums);
 
 				results = rawItems.map((item: SearchResult): EnrichedSearchResult => {
 					const staticData = itemService.getSync(item.item_vnum);
-					const containedData = isSpecialist(item.data) && item.data.contains_sp
-						? itemService.getSync(item.data.vnum) ?? undefined
+					const containsData =
+						(isSpecialist(item.data) && item.data.contains_sp) ||
+						(isPetBeadItem(item.data) && item.data.has_pet_inside);
+					const containedData = containsData
+						? (itemService.getSync(item.data.vnum) ?? undefined)
 						: undefined;
 					return {
 						...item,
@@ -117,7 +121,9 @@
 			console.error('Search failed', e);
 			results = [];
 		} finally {
-			setTimeout(() => { isCooldown = false; }, 4000);
+			setTimeout(() => {
+				isCooldown = false;
+			}, 4000);
 		}
 	}
 

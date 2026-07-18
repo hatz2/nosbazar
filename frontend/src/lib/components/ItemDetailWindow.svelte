@@ -8,6 +8,7 @@
 	import {
 		get_display_icon_id,
 		isAccessory,
+		isPetBeadItem,
 		isResistances,
 		isSpecialist,
 		itemHasFlagsToDisplay
@@ -166,6 +167,27 @@
 		}
 		return '';
 	}
+
+	function get_star_pets(item: EnrichedSearchResult): string {
+		if ('stars' in item.data) {
+			switch (item.data.stars) {
+				case 1:
+					return get_const_string(ConstStringKey.StarPets1);
+				case 2:
+					return get_const_string(ConstStringKey.StarPets2);
+				case 3:
+					return get_const_string(ConstStringKey.StarPets3);
+				case 4:
+					return get_const_string(ConstStringKey.StarPets4);
+				case 5:
+					return get_const_string(ConstStringKey.StarPets5);
+				case 6:
+					return get_const_string(ConstStringKey.StarPets6);
+			}
+		}
+
+		return '';
+	}
 </script>
 
 <Draggable {left} {top}>
@@ -307,6 +329,20 @@
 				</p>
 			{/if}
 
+			<!-- Pet data -->
+			{#if isPetBeadItem(item.data)}
+				<p class="light-orange">
+					{item.contained_item_static_data?.name[lang.current]}
+					{get_const_string(ConstStringKey.InCustody)}<br />
+					{get_const_string(ConstStringKey.Level)}: {item.data.level}<br />
+					{get_const_string(ConstStringKey.ExperiencePoints)}: {item.data.level_percentage}%<br />
+					{get_const_string(ConstStringKey.Rating)}: {get_star_pets(item)}<br />
+					{get_const_string(ConstStringKey.AttackLevel)}: {item.data.attack_level}<br />
+					{get_const_string(ConstStringKey.DefenceStat)}
+					{get_const_string(ConstStringKey.Level)}: {item.data.defence_level}<br />
+				</p>
+			{/if}
+
 			<!-- Flags section -->
 			{#if item.static_data}
 				<p class="light-orange">
@@ -329,7 +365,7 @@
 						{get_const_string(ConstStringKey.IfEquipedItWontBeTradable)}<br />
 					{/if}
 					{#if 'remaining_time_in_hours' in item.data && item.data.remaining_time_in_hours > 0}
-						<span class="price"
+						<span class="red"
 							>{get_const_string(ConstStringKey.RemainingTime)}
 							{item.data.remaining_time_in_hours / 24}
 							{get_const_string(ConstStringKey.Day)}</span
@@ -386,7 +422,7 @@
 
 			<!-- Price -->
 			{#if 'price' in item.data}
-				<p class="price">
+				<p class="red">
 					{get_const_string(ConstStringKey.Price)}: {item.data.price.toLocaleString('es-ES')}
 				</p>
 			{/if}
@@ -452,7 +488,7 @@
 		color: #f5c478;
 	}
 
-	.price {
+	.red {
 		color: #ff323d;
 	}
 

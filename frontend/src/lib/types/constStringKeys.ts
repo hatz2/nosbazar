@@ -257,7 +257,16 @@ export enum ConstStringKey {
 	DayS = 677,
 	Minutes = 589,
 	Day = 2815,
-	RemainingTime = 3919
+	RemainingTime = 3919,
+	Rating = 4827,
+	StarPets1 = 4842,
+	StarPets2 = 4843,
+	StarPets3 = 4844,
+	StarPets4 = 4845,
+	StarPets5 = 4846,
+	StarPets6 = 4847,
+	AttackLevel = 656,
+	DefenceStat = 69
 }
 
 export const CellonOptionsConstStrings: Record<number, ConstStringKey> = {

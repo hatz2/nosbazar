@@ -155,6 +155,18 @@ export interface MiniPetData {
 	price: number;
 }
 
+export interface PetBeadData {
+	vnum: number;
+	has_pet_inside: boolean;
+	pet_vnum: number;
+	level: number;
+	level_percentage: number;
+	attack_level: number;
+	defence_level: number;
+	stars: number;
+	price: number;
+}
+
 export type NoData = Record<string, never>;
 
 export type SearchResultData =
@@ -169,6 +181,7 @@ export type SearchResultData =
 	| AmuletData
 	| FairyData
 	| MiniPetData
+	| PetBeadData
 	| NoData;
 
 // ---- Type guards for the SearchResultData union ----
@@ -217,6 +230,10 @@ export function isNoData(data: SearchResultData): data is NoData {
 
 export function itemHasFlagsToDisplay(flags: ItemFlagsData): boolean {
 	return flags.no_dropping || flags.no_selling || flags.no_trading;
+}
+
+export function isPetBeadItem(data: SearchResultData): data is PetBeadData {
+	return 'has_pet_inside' in data;
 }
 
 export function get_display_icon_id(item: EnrichedSearchResult): number {
