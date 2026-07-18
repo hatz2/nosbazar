@@ -175,6 +175,14 @@ enum RequiredClass {
 	AllButAdventurer = 30
 }
 
+enum Element {
+	NoElement = 0,
+	Fire = 1,
+	Water = 2,
+	Light = 3,
+	Shadow = 4
+}
+
 export {
 	BazarCategory,
 	WeaponSubcategory,
@@ -189,5 +197,6 @@ export {
 	MainItemSubcategory,
 	ConsumerItemSubcategory,
 	SortFilter,
-	RequiredClass
+	RequiredClass,
+	Element
 };

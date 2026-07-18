@@ -15,6 +15,7 @@
 	import { onMount } from 'svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
 	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
+	import { Element } from '$lib/types/enums';
 
 	type Props = {
 		item: EnrichedSearchResult;
@@ -147,6 +148,24 @@
 
 		return result;
 	}
+
+	function get_element(item: EnrichedSearchResult): string {
+		if ('element_type' in item.data) {
+			switch (item.data.element_type) {
+				case Element.NoElement:
+					return get_const_string(ConstStringKey.NoElement);
+				case Element.Fire:
+					return get_const_string(ConstStringKey.Fire);
+				case Element.Water:
+					return get_const_string(ConstStringKey.Water);
+				case Element.Light:
+					return get_const_string(ConstStringKey.Light);
+				case Element.Shadow:
+					return get_const_string(ConstStringKey.Shadow);
+			}
+		}
+		return '';
+	}
 </script>
 
 <Draggable {left} {top}>
@@ -161,15 +180,31 @@
 				alt="Item icon"
 				style="pointer-events: none;"
 			/>
-			<p class="light-orange name-center">{item.item_name[lang.current]}</p>
+			<p class="light-orange name-center">
+				{item.item_name[lang.current]}
+				{#if 'element_type' in item.data}
+					<br />{get_const_string(ConstStringKey.Attribute)}: {get_element(item)}<br />
+					{formatString(
+						get_const_string(ConstStringKey.StrengthensElementBy),
+						item.data.fairy_level_percent
+					)}
+				{/if}
+			</p>
 		</div>
+
+		{#if 'monster_to_level_up' in item.data}
+			<p class="white-color">
+				{get_const_string(ConstStringKey.MonstersRequiredForNextFairyLevel)}:
+				{item.data.monster_to_level_up}
+			</p>
+		{/if}
 
 		<!-- Gender specific item -->
 		{#if item.static_data}
 			{#if item.static_data.flags.male_can_wear}
-				<p class="gender-desc">{get_const_string(ConstStringKey.OnlyForFemales)}</p>
+				<p class="white-color">{get_const_string(ConstStringKey.OnlyForFemales)}</p>
 			{:else if item.static_data.flags.female_can_wear}
-				<p class="gender-desc">{get_const_string(ConstStringKey.OnlyForMales)}</p>
+				<p class="white-color">{get_const_string(ConstStringKey.OnlyForMales)}</p>
 			{/if}
 		{/if}
 
@@ -380,7 +415,7 @@
 		right: 0.5rem;
 	}
 
-	.gender-desc {
+	.white-color {
 		color: #ffffff;
 	}
 

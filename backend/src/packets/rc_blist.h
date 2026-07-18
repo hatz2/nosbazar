@@ -234,6 +234,26 @@ namespace nosbazar::packets {
 			nlohmann::json json() const;
 		};
 
+		struct FairyData {
+			int vnum{};
+			int element_type{};
+			int fairy_level_percent{};
+			int unknown_1{};
+			int unknown_2{};
+			int unknown_3{};
+			bool cannot_trade_after_equip{};
+			int unknown_4{};
+			int monster_to_level_up{};
+			int unknown_5{};
+			int unknown_6{};
+			int unknown_7{};
+			int unknown_8{};
+
+			FairyData() = default;
+			FairyData(std::string_view item_data);
+			nlohmann::json json() const;
+		};
+
 		struct NoData {
 			nlohmann::json json() const {
 				return nlohmann::json::object();
@@ -251,7 +271,8 @@ namespace nosbazar::packets {
 			AccessoryData, 
 			SpecialistData,
 			CostumeData,
-			AmuletData
+			AmuletData,
+			FairyData
 		>;
 
 		/**

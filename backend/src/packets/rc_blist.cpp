@@ -329,6 +329,7 @@ namespace nosbazar::packets {
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::accessory), std::to_underlying(AccessorySubType::ring)}] = [](auto data) { return AccessoryData(data); };
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::accessory), std::to_underlying(AccessorySubType::bracelet)}] = [](auto data) { return AccessoryData(data); };
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::accessory), std::to_underlying(AccessorySubType::amulet)}] = [](auto data) { return AmuletData(data); };
+		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::accessory), std::to_underlying(AccessorySubType::fairy)}] = [](auto data) { return FairyData(data); };
 		// TODO: Add the rest of accessory types (fairy, minipet)
 
 		// Holders
@@ -511,6 +512,34 @@ namespace nosbazar::packets {
 			{"required_level", required_level},
 			{"price", price},
 			{"remaining_time_in_secs", remaining_time_in_secs}
+		};
+	}
+
+	RcBlist::FairyData::FairyData(std::string_view item_data)
+	{
+		vnum = strings::token<int>(item_data, data_separator);
+		element_type = strings::token<int>(item_data, data_separator);
+		fairy_level_percent = strings::token<int>(item_data, data_separator);
+		unknown_1 = strings::token<int>(item_data, data_separator);
+		unknown_2 = strings::token<int>(item_data, data_separator);
+		unknown_3 = strings::token<int>(item_data, data_separator);
+		cannot_trade_after_equip = strings::token<bool>(item_data, data_separator);
+		unknown_4 = strings::token<int>(item_data, data_separator);
+		monster_to_level_up = strings::token<int>(item_data, data_separator);
+		unknown_5 = strings::token<int>(item_data, data_separator);
+		unknown_6 = strings::token<int>(item_data, data_separator);
+		unknown_7 = strings::token<int>(item_data, data_separator);
+		unknown_8 = strings::token<int>(item_data, data_separator);
+	}
+
+	nlohmann::json RcBlist::FairyData::json() const
+	{
+		return {
+			{"vnum", vnum},
+			{"element_type", element_type},
+			{"fairy_level_percent", fairy_level_percent},
+			{"cannot_trade_after_equip", cannot_trade_after_equip},
+			{"monster_to_level_up", monster_to_level_up}
 		};
 	}
 

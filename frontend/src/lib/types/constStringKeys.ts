@@ -14,6 +14,7 @@ export enum ConstStringKey {
 	Minimum = 58,
 	Maximum = 59,
 	Magic = 63,
+	Attribute = 67,
 	Defence = 70,
 	Dodge = 71,
 	Melee = 73,
@@ -22,6 +23,7 @@ export enum ConstStringKey {
 	Water = 77,
 	Light = 78,
 	Shadow = 79,
+	NoElement = 80,
 	AmuletRemaining = 715,
 	AmuletHours = 716,
 	RarityLevel = 165,
@@ -242,7 +244,9 @@ export enum ConstStringKey {
 	SpWaterResStat = 3837,
 	SpLightResStat = 3838,
 	SpShadowResStat = 3839,
-	RemainingPoints = 3074
+	RemainingPoints = 3074,
+	StrengthensElementBy = 649,
+	MonstersRequiredForNextFairyLevel = 4789,
 }
 
 export const CellonOptionsConstStrings: Record<number, ConstStringKey> = {

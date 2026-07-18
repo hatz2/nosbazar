@@ -1,4 +1,5 @@
 import type { ItemFlagsData, ItemStaticData } from '$lib/services/itemService';
+import { Element } from './enums';
 
 export type SearchResult = {
 	owner_name: string;
@@ -138,6 +139,14 @@ export interface SpecialistData {
 	price: number;
 }
 
+export interface FairyData {
+	vnum: number;
+	element_type: Element;
+	fairy_level_percent: number;
+	cannot_trade_after_equip: boolean;
+	monsters_to_level_up: number;
+}
+
 export type NoData = Record<string, never>;
 
 export type SearchResultData =
@@ -150,6 +159,7 @@ export type SearchResultData =
 	| AccessoryData
 	| SpecialistData
 	| AmuletData
+	| FairyData
 	| NoData;
 
 // ---- Type guards for the SearchResultData union ----
