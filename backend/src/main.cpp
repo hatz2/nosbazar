@@ -66,12 +66,18 @@ bool authenticate_and_spawn_clients(Env& env)
     }
 
     auto accounts = auth->get_accounts();
+    uint16_t count = 0;
     for (auto& entry : accounts.items()) {
+        if (count >= env.max_clients) {
+            SPDLOG_WARN("MAX_CLIENTS ({}) reached, skipping remaining accounts", env.max_clients);
+            break;
+        }
         const std::string& id = entry.key();
         std::thread([id, auth]() {
             nosbazar::Clientless client(id, auth);
             return static_cast<int>(client.run());
         }).detach();
+        ++count;
     }
 
     return true;

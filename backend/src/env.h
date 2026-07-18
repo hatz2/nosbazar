@@ -10,6 +10,7 @@ struct Env {
 	std::string installation_id;
 	std::string login_server_ip;
 	uint16_t login_server_port;
+	uint16_t max_clients;
 
 	Env() {
 		if (!initialized) {
@@ -23,6 +24,7 @@ struct Env {
 		installation_id = dotenv::get("INSTALLATION_ID").value();
 		login_server_ip = dotenv::get("LOGIN_SERVER_IP").value();
 		login_server_port = std::stoi(dotenv::get("LOGIN_SERVER_PORT").value());
+		max_clients = std::stoi(dotenv::get("MAX_CLIENTS").value_or("5"));
 	}
 
 private:
