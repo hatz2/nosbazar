@@ -36,6 +36,7 @@
 	let rarityLevel = $state(0);
 	let upgradeLevel = $state(0);
 	let order = $state(0);
+	let pageIndex = $state(0);
 	let results = $state<EnrichedSearchResult[]>([]);
 	let openWindows = $state<OpenWindow[]>([]);
 
@@ -46,6 +47,7 @@
 		level = 0;
 		rarityLevel = 0;
 		upgradeLevel = 0;
+		pageIndex = 0;
 	});
 
 	let nextWindowId = $state(0);
@@ -68,7 +70,7 @@
 				body: JSON.stringify({
 					server,
 					filters: {
-						index: 0,
+						index: pageIndex,
 						category,
 						sub_category: subCategory,
 						level,
@@ -81,6 +83,7 @@
 			});
 			const data = await response.json();
 			console.log(data);
+			pageIndex = data.page_index ?? pageIndex;
 			const rawItems = (data.items ?? []) as SearchResult[];
 
 		if (rawItems.length > 0) {
@@ -111,6 +114,16 @@
 			console.error('Search failed', e);
 			results = [];
 		}
+	}
+
+	function go_next_page() {
+		pageIndex++;
+		on_search_clicked();
+	}
+
+	function go_previous_page() {
+		if (pageIndex > 0) pageIndex--;
+		on_search_clicked();
 	}
 </script>
 
@@ -153,6 +166,12 @@
 			];
 		}}
 	/>
+
+	<div class="pagination">
+		<BlueButton text="< Previous" onclick={go_previous_page} />
+		<span>Page {pageIndex + 1}</span>
+		<BlueButton text="Next >" onclick={go_next_page} />
+	</div>
 </div>
 
 {#each openWindows as window (window.id)}
@@ -180,5 +199,18 @@
 		padding-top: 0;
 		border: 1px solid gray;
 		max-width: 800px;
+	}
+
+	.pagination {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 12px;
+		padding: 8px 0;
+	}
+
+	.pagination span {
+		color: #ffffff;
+		font-size: 14px;
 	}
 </style>
