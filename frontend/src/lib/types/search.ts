@@ -1,4 +1,5 @@
 import type { ItemFlagsData, ItemStaticData } from '$lib/services/itemService';
+import type { MonsterStaticData } from '$lib/services/monsterService';
 import { Element } from './enums';
 
 export type SearchResult = {
@@ -15,6 +16,7 @@ export type EnrichedSearchResult = SearchResult & {
 	item_name: Record<string, string>;
 	static_data: ItemStaticData | null;
 	contained_item_static_data?: ItemStaticData;
+	contained_monster_static_data?: MonsterStaticData;
 };
 
 export interface ShellEffect {
@@ -237,5 +239,8 @@ export function isPetBeadItem(data: SearchResultData): data is PetBeadData {
 }
 
 export function get_display_icon_id(item: EnrichedSearchResult): number {
+	if (item.item_vnum === 285 && item.contained_monster_static_data) {
+		return item.contained_monster_static_data.icon_id;
+	}
 	return item.contained_item_static_data?.icon_id ?? item.static_data?.icon_id ?? 0;
 }

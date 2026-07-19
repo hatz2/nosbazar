@@ -7,6 +7,7 @@
 #include <crow.h>
 #include <io/item_dat_parser.h>
 #include <io/bcard_parser.h>
+#include <io/monster_dat_parser.h>
 #include <io/nos_file_text_reader.h>
 #include <crow/middlewares/cors.h>
 #include <io/nsip_data_reader.h>
@@ -34,6 +35,8 @@ void initialize_game_data()
     nosbazar::io::ItemDatParser::instance().parse(reader.get_file_content("Item.dat"));
     SPDLOG_INFO("Parsing BCard.dat...");
     nosbazar::io::BCardParser::instance().parse(reader.get_file_content("BCard.dat"));
+    SPDLOG_INFO("Parsing monster.dat...");
+    nosbazar::io::MonsterDatParser::instance().parse(reader.get_file_content("monster.dat"));
     SPDLOG_INFO("Parsing NSipData.NOS...");
     nosbazar::io::NSipDataReader::instance().initialize("assets/NostaleData/NSipData.NOS");
     nosbazar::io::LangManager::get_instance();
@@ -99,6 +102,7 @@ int main(int argc, char** argv) {
 
     CROW_ROUTE(app, "/search").methods("POST"_method)(nosbazar::api::handle_search);
     CROW_ROUTE(app, "/items/static/<uint>").methods("GET"_method)(nosbazar::api::handle_item_static);
+    CROW_ROUTE(app, "/monster/static/<uint>").methods("GET"_method)(nosbazar::api::handle_monster_static);
     CROW_ROUTE(app, "/icon/<uint>").methods("GET"_method)(nosbazar::api::handle_icon);
     CROW_ROUTE(app, "/servers").methods("GET"_method)(nosbazar::api::handle_servers);
     CROW_ROUTE(app, "/conststring/<uint>").methods("GET"_method)(nosbazar::api::handle_const_string);

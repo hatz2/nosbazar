@@ -199,7 +199,7 @@
 		<img
 			src="http://localhost:8080/icon/{get_display_icon_id(item)}"
 			alt="Item icon"
-			style="pointer-events: none; position: absolute; top: 10px; left: 10px;"
+			style="pointer-events: none; position: absolute; top: 10px; left: 10px; max-width: 32px; max-height: 32px;"
 		/>
 		<!-- Name -->
 		<div class="body-text">
@@ -332,7 +332,7 @@
 			<!-- Pet data -->
 			{#if isPetBeadItem(item.data)}
 				<p class="light-orange">
-					{item.contained_item_static_data?.name[lang.current]}
+					{item.contained_monster_static_data?.name[lang.current]}
 					{get_const_string(ConstStringKey.InCustody)}<br />
 					{get_const_string(ConstStringKey.Level)}: {item.data.level}<br />
 					{get_const_string(ConstStringKey.ExperiencePoints)}: {item.data.level_percentage}%<br />

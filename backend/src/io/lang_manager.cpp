@@ -79,6 +79,25 @@ namespace nosbazar::io {
 		return get_all_translations("_code_{}_BCard.txt", code_name);
 	}
 
+	std::string LangManager::get_monster_translation(Language lang, const std::string& code_name)
+	{
+		std::string lang_lower = language_string.at(lang);
+		std::transform(lang_lower.begin(), lang_lower.end(), lang_lower.begin(), ::tolower);
+		std::string filename = fmt::format("_code_{}_monster.txt", lang_lower);
+		std::string result = get_translation(lang, filename, code_name);
+		std::replace(result.begin(), result.end(), '^', ' ');
+		return result;
+	}
+
+	nlohmann::json LangManager::get_all_monster_translations(const std::string& code_name)
+	{
+		nlohmann::json result;
+		for (const auto& [lang, code] : language_string) {
+			result[code] = get_monster_translation(lang, code_name);
+		}
+		return result;
+	}
+
 	LangManager::LangManager()
 	{
 		lang_files.emplace(Language::spanish, std::make_unique<LangFile>(Language::spanish));

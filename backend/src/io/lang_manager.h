@@ -18,6 +18,10 @@ namespace nosbazar::io {
 
 		nlohmann::json get_all_bcard_translations(const std::string& code_name);
 
+		std::string get_monster_translation(Language lang, const std::string& code_name);
+
+		nlohmann::json get_all_monster_translations(const std::string& code_name);
+
 	private:
 
 		std::string get_translation(Language lang, const std::string& filename, const std::string& code_name);

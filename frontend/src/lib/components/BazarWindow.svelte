@@ -7,6 +7,7 @@
 		isPetBeadItem
 	} from '$lib/types/search';
 	import { itemService } from '$lib/services/itemService';
+	import { monsterService } from '$lib/services/monsterService';
 	import BlueButton from './BlueButton.svelte';
 	import Category from './Category.svelte';
 	// import Draggable from './Draggable.svelte';
@@ -92,12 +93,19 @@
 
 			if (rawItems.length > 0) {
 				const allVnums = rawItems.map((item: SearchResult) => item.item_vnum);
+				const petVnums: number[] = [];
 				for (const item of rawItems) {
 					if (isSpecialist(item.data) && item.data.contains_sp) {
 						allVnums.push(item.data.vnum);
 					}
+					if (isPetBeadItem(item.data) && item.data.has_pet_inside) {
+						petVnums.push(item.data.pet_vnum);
+					}
 				}
-				await itemService.fetchMany(allVnums);
+				await Promise.all([
+					itemService.fetchMany(allVnums),
+					monsterService.fetchMany(petVnums)
+				]);
 
 				results = rawItems.map((item: SearchResult): EnrichedSearchResult => {
 					const staticData = itemService.getSync(item.item_vnum);
@@ -107,11 +115,16 @@
 					const containedData = containsData
 						? (itemService.getSync(item.data.vnum) ?? undefined)
 						: undefined;
+					const containedMonsterData =
+						isPetBeadItem(item.data) && item.data.has_pet_inside
+							? (monsterService.getSync(item.data.pet_vnum) ?? undefined)
+							: undefined;
 					return {
 						...item,
 						item_name: staticData?.name || { UK: item.item_vnum.toString() },
 						static_data: staticData,
-						contained_item_static_data: containedData
+						contained_item_static_data: containedData,
+						contained_monster_static_data: containedMonsterData
 					};
 				});
 			} else {
