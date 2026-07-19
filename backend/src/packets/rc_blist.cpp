@@ -335,6 +335,7 @@ namespace nosbazar::packets {
 		// Holders
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::sp_card_holder)}] = [](auto data) { return SpecialistData(data); };
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::pet_bead)}] = [](auto data) { return PetBeadData(data); };
+		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::mount_bead)}] = [](auto data) { return MountBeadData(data); };
 
 		// TODO: Add the rest of holder types
 
@@ -602,6 +603,28 @@ namespace nosbazar::packets {
 			{"defence_level", defence_level},
 			{"stars", stars},
 			{"price", 0},
+		};
+	}
+
+	RcBlist::MountBeadData::MountBeadData(std::string_view item_data)
+	{
+		vnum = strings::token<int>(item_data, data_separator);
+		has_mount_inside = strings::token<bool>(item_data, data_separator);
+		mount_vnum = strings::token<int>(item_data, data_separator);
+
+		if (has_mount_inside) {
+			unknown_1 = strings::token<int>(item_data, data_separator);
+		}
+	}
+
+	nlohmann::json RcBlist::MountBeadData::json() const
+	{
+		return {
+			{"vnum", vnum},
+			{"has_mount_inside", has_mount_inside},
+			{"mount_vnum", mount_vnum},
+			{"do_not_show_description", true},
+			{"do_not_show_flags", true}
 		};
 	}
 

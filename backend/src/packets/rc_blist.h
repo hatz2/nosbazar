@@ -285,6 +285,17 @@ namespace nosbazar::packets {
 			nlohmann::json json() const;
 		};
 
+		struct MountBeadData {
+			int vnum{};
+			bool has_mount_inside{};
+			int mount_vnum{};
+			int unknown_1{};
+
+			MountBeadData() = default;
+			MountBeadData(std::string_view item_data);
+			nlohmann::json json() const;
+		};
+
 		struct NoData {
 			nlohmann::json json() const {
 				return nlohmann::json::object();
@@ -305,7 +316,8 @@ namespace nosbazar::packets {
 			AmuletData,
 			FairyData,
 			MiniPetData,
-			PetBeadData
+			PetBeadData,
+			MountBeadData
 		>;
 
 		/**

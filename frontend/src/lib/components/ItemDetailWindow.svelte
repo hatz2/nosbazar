@@ -9,9 +9,12 @@
 		get_display_icon_id,
 		isAccessory,
 		isPetBeadItem,
+		isMountBeadItem,
 		isResistances,
 		isSpecialist,
-		itemHasFlagsToDisplay
+		itemHasFlagsToDisplay,
+		shouldShowDescription,
+		shouldShowFlags
 	} from '$lib/types/search';
 	import { onMount } from 'svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
@@ -352,10 +355,22 @@
 				</p>
 			{/if}
 
+			<!-- Mount data -->
+			{#if isMountBeadItem(item.data)}
+				<p class="light-orange">
+					{#if item.data.has_mount_inside}
+						{item.contained_mount_item_static_data?.name[lang.current]}
+						{get_const_string(ConstStringKey.InCustody)}<br />
+					{:else}
+						{get_const_string(ConstStringKey.NotUsed)}<br />
+					{/if}
+				</p>
+			{/if}
+
 			<!-- Flags section -->
 			{#if item.static_data}
 				<p class="light-orange">
-					{#if itemHasFlagsToDisplay(item.static_data.flags)}
+					{#if itemHasFlagsToDisplay(item.static_data.flags) && shouldShowFlags(item.data)}
 						{#if item.static_data.flags.no_dropping}
 							[{get_const_string(ConstStringKey.Drop)}] {get_const_string(ConstStringKey.False)}<br
 							/>
@@ -457,7 +472,9 @@
 				{/each}
 			</p>
 
-			<p class="description">{item.static_data?.description[lang.current]}</p>
+			{#if shouldShowDescription(item.data)}
+				<p class="description">{item.static_data?.description[lang.current]}</p>
+			{/if}
 		</div>
 	</div>
 </Draggable>

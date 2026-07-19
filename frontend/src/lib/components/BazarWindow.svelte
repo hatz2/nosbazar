@@ -4,7 +4,8 @@
 		type SearchResult,
 		type EnrichedSearchResult,
 		isSpecialist,
-		isPetBeadItem
+		isPetBeadItem,
+		isMountBeadItem
 	} from '$lib/types/search';
 	import { itemService } from '$lib/services/itemService';
 	import { monsterService } from '$lib/services/monsterService';
@@ -101,6 +102,9 @@
 					if (isPetBeadItem(item.data) && item.data.has_pet_inside) {
 						petVnums.push(item.data.pet_vnum);
 					}
+					if (isMountBeadItem(item.data) && item.data.has_mount_inside) {
+						allVnums.push(item.data.mount_vnum);
+					}
 				}
 				await Promise.all([
 					itemService.fetchMany(allVnums),
@@ -119,12 +123,17 @@
 						isPetBeadItem(item.data) && item.data.has_pet_inside
 							? (monsterService.getSync(item.data.pet_vnum) ?? undefined)
 							: undefined;
+					const containedMountItemData =
+						isMountBeadItem(item.data) && item.data.has_mount_inside
+							? (itemService.getSync(item.data.mount_vnum) ?? undefined)
+							: undefined;
 					return {
 						...item,
 						item_name: staticData?.name || { UK: item.item_vnum.toString() },
 						static_data: staticData,
 						contained_item_static_data: containedData,
-						contained_monster_static_data: containedMonsterData
+						contained_monster_static_data: containedMonsterData,
+						contained_mount_item_static_data: containedMountItemData
 					};
 				});
 			} else {

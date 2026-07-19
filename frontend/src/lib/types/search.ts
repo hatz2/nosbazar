@@ -17,6 +17,7 @@ export type EnrichedSearchResult = SearchResult & {
 	static_data: ItemStaticData | null;
 	contained_item_static_data?: ItemStaticData;
 	contained_monster_static_data?: MonsterStaticData;
+	contained_mount_item_static_data?: ItemStaticData;
 };
 
 export interface ShellEffect {
@@ -169,6 +170,14 @@ export interface PetBeadData {
 	price: number;
 }
 
+export interface MountBeadData {
+	vnum: number;
+	has_mount_inside: boolean;
+	mount_vnum: number;
+	do_not_show_description: boolean;
+	do_not_show_flags: boolean;
+}
+
 export type NoData = Record<string, never>;
 
 export type SearchResultData =
@@ -184,6 +193,7 @@ export type SearchResultData =
 	| FairyData
 	| MiniPetData
 	| PetBeadData
+	| MountBeadData
 	| NoData;
 
 // ---- Type guards for the SearchResultData union ----
@@ -236,6 +246,24 @@ export function itemHasFlagsToDisplay(flags: ItemFlagsData): boolean {
 
 export function isPetBeadItem(data: SearchResultData): data is PetBeadData {
 	return 'has_pet_inside' in data;
+}
+
+export function isMountBeadItem(data: SearchResultData): data is MountBeadData {
+	return 'has_mount_inside' in data;
+}
+
+export function shouldShowDescription(data: SearchResultData): boolean {
+	if ('do_not_show_description' in data && data.do_not_show_description) {
+		return false;
+	}
+	return true;
+}
+
+export function shouldShowFlags(data: SearchResultData): boolean {
+	if ('do_not_show_flags' in data && data.do_not_show_flags) {
+		return false;
+	}
+	return true;
 }
 
 export function get_display_icon_id(item: EnrichedSearchResult): number {
