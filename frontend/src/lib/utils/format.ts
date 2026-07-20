@@ -8,7 +8,7 @@ export function formatString(template: string, ...args: (string | number)[]): st
 	let result = '';
 	for (let i = 0; i < clean.length; i++) {
 		if (clean[i] === '%' && i + 1 < clean.length) {
-			if (clean[i + 1] === 's') {
+			if (clean[i + 1] === 's' || clean[i + 1] === 'd') {
 				result += String(args[argIndex++] ?? '%s');
 				i++;
 			} else if (clean[i + 1] === '%') {
