@@ -4,6 +4,7 @@
 #include <packets/c_blist.h>
 #include <io/item_dat_parser.h>
 #include <io/monster_dat_parser.h>
+#include <io/skill_dat_parser.h>
 #include <io/nsip_data_reader.h>
 #include <io/const_string_parser.h>
 #include <nlohmann/json.hpp>
@@ -78,6 +79,21 @@ crow::response handle_monster_static(const crow::request& req, uint32_t vnum)
         SPDLOG_ERROR("Internal error fetching monster data for vnum {} : {}", vnum, e.what());
         return crow::response(500, "Internal Server Error.");
     }
+}
+
+crow::response handle_skill_static(const crow::request& req, uint32_t vnum)
+{
+	try {
+		const nosbazar::io::Skill& skill = nosbazar::io::SkillDatParser::instance().skill_data(vnum);
+		nlohmann::json json_data = skill.json();
+		return crow::response(json_data.dump(2));
+	} catch (const std::out_of_range& e) {
+		SPDLOG_WARN("Skill not found for vnum: {}", vnum);
+		return crow::response(404, "Skill data not found.");
+	} catch (const std::exception& e) {
+		SPDLOG_ERROR("Internal error fetching skill data for vnum {} : {}", vnum, e.what());
+		return crow::response(500, "Internal Server Error.");
+	}
 }
 
 crow::response handle_icon(const crow::request& req, uint32_t icon_id)

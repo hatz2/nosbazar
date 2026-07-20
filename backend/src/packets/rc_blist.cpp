@@ -336,6 +336,8 @@ namespace nosbazar::packets {
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::sp_card_holder)}] = [](auto data) { return SpecialistData(data); };
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::pet_bead)}] = [](auto data) { return PetBeadData(data); };
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::mount_bead)}] = [](auto data) { return MountBeadData(data); };
+		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::partner_bead)}] = [](auto data) { return PartnerBeadData(data); };
+		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::partner_card_holder)}] = [](auto data) { return PartnerSpecialistData(data); };
 
 		// TODO: Add the rest of holder types
 
@@ -625,6 +627,106 @@ namespace nosbazar::packets {
 			{"mount_vnum", mount_vnum},
 			{"do_not_show_description", true},
 			{"do_not_show_flags", true}
+		};
+	}
+
+	RcBlist::PartnerBeadData::PartnerBeadData(std::string_view item_data)
+	{
+		vnum = strings::token<int>(item_data, data_separator);
+		has_partner_inside = strings::token<bool>(item_data, data_separator);
+		partner_vnum = strings::token<int>(item_data, data_separator);
+
+		if (has_partner_inside) {
+			level = strings::token<int>(item_data, data_separator);
+			exp_points = strings::token<int>(item_data, data_separator);
+			max_exp_points = strings::token<int>(item_data, data_separator);
+			attack_level = strings::token<int>(item_data, data_separator);
+			defence_level = strings::token<int>(item_data, data_separator);
+			unknown_1 = strings::token<int>(item_data, data_separator);
+		}
+	}
+
+	nlohmann::json RcBlist::PartnerBeadData::json() const
+	{
+		int level_percentage = 0;
+
+		if (max_exp_points) {
+			level_percentage = exp_points * 100 / max_exp_points;
+		}
+
+		return {
+			{"vnum", vnum},
+			{"has_partner_inside", has_partner_inside},
+			{"partner_vnum", partner_vnum},
+			{"level", level},
+			{"level_percentage", level_percentage},
+			{"attack_level", attack_level},
+			{"defence_level", defence_level},
+			{"price", 0},
+		};
+	}
+
+	nlohmann::json RcBlist::PartnerSkillData::json() const
+	{
+		return {
+			{"vnum", vnum},
+			{"grade", grade}
+		};
+	}
+
+	RcBlist::PartnerSpecialistData::PartnerSpecialistData(std::string_view item_data)
+	{
+		vnum = strings::token<int>(item_data, data_separator);
+		has_partner_sp_inside = strings::token<bool>(item_data, data_separator);
+		partner_sp_vnum = strings::token<int>(item_data, data_separator);
+
+		if (has_partner_sp_inside) {
+			element_type = strings::token<int>(item_data, data_separator);
+
+			for (int i = 0; i < PartnerSpecialistData::num_skills; ++i) {
+				PartnerSkillData skill_data{ 
+					.vnum = strings::token<int>(item_data, data_separator), 
+					.grade = strings::token<int>(item_data, data_separator) 
+				};
+
+				skills[i] = std::move(skill_data);
+			}
+
+			upgrade_level = strings::token<int>(item_data, data_separator);
+			attack_bonus = strings::token<int>(item_data, data_separator);
+			defence_bonus = strings::token<int>(item_data, data_separator);
+			crit_reduction_bonus = strings::token<int>(item_data, data_separator);
+			hp_mp_bonus = strings::token<int>(item_data, data_separator);
+			fire_res_bonus = strings::token<int>(item_data, data_separator);
+			water_res_bonus = strings::token<int>(item_data, data_separator);
+			light_res_bonus = strings::token<int>(item_data, data_separator);
+			shadow_res_bonus = strings::token<int>(item_data, data_separator);
+			unknown_1 = strings::token<int>(item_data, data_separator);
+		}
+	}
+
+	nlohmann::json RcBlist::PartnerSpecialistData::json() const
+	{
+		nlohmann::json json_skills = nlohmann::json::array();
+		for (const PartnerSkillData& skill : skills) {
+			json_skills.push_back(std::move(skill.json()));
+		}
+
+		return {
+			{"vnum", vnum},
+			{"has_partner_sp_inside", has_partner_sp_inside},
+			{"partner_sp_vnum", partner_sp_vnum},
+			{"element_type", element_type},
+			{"skills", json_skills},
+			{"upgrade_level", upgrade_level},
+			{"attack_bonus", attack_bonus},
+			{"defence_bonus", defence_bonus},
+			{"crit_reduction_bonus", crit_reduction_bonus},
+			{"hp_mp_bonus", hp_mp_bonus},
+			{"fire_res_bonus", fire_res_bonus},
+			{"water_res_bonus", water_res_bonus},
+			{"light_res_bonus", light_res_bonus},
+			{"shadow_res_bonus", shadow_res_bonus}
 		};
 	}
 

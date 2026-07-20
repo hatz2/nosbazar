@@ -296,6 +296,53 @@ namespace nosbazar::packets {
 			nlohmann::json json() const;
 		};
 
+		struct PartnerBeadData {
+			int vnum{};
+			bool has_partner_inside{};
+			int partner_vnum{};
+			int level{};
+			int exp_points{};
+			int max_exp_points{};
+			int attack_level{};
+			int defence_level{};
+			int unknown_1{};
+
+			PartnerBeadData() = default;
+			PartnerBeadData(std::string_view item_data);
+			nlohmann::json json() const;
+		};
+
+		struct PartnerSkillData {
+			int vnum{};
+			int grade{};
+
+			nlohmann::json json() const;
+		};
+
+		struct PartnerSpecialistData {
+			static constexpr int num_skills = 3;
+
+			int vnum{};
+			bool has_partner_sp_inside{};
+			int partner_sp_vnum{};
+			int element_type{};
+			std::array<PartnerSkillData, num_skills> skills;
+			int upgrade_level{};
+			int attack_bonus{};
+			int defence_bonus{};
+			int crit_reduction_bonus{};
+			int hp_mp_bonus{};
+			int fire_res_bonus{};
+			int water_res_bonus{};
+			int light_res_bonus{};
+			int shadow_res_bonus{};
+			int unknown_1{};
+
+			PartnerSpecialistData() = default;
+			PartnerSpecialistData(std::string_view item_data);
+			nlohmann::json json() const;
+		};
+
 		struct NoData {
 			nlohmann::json json() const {
 				return nlohmann::json::object();
@@ -317,7 +364,9 @@ namespace nosbazar::packets {
 			FairyData,
 			MiniPetData,
 			PetBeadData,
-			MountBeadData
+			MountBeadData,
+			PartnerBeadData,
+			PartnerSpecialistData
 		>;
 
 		/**

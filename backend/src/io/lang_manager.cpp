@@ -98,6 +98,19 @@ namespace nosbazar::io {
 		return result;
 	}
 
+	std::string LangManager::get_skill_translation(Language lang, const std::string& code_name)
+	{
+		std::string lang_lower = language_string.at(lang);
+		std::transform(lang_lower.begin(), lang_lower.end(), lang_lower.begin(), ::tolower);
+		std::string filename = fmt::format("_code_{}_Skill.txt", lang_lower);
+		return get_translation(lang, filename, code_name);
+	}
+
+	nlohmann::json LangManager::get_all_skill_translations(const std::string& code_name)
+	{
+		return get_all_translations("_code_{}_Skill.txt", code_name);
+	}
+
 	LangManager::LangManager()
 	{
 		lang_files.emplace(Language::spanish, std::make_unique<LangFile>(Language::spanish));
