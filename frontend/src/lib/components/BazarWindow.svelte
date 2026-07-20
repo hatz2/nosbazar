@@ -5,10 +5,13 @@
 		type EnrichedSearchResult,
 		isSpecialist,
 		isPetBeadItem,
+		isPartnerBeadItem,
+		isPartnerSpecialistItem,
 		isMountBeadItem
 	} from '$lib/types/search';
 	import { itemService } from '$lib/services/itemService';
 	import { monsterService } from '$lib/services/monsterService';
+	import { skillService } from '$lib/services/skillService';
 	import BlueButton from './BlueButton.svelte';
 	import Category from './Category.svelte';
 	// import Draggable from './Draggable.svelte';
@@ -95,6 +98,7 @@
 			if (rawItems.length > 0) {
 				const allVnums = rawItems.map((item: SearchResult) => item.item_vnum);
 				const petVnums: number[] = [];
+				const skillVnums: number[] = [];
 				for (const item of rawItems) {
 					if (isSpecialist(item.data) && item.data.contains_sp) {
 						allVnums.push(item.data.vnum);
@@ -102,27 +106,44 @@
 					if (isPetBeadItem(item.data) && item.data.has_pet_inside) {
 						petVnums.push(item.data.pet_vnum);
 					}
+					if (isPartnerBeadItem(item.data) && item.data.has_partner_inside) {
+						petVnums.push(item.data.partner_vnum);
+					}
+					if (isPartnerSpecialistItem(item.data) && item.data.has_partner_sp_inside) {
+						allVnums.push(item.data.partner_sp_vnum);
+						for (const skill of item.data.skills) {
+							skillVnums.push(skill.vnum);
+						}
+					}
 					if (isMountBeadItem(item.data) && item.data.has_mount_inside) {
 						allVnums.push(item.data.mount_vnum);
 					}
 				}
 				await Promise.all([
 					itemService.fetchMany(allVnums),
-					monsterService.fetchMany(petVnums)
+					monsterService.fetchMany(petVnums),
+					skillService.fetchMany(skillVnums)
 				]);
 
 				results = rawItems.map((item: SearchResult): EnrichedSearchResult => {
 					const staticData = itemService.getSync(item.item_vnum);
 					const containsData =
 						(isSpecialist(item.data) && item.data.contains_sp) ||
+						(isPartnerSpecialistItem(item.data) && item.data.has_partner_sp_inside) ||
 						(isPetBeadItem(item.data) && item.data.has_pet_inside);
 					const containedData = containsData
-						? (itemService.getSync(item.data.vnum) ?? undefined)
+						? (itemService.getSync(
+								isPartnerSpecialistItem(item.data)
+									? item.data.partner_sp_vnum
+									: item.data.vnum
+						  ) ?? undefined)
 						: undefined;
 					const containedMonsterData =
 						isPetBeadItem(item.data) && item.data.has_pet_inside
 							? (monsterService.getSync(item.data.pet_vnum) ?? undefined)
-							: undefined;
+							: isPartnerBeadItem(item.data) && item.data.has_partner_inside
+								? (monsterService.getSync(item.data.partner_vnum) ?? undefined)
+								: undefined;
 					const containedMountItemData =
 						isMountBeadItem(item.data) && item.data.has_mount_inside
 							? (itemService.getSync(item.data.mount_vnum) ?? undefined)

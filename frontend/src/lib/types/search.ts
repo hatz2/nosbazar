@@ -170,6 +170,39 @@ export interface PetBeadData {
 	price: number;
 }
 
+export interface PartnerBeadData {
+	vnum: number;
+	has_partner_inside: boolean;
+	partner_vnum: number;
+	level: number;
+	level_percentage: number;
+	attack_level: number;
+	defence_level: number;
+	price: number;
+}
+
+export interface PartnerSkillData {
+	vnum: number;
+	grade: number;
+}
+
+export interface PartnerSpecialistData {
+	vnum: number;
+	has_partner_sp_inside: boolean;
+	partner_sp_vnum: number;
+	element_type: number;
+	skills: PartnerSkillData[];
+	upgrade_level: number;
+	attack_bonus: number;
+	defence_bonus: number;
+	crit_reduction_bonus: number;
+	hp_mp_bonus: number;
+	fire_res_bonus: number;
+	water_res_bonus: number;
+	light_res_bonus: number;
+	shadow_res_bonus: number;
+}
+
 export interface MountBeadData {
 	vnum: number;
 	has_mount_inside: boolean;
@@ -193,6 +226,8 @@ export type SearchResultData =
 	| FairyData
 	| MiniPetData
 	| PetBeadData
+	| PartnerBeadData
+	| PartnerSpecialistData
 	| MountBeadData
 	| NoData;
 
@@ -246,6 +281,14 @@ export function itemHasFlagsToDisplay(flags: ItemFlagsData): boolean {
 
 export function isPetBeadItem(data: SearchResultData): data is PetBeadData {
 	return 'has_pet_inside' in data;
+}
+
+export function isPartnerBeadItem(data: SearchResultData): data is PartnerBeadData {
+	return 'has_partner_inside' in data;
+}
+
+export function isPartnerSpecialistItem(data: SearchResultData): data is PartnerSpecialistData {
+	return 'has_partner_sp_inside' in data;
 }
 
 export function isMountBeadItem(data: SearchResultData): data is MountBeadData {

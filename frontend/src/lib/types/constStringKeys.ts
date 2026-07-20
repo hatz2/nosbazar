@@ -267,7 +267,18 @@ export enum ConstStringKey {
 	StarPets6 = 4847,
 	AttackLevel = 656,
 	DefenceStat = 69,
-	NotUsed = 2169
+	NotUsed = 2169,
+	PartnerSkill = 3734,
+	PartnerSkillLevel = 3737,
+	PartnerAttackBonus = 4764,
+	PartnerDefenceBonus = 4765,
+	PartnerCritReduction = 4766,
+	PartnerHpMpBonus = 4767,
+	PartnerFireResBonus = 4768,
+	PartnerWaterResBonus = 4769,
+	PartnerLightResBonus = 4770,
+	PartnerShadowResBonus = 4771,
+	PartnerUpgradeLevel = 4783
 }
 
 export const CellonOptionsConstStrings: Record<number, ConstStringKey> = {

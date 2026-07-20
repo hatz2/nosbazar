@@ -183,6 +183,16 @@ enum Element {
 	Shadow = 4
 }
 
+const PartnerSkillLevels: Record<number, string> = {
+	1: 'F',
+	2: 'E',
+	3: 'D',
+	4: 'C',
+	5: 'B',
+	6: 'A',
+	7: 'S'
+};
+
 export {
 	BazarCategory,
 	WeaponSubcategory,
@@ -198,5 +208,6 @@ export {
 	ConsumerItemSubcategory,
 	SortFilter,
 	RequiredClass,
-	Element
+	Element,
+	PartnerSkillLevels
 };

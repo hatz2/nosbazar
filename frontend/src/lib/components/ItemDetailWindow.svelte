@@ -9,6 +9,8 @@
 		get_display_icon_id,
 		isAccessory,
 		isPetBeadItem,
+		isPartnerBeadItem,
+		isPartnerSpecialistItem,
 		isMountBeadItem,
 		isResistances,
 		isSpecialist,
@@ -16,10 +18,11 @@
 		shouldShowDescription,
 		shouldShowFlags
 	} from '$lib/types/search';
+	import { skillService } from '$lib/services/skillService';
 	import { onMount } from 'svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
 	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
-	import { Element } from '$lib/types/enums';
+	import { Element, PartnerSkillLevels } from '$lib/types/enums';
 
 	type Props = {
 		item: EnrichedSearchResult;
@@ -75,6 +78,16 @@
 		fetchConstString(ConstStringKey.CellonMpRecovery);
 		fetchConstString(ConstStringKey.CellonCritDmgReduction);
 		fetchConstString(ConstStringKey.CellonMpConsumptionReduction);
+		fetchConstString(ConstStringKey.PartnerSkill);
+		fetchConstString(ConstStringKey.PartnerSkillLevel);
+		fetchConstString(ConstStringKey.PartnerAttackBonus);
+		fetchConstString(ConstStringKey.PartnerDefenceBonus);
+		fetchConstString(ConstStringKey.PartnerCritReduction);
+		fetchConstString(ConstStringKey.PartnerHpMpBonus);
+		fetchConstString(ConstStringKey.PartnerFireResBonus);
+		fetchConstString(ConstStringKey.PartnerWaterResBonus);
+		fetchConstString(ConstStringKey.PartnerLightResBonus);
+		fetchConstString(ConstStringKey.PartnerShadowResBonus);
 	});
 
 	function get_required_class_string(required_class: number | null): string {
@@ -208,7 +221,7 @@
 		<div class="body-text">
 			<p class="light-orange">
 				{item.item_name[lang.current]}
-				{#if 'element_type' in item.data}
+				{#if 'fairy_level_percent' in item.data}
 					<br />{get_const_string(ConstStringKey.Attribute)}: {get_element(item)}<br />
 					{formatString(
 						get_const_string(ConstStringKey.StrengthensElementBy),
@@ -346,6 +359,96 @@
 						{get_const_string(ConstStringKey.Level)}: {item.data.level}<br />
 						{get_const_string(ConstStringKey.ExperiencePoints)}: {item.data.level_percentage}%<br />
 						{get_const_string(ConstStringKey.Rating)}: {get_star_pets(item)}<br />
+						{get_const_string(ConstStringKey.AttackLevel)}: {item.data.attack_level}<br />
+						{get_const_string(ConstStringKey.DefenceStat)}
+						{get_const_string(ConstStringKey.Level)}: {item.data.defence_level}<br />
+					{:else}
+						{get_const_string(ConstStringKey.NotUsed)}<br />
+					{/if}
+				</p>
+			{/if}
+
+			<!-- Partner specialist data -->
+			{#if isPartnerSpecialistItem(item.data)}
+				{#if item.data.has_partner_sp_inside}
+					<p class="light-orange">
+						{item.contained_item_static_data?.name[lang.current]}
+						{get_const_string(ConstStringKey.InCustody)}<br />
+						{get_element(item)}<br />
+					</p>
+
+					<p class="light-orange">
+						{formatString(
+							get_const_string(ConstStringKey.PartnerUpgradeLevel),
+							item.data.upgrade_level
+						)}<br />
+						{formatString(
+							get_const_string(ConstStringKey.PartnerAttackBonus),
+							20 * item.data.attack_bonus
+						)} (+ {item.data.attack_bonus})<br />
+						{formatString(
+							get_const_string(ConstStringKey.PartnerDefenceBonus),
+							10 * item.data.defence_bonus
+						)} (+ {item.data.defence_bonus})<br />
+						{formatString(
+							get_const_string(ConstStringKey.PartnerCritReduction),
+							item.data.crit_reduction_bonus
+						)} (+ {item.data.crit_reduction_bonus})<br />
+						{formatString(
+							get_const_string(ConstStringKey.PartnerHpMpBonus),
+							300 * item.data.hp_mp_bonus
+						)} (+
+						{item.data.hp_mp_bonus})<br />
+
+						{formatString(
+							get_const_string(ConstStringKey.PartnerFireResBonus),
+							item.data.fire_res_bonus
+						)} (+
+						{item.data.fire_res_bonus})<br />
+
+						{formatString(
+							get_const_string(ConstStringKey.PartnerWaterResBonus),
+							item.data.water_res_bonus
+						)} (+
+						{item.data.water_res_bonus})<br />
+
+						{formatString(
+							get_const_string(ConstStringKey.PartnerLightResBonus),
+							item.data.light_res_bonus
+						)} (+
+						{item.data.light_res_bonus})<br />
+
+						{formatString(
+							get_const_string(ConstStringKey.PartnerShadowResBonus),
+							item.data.shadow_res_bonus
+						)} (+
+						{item.data.shadow_res_bonus})<br />
+					</p>
+
+					<p class="light-orange">
+						{get_const_string(ConstStringKey.PartnerSkill)}<br />
+						{#each item.data.skills as skill, i (i)}
+							{skillService.getSync(skill.vnum)?.name[lang.current] ?? `Skill ${skill.vnum}`} : {PartnerSkillLevels[
+								skill.grade
+							] ?? skill.grade}
+							{get_const_string(ConstStringKey.PartnerSkillLevel)}<br />
+						{/each}
+					</p>
+				{:else}
+					<p class="light-orange">
+						{get_const_string(ConstStringKey.NotUsed)}<br />
+					</p>
+				{/if}
+			{/if}
+
+			<!-- Partner bead data -->
+			{#if isPartnerBeadItem(item.data)}
+				<p class="light-orange">
+					{#if item.data.has_partner_inside}
+						{item.contained_monster_static_data?.name[lang.current]}
+						{get_const_string(ConstStringKey.InCustody)}<br />
+						{get_const_string(ConstStringKey.Level)}: {item.data.level}<br />
+						{get_const_string(ConstStringKey.ExperiencePoints)}: {item.data.level_percentage}%<br />
 						{get_const_string(ConstStringKey.AttackLevel)}: {item.data.attack_level}<br />
 						{get_const_string(ConstStringKey.DefenceStat)}
 						{get_const_string(ConstStringKey.Level)}: {item.data.defence_level}<br />

@@ -425,6 +425,10 @@
 	const partnerOptions = $derived([
 		{ label: get_const_string(ConstStringKey.All), value: enums.PartnerSubcategory.All },
 		{
+			label: get_const_string(ConstStringKey.BazarSubcategoryEmptyPartnerBead),
+			value: enums.PartnerSubcategory.EmptyPartnerBead
+		},
+		{
 			label: get_const_string(ConstStringKey.BazarSubcategoryPartnerBead),
 			value: enums.PartnerSubcategory.PartnerBead
 		},
