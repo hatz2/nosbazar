@@ -16,5 +16,8 @@
 		font-size: 10pt;
 		-webkit-font-smoothing: none;
 		font-smooth: never;
+		font-style: normal;
+		font-weight: normal;
+		font-variant: normal;
 	}
 </style>
