@@ -211,6 +211,20 @@ export interface MountBeadData {
 	do_not_show_flags: boolean;
 }
 
+export interface ShellOptionData {
+	grade: number;
+	vnum: number;
+	value: number;
+}
+
+export interface ShellData {
+	vnum: number;
+	required_level: number;
+	rare: number;
+	price: number;
+	shell_options: ShellOptionData[];
+}
+
 export type NoData = Record<string, never>;
 
 export type SearchResultData =
@@ -229,6 +243,7 @@ export type SearchResultData =
 	| PartnerBeadData
 	| PartnerSpecialistData
 	| MountBeadData
+	| ShellData
 	| NoData;
 
 // ---- Type guards for the SearchResultData union ----
@@ -293,6 +308,10 @@ export function isPartnerSpecialistItem(data: SearchResultData): data is Partner
 
 export function isMountBeadItem(data: SearchResultData): data is MountBeadData {
 	return 'has_mount_inside' in data;
+}
+
+export function isShellData(data: SearchResultData): data is ShellData {
+	return 'shell_options' in data;
 }
 
 export function shouldShowDescription(data: SearchResultData): boolean {
