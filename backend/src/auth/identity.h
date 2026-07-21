@@ -12,6 +12,8 @@ namespace nosbazar::auth {
 
 		void set_request(const nlohmann::json& request);
 
+		void load_from_disk();
+
 		std::string string() const;
 
 		nlohmann::json json() const;
@@ -36,7 +38,7 @@ namespace nosbazar::auth {
 		std::string generate_vector() const;
 
 
-		std::string filename;
+		std::string file_path;
 		nlohmann::json fingerprint;
 	};
 }

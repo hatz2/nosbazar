@@ -11,24 +11,14 @@
 using json = nlohmann::json;
 
 namespace nosbazar::auth {
-	Identity::Identity(const std::string& file_path) : filename(file_path)
+	Identity::Identity(const std::string& file_path) : file_path(file_path)
 	{
-		std::ifstream file(file_path);
-		std::ostringstream content;
-
-		if (!file.is_open()) {
-			return;
-		}
-
-		content << file.rdbuf();
-
-		fingerprint = json::parse(content.str());
-
-		file.close();
+		load_from_disk();
 	}
 
 	void Identity::update()
 	{
+		load_from_disk();
 		update_vector();
 		update_server_time();
 		update_creation();
@@ -89,6 +79,22 @@ namespace nosbazar::auth {
 		fingerprint["request"] = request;
 	}
 
+	void Identity::load_from_disk()
+	{
+		std::ifstream file(file_path);
+		std::ostringstream content;
+
+		if (!file.is_open()) {
+			return;
+		}
+
+		content << file.rdbuf();
+
+		fingerprint = json::parse(content.str());
+
+		file.close();
+	}
+
 	std::string Identity::string() const
 	{
 		return fingerprint.dump();
@@ -101,7 +107,7 @@ namespace nosbazar::auth {
 
 	void Identity::save() const
 	{
-		std::ofstream file(filename);
+		std::ofstream file(file_path);
 
 		if (!file.is_open()) {
 			return;

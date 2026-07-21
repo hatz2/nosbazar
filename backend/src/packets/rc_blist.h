@@ -21,7 +21,26 @@ namespace nosbazar::packets {
 			b = 2,
 			a = 3,
 			s = 4,
-			special = 7
+			special_c = 5,
+			special_b = 6,
+			special_a = 7,
+			special_s = 8,
+			pink_c = 9,
+			pink_b = 10,
+			pink_a = 11,
+			pink_s = 12,
+			armor_c = 13,
+			armor_b = 14,
+			armor_a = 15,
+			armor_s = 16,
+			armor_special_c = 17,
+			armor_special_b = 18,
+			armor_special_a = 19,
+			armor_special_s = 20,
+			armor_pink_c = 21,
+			armor_pink_b = 22,
+			armor_pink_a = 23,
+			armor_pink_s = 24,
 		};
 
 		struct ShellEffect {
@@ -343,6 +362,35 @@ namespace nosbazar::packets {
 			nlohmann::json json() const;
 		};
 
+		/**
+		 * Single option from a shell item.
+		 */
+		struct ShellOptionData {
+			int grade{};
+			int vnum{};
+			int value{};
+
+			ShellOptionData() = default;
+			ShellOptionData(std::string_view item_data);
+			nlohmann::json json() const;
+		};
+
+		/**
+		 * Shell item data.
+		 */
+		struct ShellData {
+			int vnum{};
+			int required_level{};
+			int rare{};
+			int price{};
+			std::vector<ShellOptionData> options;
+			int unknown_1{};
+
+			ShellData() = default;
+			ShellData(std::string_view item_data);
+			nlohmann::json json() const;
+		};
+
 		struct NoData {
 			nlohmann::json json() const {
 				return nlohmann::json::object();
@@ -366,7 +414,8 @@ namespace nosbazar::packets {
 			PetBeadData,
 			MountBeadData,
 			PartnerBeadData,
-			PartnerSpecialistData
+			PartnerSpecialistData,
+			ShellData
 		>;
 
 		/**

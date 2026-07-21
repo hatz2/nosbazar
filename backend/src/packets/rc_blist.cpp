@@ -339,9 +339,10 @@ namespace nosbazar::packets {
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::partner_bead)}] = [](auto data) { return PartnerBeadData(data); };
 		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::holder), std::to_underlying(HolderSubType::partner_card_holder)}] = [](auto data) { return PartnerSpecialistData(data); };
 
-		// TODO: Add the rest of holder types
 
-		// TODO: Add shells
+		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::shell), std::to_underlying(ShellSubType::weapon)}] = [](auto data) { return ShellData(data); };
+		registry[{std::to_underlying(InventoryTab::equip), std::to_underlying(EquipType::shell), std::to_underlying(ShellSubType::armour)}] = [](auto data) { return ShellData(data); };
+
 	}
 	RcBlist::RcBlist(std::string_view packet)
 	{
@@ -727,6 +728,55 @@ namespace nosbazar::packets {
 			{"water_res_bonus", water_res_bonus},
 			{"light_res_bonus", light_res_bonus},
 			{"shadow_res_bonus", shadow_res_bonus}
+		};
+	}
+
+	RcBlist::ShellOptionData::ShellOptionData(std::string_view item_data)
+	{
+		grade = strings::token<int>(item_data, shell_separator);
+		vnum = strings::token<int>(item_data, shell_separator);
+		value = strings::token<int>(item_data, shell_separator);
+	}
+
+	nlohmann::json RcBlist::ShellOptionData::json() const
+	{
+		return {
+			{"grade", grade},
+			{"vnum", vnum},
+			{"value", value}
+		};
+	}
+
+	RcBlist::ShellData::ShellData(std::string_view item_data)
+	{
+		vnum = strings::token<int>(item_data, data_separator);
+		required_level = strings::token<int>(item_data, data_separator);
+		rare = strings::token<int>(item_data, data_separator);
+		price = strings::token<int>(item_data, data_separator);
+
+		int number_of_options = strings::token<int>(item_data, data_separator);
+		for (int i = 0; i < number_of_options; ++i) {
+			std::string_view option = strings::token<std::string_view>(item_data, data_separator);
+			ShellOptionData option_data(option);
+			options.push_back(std::move(option_data));
+		}
+		unknown_1 = strings::token<int>(item_data, data_separator);
+	}
+
+	nlohmann::json RcBlist::ShellData::json() const
+	{
+		nlohmann::json json_options = nlohmann::json::array();
+		for (const auto& option : options) {
+			json_options.push_back(std::move(option.json()));
+		}
+
+		return {
+			{"vnum", vnum},
+			{"required_level", required_level},
+			{"rare", rare},
+			{"price", price},
+			{"shell_options", json_options},
+			{"do_not_show_description", true},
 		};
 	}
 
