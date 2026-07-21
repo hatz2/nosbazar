@@ -4,7 +4,12 @@
 	import { lang } from '$lib/stores/lang.svelte';
 	import { RequiredClass } from '$lib/types/enums';
 	import CloseButton from './CloseButton.svelte';
-	import { formatCellonOptionString, formatString } from '$lib/utils/format';
+	import {
+		formatCellonOptionString,
+		formatShellOptionString,
+		formatString,
+		ShellGradeColor
+	} from '$lib/utils/format';
 	import {
 		get_display_icon_id,
 		isAccessory,
@@ -16,7 +21,8 @@
 		isSpecialist,
 		itemHasFlagsToDisplay,
 		shouldShowDescription,
-		shouldShowFlags
+		shouldShowFlags,
+		isShellData
 	} from '$lib/types/search';
 	import { skillService } from '$lib/services/skillService';
 	import { onMount } from 'svelte';
@@ -155,12 +161,12 @@
 
 		if ('required_level' in item.data) {
 			if (item.static_data?.flags.is_champion_equip) {
-				result = `${get_const_string(ConstStringKey.Required)} ${get_const_string(ConstStringKey.ChampionLevel)}: `;
+				result = `${get_const_string(ConstStringKey.Required)}${get_const_string(ConstStringKey.ChampionLevel)}: `;
 			} else {
-				result = `${get_const_string(ConstStringKey.Required)} ${get_const_string(ConstStringKey.Level)}: `;
+				result = `${get_const_string(ConstStringKey.Required)}${get_const_string(ConstStringKey.Level)}: `;
 			}
 
-			result += `${item.data.required_level} ${get_const_string(ConstStringKey.Lv)}`;
+			result += `${item.data.required_level}${get_const_string(ConstStringKey.Lv)}`;
 		}
 
 		return result;
@@ -552,6 +558,22 @@
 				<p class="red">
 					{get_const_string(ConstStringKey.Price)}: {item.data.price.toLocaleString('es-ES')}
 				</p>
+			{/if}
+
+			{#if isShellData(item.data)}
+				{#if item.data.shell_options.length > 0}
+					<p>
+						{#each item.data.shell_options as option, i (i)}
+							<span style="color: {ShellGradeColor[option.grade] ?? '#FFFFFF'}">
+								{formatShellOptionString(option)}
+							</span><br />
+						{/each}
+					</p>
+				{:else}
+					<p class="red">
+						{get_const_string(ConstStringKey.OptionNotIdentified)}
+					</p>
+				{/if}
 			{/if}
 
 			<!-- Cell options -->
