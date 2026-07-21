@@ -407,6 +407,22 @@
 		{
 			label: get_const_string(ConstStringKey.Thunderer),
 			value: enums.SpecialistSubcategory.Thunderer
+		},
+		{
+			label: get_const_string(ConstStringKey.Achilles),
+			value: enums.SpecialistSubcategory.Achilles
+		},
+		{
+			label: get_const_string(ConstStringKey.AdmiralYi),
+			value: enums.SpecialistSubcategory.AdmiralYi
+		},
+		{
+			label: get_const_string(ConstStringKey.Merlin),
+			value: enums.SpecialistSubcategory.Merlin
+		},
+		{
+			label: get_const_string(ConstStringKey.Thor),
+			value: enums.SpecialistSubcategory.Thor
 		}
 	]);
 

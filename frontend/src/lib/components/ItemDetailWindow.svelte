@@ -560,9 +560,6 @@
 					<p class="light-orange">
 						{#each item.data.options as option, i (i)}
 							{formatCellonOptionString(option)}<br />
-							<!-- {option.level}{get_const_string(ConstStringKey.Lv)}
-						{get_const_string(CellonOptionsConstStrings[option.vnum])}
-						{option.value}<br /> -->
 						{/each}
 					</p>
 				{/if}
