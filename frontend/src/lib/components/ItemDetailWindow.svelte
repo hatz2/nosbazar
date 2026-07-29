@@ -17,7 +17,6 @@
 		get_required_class_string,
 		get_required_level,
 		get_element,
-		get_star_pets
 	} from '$lib/utils/format';
 	import {
 		get_display_icon_id,
