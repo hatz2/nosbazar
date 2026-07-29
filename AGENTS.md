@@ -87,10 +87,11 @@ Linting via `eslint.config.js`, formatting via `.prettierrc`. Run lint/format be
 - **Do not try to compile the project** - but still try to detect compilation errors before submitting a response
 - **When committing, do not modify any existing files** — stage and commit only files that are already dirty. Never edit, reformat, or change code during a commit.
 - **Search before building** — always grep/glob for existing utilities, helpers, components, types, or patterns before writing new code. If similar functionality exists, extend it instead of duplicating.
+- **Keep all comments and documentation in English** — including markdown files, code comments, and commit messages.
 
 ---
 
-## Shell effects on weapons/armor (applied conchas)
+## Shell effects on weapons/armor (applied shells)
 
 - `WeaponData` and `ArmourData` carry a `shells: ShellEffect[]` array serialized by the backend.
 - Each `ShellEffect` has `{grade, vnum, value, upgrade}`.
