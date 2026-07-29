@@ -112,6 +112,7 @@ Linting via `eslint.config.js`, formatting via `.prettierrc`. Run lint/format be
 - **String handling**: prefer `std::string_view` for parameters and parsing tokens. Avoid `std::string` ownership where not needed.
 - **No raw loops over packets** — use the token-based parser pattern in `strings::parse.h` instead of manual string splitting.
 - **No exceptions in hot paths** — game packet parsing runs per-tick; use `std::optional` or error codes for expected failures.
+- **Remove unused `#include`** — before committing, check that every `#include` is used. If a header is no longer needed, remove it.
 
 ---
 
@@ -123,3 +124,4 @@ Linting via `eslint.config.js`, formatting via `.prettierrc`. Run lint/format be
 - **DOM access**: never use `document.querySelector` or direct DOM manipulation in components. Use Svelte bindings or `getElementById` only as last resort.
 - **Store access**: use `import { lang } from '$lib/stores/lang.svelte'` with `$derived` / rune syntax. Do not use Svelte's legacy `$store` prefix syntax.
 - **No inline styles in templates** — define classes in `<style>` block. Exception: dynamic colors (e.g., `ShellGradeColor`).
+- **Remove unused imports** — before committing, check that every `import` is used. If an import is no longer needed, remove it (both TS imports and Svelte component imports).
