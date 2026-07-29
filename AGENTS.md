@@ -88,6 +88,7 @@ Linting via `eslint.config.js`, formatting via `.prettierrc`. Run lint/format be
 - **When committing, do not modify any existing files** — stage and commit only files that are already dirty. Never edit, reformat, or change code during a commit.
 - **Search before building** — always grep/glob for existing utilities, helpers, components, types, or patterns before writing new code. If similar functionality exists, extend it instead of duplicating.
 - **Keep all comments and documentation in English** — including markdown files, code comments, and commit messages.
+- **Never commit unless explicitly told to** — wait for the user to say "commit" or similar before staging any changes.
 
 ---
 
