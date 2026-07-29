@@ -85,6 +85,8 @@ Linting via `eslint.config.js`, formatting via `.prettierrc`. Run lint/format be
 - **Never commit `.env` or game data files** — both are gitignored by pattern.
 - The Crow route handler blocks on `task->response.packet.get_future().get()` — synchronous blocking is by design, not a bug to "fix".
 - **Do not try to compile the project** - but still try to detect compilation errors before submitting a response
+- **When committing, do not modify any existing files** — stage and commit only files that are already dirty. Never edit, reformat, or change code during a commit.
+- **Search before building** — always grep/glob for existing utilities, helpers, components, types, or patterns before writing new code. If similar functionality exists, extend it instead of duplicating.
 
 ---
 
@@ -98,3 +100,25 @@ Linting via `eslint.config.js`, formatting via `.prettierrc`. Run lint/format be
   - `<0` = was the **last** shell option upgraded (wraps output in `[ ... ]`)
 - `formatAppliedShellEffectString` in `format.ts` handles display: adds `++` prefix and `(+bonus)` suffix.
 - Base upgrade values per vnum are in `WeaponShellUpgradeBaseValue` / `ArmorShellUpgradeBaseValue` (`format.ts`). Default fallback is `10` for unknown vnums.
+
+---
+
+## C++ conventions
+
+- **Headers**: use `#pragma once`, not include guards. Keep headers self-contained — include what you use.
+- **Naming**: `snake_case` for functions and variables, `PascalCase` for types and enums. Member variables use `snake_case` with no prefix.
+- **std::variant dispatch**: use `std::visit` with a lambda, not manual `if-holds-alternative` chains. See existing pattern in `rc_blist.cpp` `json()`.
+- **String handling**: prefer `std::string_view` for parameters and parsing tokens. Avoid `std::string` ownership where not needed.
+- **No raw loops over packets** — use the token-based parser pattern in `strings::parse.h` instead of manual string splitting.
+- **No exceptions in hot paths** — game packet parsing runs per-tick; use `std::optional` or error codes for expected failures.
+
+---
+
+## Svelte / TypeScript conventions
+
+- **Svelte 5 runes**: use `$props()`, `$state()`, `$derived()`, `$effect()`. Do not use `export let`, `let:` directives, or `$:` reactive statements.
+- **Typing**: always type component props via a `type Props = { ... }` interface. Avoid `any` — use proper discriminated unions and type guards.
+- **Imports**: group by: (1) Svelte internals, (2) project utils/services, (3) types. Use `$lib/` path alias, never relative imports that traverse up.
+- **DOM access**: never use `document.querySelector` or direct DOM manipulation in components. Use Svelte bindings or `getElementById` only as last resort.
+- **Store access**: use `import { lang } from '$lib/stores/lang.svelte'` with `$derived` / rune syntax. Do not use Svelte's legacy `$store` prefix syntax.
+- **No inline styles in templates** — define classes in `<style>` block. Exception: dynamic colors (e.g., `ShellGradeColor`).
