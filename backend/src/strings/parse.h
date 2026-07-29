@@ -39,7 +39,10 @@ namespace nosbazar::strings {
 
 	template<>
 	inline int token(std::string_view& s, char delim) {
-		return static_cast<int>(token<unsigned int>(s, delim));
+		int result = 0;
+		std::string_view token_str = token<std::string_view>(s, delim);
+		std::from_chars(token_str.data(), token_str.data() + token_str.size(), result);
+		return result;
 	}
 
 	template<>

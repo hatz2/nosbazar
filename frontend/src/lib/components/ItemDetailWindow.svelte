@@ -7,6 +7,7 @@
 	import {
 		formatCellonOptionString,
 		formatShellOptionString,
+		formatAppliedShellEffectString,
 		formatString,
 		ShellGradeColor
 	} from '$lib/utils/format';
@@ -557,6 +558,17 @@
 			{#if 'price' in item.data}
 				<p class="red">
 					{get_const_string(ConstStringKey.Price)}: {item.data.price.toLocaleString('es-ES')}
+				</p>
+			{/if}
+
+			<!-- Shell effects on weapons/armor -->
+			{#if 'shells' in item.data && item.data.shells.length > 0}
+				<p>
+					{#each item.data.shells as shell, i (i)}
+						<span style="color: {ShellGradeColor[shell.grade] ?? '#FFFFFF'}">
+							{formatAppliedShellEffectString(shell)}
+						</span><br />
+					{/each}
 				</p>
 			{/if}
 

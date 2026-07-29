@@ -70,8 +70,8 @@ namespace nosbazar::packets {
 			int max_ammo{}; // only if weapon is bow or xbox
 			int price{};
 			int unknown_3{};
-			int unknown_4{};
-			int unknown_5{};
+			int rarity_of_effects{};
+			int owner_id{};
 			int shell_count{};
 			int unknown_6{};
 			std::vector<ShellEffect> shells;

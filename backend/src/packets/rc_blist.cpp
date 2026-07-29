@@ -38,8 +38,8 @@ namespace nosbazar::packets {
 		max_ammo = strings::token<int>(item_data, data_separator);
 		price = strings::token<int>(item_data, data_separator);
 		unknown_3 = strings::token<int>(item_data, data_separator);
-		unknown_4 = strings::token<int>(item_data, data_separator);
-		unknown_5 = strings::token<int>(item_data, data_separator);
+		rarity_of_effects = strings::token<int>(item_data, data_separator);
+		owner_id = strings::token<int>(item_data, data_separator);
 		shell_count = strings::token<int>(item_data, data_separator);
 		unknown_6 = strings::token<int>(item_data, data_separator);
 

@@ -6,7 +6,8 @@ import {
 	WeaponShellOptionsConstStrings,
 	ShellQualifierKeys
 } from '$lib/types/constStringKeys';
-import type { CellonOption, ShellOptionData } from '$lib/types/search';
+import type { CellonOption, ShellEffect, ShellOptionData } from '$lib/types/search';
+import { WeaponShellOption, ArmorShellOption } from '$lib/types/enums';
 
 export function formatString(template: string, ...args: (string | number)[]): string {
 	const clean = template.replace(/<NEW_TYPE><\d+(,\d+)*>/g, '');
@@ -115,4 +116,124 @@ export function formatShellOptionString(shellOption: ShellOptionData): string {
 	}
 	result += template;
 	return result;
+}
+
+const WeaponShellUpgradeBaseValue: Partial<Record<number, number>> = {
+	[WeaponShellOption.EnhancedDmg]: 80,
+	[WeaponShellOption.IncreasedDmg]: 2,
+	[WeaponShellOption.MinorBleeding]: 1,
+	[WeaponShellOption.Bleeding]: 1,
+	[WeaponShellOption.HeavyBleeding]: 1,
+	[WeaponShellOption.Blackout]: 1,
+	[WeaponShellOption.Freeze]: 1,
+	[WeaponShellOption.DeadlyBlackout]: 1,
+	[WeaponShellOption.IncreasedDmgToPlants]: 2,
+	[WeaponShellOption.IncreasedDmgToAnimals]: 2,
+	[WeaponShellOption.IncreasedDmgToMonsters]: 2,
+	[WeaponShellOption.IncreasedDmgToUndeads]: 2,
+	[WeaponShellOption.IncreasedDmgToKovolts]: 2,
+	[WeaponShellOption.IncreasedDmgToMapBosses]: 2,
+	[WeaponShellOption.IncreasedCritChance]: 1,
+	[WeaponShellOption.IncreasedCritDmg]: 10,
+	[WeaponShellOption.UndisturbedCasting]: 1000,
+	[WeaponShellOption.IncreasedFireElement]: 80,
+	[WeaponShellOption.IncreasedWaterElement]: 80,
+	[WeaponShellOption.IncreasedLightElement]: 80,
+	[WeaponShellOption.IncreasedShadowElement]: 80,
+	[WeaponShellOption.IncreasedAllElements]: 80,
+	[WeaponShellOption.ReducedMpConsumption]: 2,
+	[WeaponShellOption.HpRecoveryPerKill]: 2,
+	[WeaponShellOption.MpRecoveryPerKill]: 2,
+	[WeaponShellOption.IncreasedSlDmgStat]: 1,
+	[WeaponShellOption.IncreasedSlDefenseStat]: 1,
+	[WeaponShellOption.IncreasedSlPropertyStat]: 1,
+	[WeaponShellOption.IncreasedSlEnergyStat]: 1,
+	[WeaponShellOption.IncreasedOverallSlStat]: 1,
+	[WeaponShellOption.GainMoreGold]: 2,
+	[WeaponShellOption.IncreasedCombatExp]: 2,
+	[WeaponShellOption.IncreasedJobExp]: 2,
+	[WeaponShellOption.IncreasedPvpDmg]: 2,
+	[WeaponShellOption.ReducedPvpDefence]: 2,
+	[WeaponShellOption.ReducedPvpFireResistance]: 2,
+	[WeaponShellOption.ReducedPvpWaterResistance]: 2,
+	[WeaponShellOption.ReducedPvpLightResistance]: 2,
+	[WeaponShellOption.ReducedPvpShadowResistance]: 2,
+	[WeaponShellOption.ReducedPvpAllResistances]: 2,
+	[WeaponShellOption.HitEverytimeInPvp]: 2,
+	[WeaponShellOption.PercentDmgAt15InPvp]: 2,
+	[WeaponShellOption.ReducedPvpManaPerHit]: 2,
+	[WeaponShellOption.IgnorePvpFireResistance]: 2,
+	[WeaponShellOption.IgnorePvpWaterResistance]: 2,
+	[WeaponShellOption.IgnorePvpLightResistance]: 2,
+	[WeaponShellOption.IgnorePvpShadowResistance]: 2,
+	[WeaponShellOption.SpRecoveryPerKill]: 2,
+	[WeaponShellOption.IncreasedAccuracy]: 2,
+	[WeaponShellOption.IncreasedConcentration]: 2,
+};
+
+const ArmorShellUpgradeBaseValue: Partial<Record<number, number>> = {
+	[ArmorShellOption.EnhancedMeleeDefense]: 100,
+	[ArmorShellOption.EnhancedLongRangeDefense]: 100,
+	[ArmorShellOption.EnhancedMagicDefense]: 100,
+	[ArmorShellOption.IncreasedOverallDefence]: 4,
+	[ArmorShellOption.ReducedMinorBleedingChance]: 4,
+	[ArmorShellOption.ReducedBleedingChance]: 4,
+	[ArmorShellOption.ReducedAllBleedingChance]: 4,
+	[ArmorShellOption.ReducedBlackoutChance]: 4,
+	[ArmorShellOption.ReducedAllBlackoutChance]: 4,
+	[ArmorShellOption.ReducedHandOfDeathChance]: 4,
+	[ArmorShellOption.ReducedFreezeChance]: 4,
+	[ArmorShellOption.ReducedBlindChance]: 4,
+	[ArmorShellOption.ReducedBindChance]: 4,
+	[ArmorShellOption.ReducedWeakenDefenceChance]: 4,
+	[ArmorShellOption.ReducedShockChance]: 4,
+	[ArmorShellOption.ReducedParalysisChance]: 4,
+	[ArmorShellOption.ReducedAllNegativeEffectsChance]: 4,
+	[ArmorShellOption.IncreasedHpRecoveryWhileResting]: 4,
+	[ArmorShellOption.IncreasedNaturalHpRecovery]: 4,
+	[ArmorShellOption.IncreasedMpRecoveryWhileResting]: 4,
+	[ArmorShellOption.IncreasedNaturalMpRecovery]: 4,
+	[ArmorShellOption.RecoverDmgAsHp]: 4,
+	[ArmorShellOption.ReducedCritChance]: 4,
+	[ArmorShellOption.IncreasedFireResistance]: 4,
+	[ArmorShellOption.IncreasedWaterResistance]: 4,
+	[ArmorShellOption.IncreasedLightResistance]: 4,
+	[ArmorShellOption.IncreasedShadowResistance]: 4,
+	[ArmorShellOption.IncreasedAllResistances]: 4,
+	[ArmorShellOption.ReducedDignityLoss]: 4,
+	[ArmorShellOption.ReducedProductionPointConsumption]: 4,
+	[ArmorShellOption.MoreMinigameRewards]: 4,
+	[ArmorShellOption.IncreasedItemRecovery]: 4,
+	[ArmorShellOption.IncreasedPvpOverallDefence]: 4,
+	[ArmorShellOption.DodgePvpMelee]: 4,
+	[ArmorShellOption.DodgePvpRanged]: 4,
+	[ArmorShellOption.DodgePvpMagic]: 4,
+	[ArmorShellOption.DodgePvpAll]: 4,
+	[ArmorShellOption.ManaDamageProtection]: 4,
+	[ArmorShellOption.ImmuneToPvpFireDamage]: 4,
+	[ArmorShellOption.ImmuneToPvpWaterDamage]: 4,
+	[ArmorShellOption.ImmuneToPvpLightDamage]: 4,
+	[ArmorShellOption.ImmuneToPvpShadowDamage]: 4,
+};
+
+function getShellUpgradeBonus(grade: number, vnum: number, upgrade: number): number {
+	const map = grade > 12 ? ArmorShellUpgradeBaseValue : WeaponShellUpgradeBaseValue;
+	const baseValue = map[vnum] ?? 10;
+	return upgrade * baseValue;
+}
+
+export function formatAppliedShellEffectString(
+	shellEffect: ShellEffect
+): string {
+	const base = formatShellOptionString(shellEffect);
+	if (shellEffect.upgrade === 0) {
+		return base;
+	}
+	const absUpgrade = Math.abs(shellEffect.upgrade);
+	const bonus = getShellUpgradeBonus(shellEffect.grade, shellEffect.vnum, absUpgrade);
+	const text = `++ ${base}(+${bonus})`;
+	if (shellEffect.upgrade < 0) {
+		return `[ ${text} ]`;
+	}
+	return text;
 }
