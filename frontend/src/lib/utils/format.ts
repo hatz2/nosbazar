@@ -6,8 +6,8 @@ import {
 	WeaponShellOptionsConstStrings,
 	ShellQualifierKeys
 } from '$lib/types/constStringKeys';
-import type { CellonOption, ShellEffect, ShellOptionData } from '$lib/types/search';
-import { WeaponShellOption, ArmorShellOption } from '$lib/types/enums';
+import type { CellonOption, ShellEffect, ShellOptionData, EnrichedSearchResult } from '$lib/types/search';
+import { WeaponShellOption, ArmorShellOption, RequiredClass, Element } from '$lib/types/enums';
 
 export function formatString(template: string, ...args: (string | number)[]): string {
 	const clean = template.replace(/<NEW_TYPE><\d+(,\d+)*>/g, '');
@@ -236,4 +236,116 @@ export function formatAppliedShellEffectString(
 		return `[ ${text} ]`;
 	}
 	return text;
+}
+
+export function get_required_class_string(required_class: number | null): string {
+	let result: string = '';
+
+	if (required_class === null) {
+		return result;
+	}
+
+	if (required_class == RequiredClass.All) {
+		return result;
+	}
+
+	const single_class =
+		required_class == RequiredClass.Adventurer ||
+		required_class == RequiredClass.Swordsman ||
+		required_class == RequiredClass.Archer ||
+		required_class == RequiredClass.Mage ||
+		required_class == RequiredClass.Martial;
+
+	if (single_class) {
+		if (required_class & RequiredClass.Adventurer) {
+			result += get_const_string(ConstStringKey.Adventurer);
+		}
+		if (required_class & RequiredClass.Swordsman) {
+			result += get_const_string(ConstStringKey.Swordsman);
+		}
+		if (required_class & RequiredClass.Archer) {
+			result += get_const_string(ConstStringKey.Archer);
+		}
+		if (required_class & RequiredClass.Mage) {
+			result += get_const_string(ConstStringKey.Mage);
+		}
+		if (required_class & RequiredClass.Martial) {
+			result += get_const_string(ConstStringKey.MartialArtist);
+		}
+	} else {
+		if (required_class & RequiredClass.Adventurer) {
+			result += `${get_const_string(ConstStringKey.Adventurer)}, `;
+		}
+		if (required_class & RequiredClass.Swordsman) {
+			result += `${get_const_string(ConstStringKey.Swordsman)}, `;
+		}
+		if (required_class & RequiredClass.Archer) {
+			result += `${get_const_string(ConstStringKey.Archer)}, `;
+		}
+		if (required_class & RequiredClass.Mage) {
+			result += `${get_const_string(ConstStringKey.Mage)}, `;
+		}
+		if (required_class & RequiredClass.Martial) {
+			result += get_const_string(ConstStringKey.MartialArtist);
+		}
+	}
+
+	result += ` ${get_const_string(ConstStringKey.Only)}`;
+
+	return result;
+}
+
+export function get_required_level(item: EnrichedSearchResult): string {
+	let result: string = '';
+
+	if ('required_level' in item.data) {
+		if (item.static_data?.flags.is_champion_equip) {
+			result = `${get_const_string(ConstStringKey.Required)}${get_const_string(ConstStringKey.ChampionLevel)}: `;
+		} else {
+			result = `${get_const_string(ConstStringKey.Required)}${get_const_string(ConstStringKey.Level)}: `;
+		}
+
+		result += `${item.data.required_level}${get_const_string(ConstStringKey.Lv)}`;
+	}
+
+	return result;
+}
+
+export function get_element(item: EnrichedSearchResult): string {
+	if ('element_type' in item.data) {
+		switch (item.data.element_type) {
+			case Element.NoElement:
+				return get_const_string(ConstStringKey.FairyNoElement);
+			case Element.Fire:
+				return get_const_string(ConstStringKey.FairyFireElement);
+			case Element.Water:
+				return get_const_string(ConstStringKey.FairyWaterElement);
+			case Element.Light:
+				return get_const_string(ConstStringKey.FairyLightElement);
+			case Element.Shadow:
+				return get_const_string(ConstStringKey.FairyShadowElement);
+		}
+	}
+	return '';
+}
+
+export function get_star_pets(item: EnrichedSearchResult): string {
+	if ('stars' in item.data) {
+		switch (item.data.stars) {
+			case 1:
+				return get_const_string(ConstStringKey.StarPets1);
+			case 2:
+				return get_const_string(ConstStringKey.StarPets2);
+			case 3:
+				return get_const_string(ConstStringKey.StarPets3);
+			case 4:
+				return get_const_string(ConstStringKey.StarPets4);
+			case 5:
+				return get_const_string(ConstStringKey.StarPets5);
+			case 6:
+				return get_const_string(ConstStringKey.StarPets6);
+		}
+	}
+
+	return '';
 }
