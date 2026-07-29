@@ -85,3 +85,16 @@ Linting via `eslint.config.js`, formatting via `.prettierrc`. Run lint/format be
 - **Never commit `.env` or game data files** — both are gitignored by pattern.
 - The Crow route handler blocks on `task->response.packet.get_future().get()` — synchronous blocking is by design, not a bug to "fix".
 - **Do not try to compile the project** - but still try to detect compilation errors before submitting a response
+
+---
+
+## Shell effects on weapons/armor (applied conchas)
+
+- `WeaponData` and `ArmourData` carry a `shells: ShellEffect[]` array serialized by the backend.
+- Each `ShellEffect` has `{grade, vnum, value, upgrade}`.
+- `upgrade` encodes both level and "last upgraded" via its sign:
+  - `0` = no upgrade
+  - `>0` = has upgrade
+  - `<0` = was the **last** shell option upgraded (wraps output in `[ ... ]`)
+- `formatAppliedShellEffectString` in `format.ts` handles display: adds `++` prefix and `(+bonus)` suffix.
+- Base upgrade values per vnum are in `WeaponShellUpgradeBaseValue` / `ArmorShellUpgradeBaseValue` (`format.ts`). Default fallback is `10` for unknown vnums.
