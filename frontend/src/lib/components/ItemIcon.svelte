@@ -13,6 +13,7 @@
 			alt="Item icon"
 			width={32}
 			height={32}
+			class="orange-outline"
 		/>
 	</span>
 {/if}

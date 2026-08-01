@@ -14,10 +14,27 @@
 	};
 
 	let { item }: Props = $props();
+
+	function getCurrentShellLevel(item: EnrichedSearchResult) {
+		let level = 0;
+		if ('shells' in item.data) {
+			item.data.shells.forEach((shell) => {
+				level += Math.abs(shell.upgrade);
+			});
+		}
+		return level;
+	}
+
+	let shell_level = $derived(getCurrentShellLevel(item));
 </script>
 
 {#if 'shells' in item.data && item.data.shells.length > 0}
 	<p>
+		{#if shell_level !== 0}
+			<span class="white">
+				{get_const_string(ConstStringKey.CurrentShellLevel)} ({shell_level}/8)
+			</span><br />
+		{/if}
 		{#each item.data.shells as shell, i (i)}
 			<span style="color: {ShellGradeColor[shell.grade] ?? '#FFFFFF'}">
 				{formatAppliedShellEffectString(shell)}
@@ -45,5 +62,9 @@
 <style>
 	.red {
 		color: #ff323d;
+	}
+
+	.white {
+		color: #ffffff;
 	}
 </style>
