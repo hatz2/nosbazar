@@ -377,6 +377,11 @@ export enum ConstStringKey {
 	ShellExceptSticks = 2984,
 	ShellSticksOnly = 2985,
 	ShellMainWeaponOnly = 2986,
+	ThisIsSomeoneElseWeapon = 2942,
+	CurrentShellLevel = 4966,
+	CarveRunes = 4491,
+	RuneSkills = 4518,
+	RunePowers = 4519
 }
 
 export const CellonOptionsConstStrings: Record<number, ConstStringKey> = {
@@ -436,7 +441,7 @@ export const WeaponShellOptionsConstStrings: Partial<Record<number, ConstStringK
 	45: ConstStringKey.ShellIgnorePvpWaterResistance,
 	46: ConstStringKey.ShellIgnorePvpLightResistance,
 	47: ConstStringKey.ShellIgnorePvpShadowResistance,
-	48: ConstStringKey.ShellSpRecoveryPerKill,
+	48: ConstStringKey.ShellSpRecoveryPerKill
 };
 
 export const ArmorShellOptionsConstStrings: Partial<Record<number, ConstStringKey>> = {
@@ -481,7 +486,7 @@ export const ArmorShellOptionsConstStrings: Partial<Record<number, ConstStringKe
 	39: ConstStringKey.ShellImmuneToPvpFireDamage,
 	40: ConstStringKey.ShellImmuneToPvpWaterDamage,
 	41: ConstStringKey.ShellImmuneToPvpLightDamage,
-	42: ConstStringKey.ShellImmuneToPvpShadowDamage,
+	42: ConstStringKey.ShellImmuneToPvpShadowDamage
 };
 
 export const ShellQualifierKeys: Partial<Record<number, ConstStringKey>> = {
@@ -490,5 +495,5 @@ export const ShellQualifierKeys: Partial<Record<number, ConstStringKey>> = {
 	17: ConstStringKey.ShellSticksOnly,
 	31: ConstStringKey.ShellMainWeaponOnly,
 	32: ConstStringKey.ShellMainWeaponOnly,
-	33: ConstStringKey.ShellMainWeaponOnly,
+	33: ConstStringKey.ShellMainWeaponOnly
 };

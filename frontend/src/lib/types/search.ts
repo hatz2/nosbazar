@@ -38,6 +38,9 @@ interface WeaponData {
 	price: number;
 	shell_count: number;
 	shells: ShellEffect[];
+	runes: RuneEffect[];
+	owner_id: number;
+	display_runes_count: number;
 }
 
 export interface MeleeWeaponData extends WeaponData {
@@ -70,6 +73,9 @@ export interface ArmourData {
 	dodge: number;
 	price: number;
 	shells: ShellEffect[];
+	runes: RuneEffect[];
+	display_runes_count: number;
+	owner_id: number;
 }
 
 interface EquipmentData {
@@ -223,6 +229,14 @@ export interface ShellData {
 	rare: number;
 	price: number;
 	shell_options: ShellOptionData[];
+}
+
+export interface RuneEffect {
+	bcard_vnum: number;
+	bcard_sub: number;
+	bcard_value_1: number;
+	bcard_value_2: number;
+	upgrade: number;
 }
 
 export type NoData = Record<string, never>;
