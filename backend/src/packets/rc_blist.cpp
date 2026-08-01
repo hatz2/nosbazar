@@ -108,7 +108,7 @@ namespace nosbazar::packets {
 		price = strings::token<int>(item_data, data_separator);
 		unknown_1 = strings::token<int>(item_data, data_separator);
 		unknown_2 = strings::token<int>(item_data, data_separator);
-		unknown_3 = strings::token<int>(item_data, data_separator);
+		owner_id = strings::token<int>(item_data, data_separator);
 		shell_count = strings::token<int>(item_data, data_separator);
 		unknown_4 = strings::token<int>(item_data, data_separator);
 
@@ -118,7 +118,16 @@ namespace nosbazar::packets {
 			shells.emplace_back(ShellEffect(shell_effect_data));
 		}
 
-		unknown_5 = strings::token<int>(item_data, data_separator);
+		display_runes_count = strings::token<int>(item_data, data_separator);
+		unknown_6 = strings::token<int>(item_data, data_separator);
+		runes_count = strings::token<int>(item_data, data_separator);
+		runes.reserve(runes_count);
+		for (int i = 0; i < runes_count; ++i) {
+			std::string_view rune_effect_data = strings::token<std::string_view>(item_data, data_separator);
+			runes.emplace_back(RuneEffect(rune_effect_data));
+		}
+
+		unknown_7 = strings::token<int>(item_data, data_separator);
 	}
 
 	nlohmann::json RcBlist::ArmourData::json() const
@@ -134,6 +143,8 @@ namespace nosbazar::packets {
 			{ "magic_defence", magic_defence },
 			{ "dodge", dodge },
 			{ "price", price },
+			{ "owner_id", owner_id },
+			{ "display_runes_count", display_runes_count },
 		};
 
 		nlohmann::json json_shells = nlohmann::json::array();
@@ -142,6 +153,13 @@ namespace nosbazar::packets {
 		}
 
 		result["shells"] = json_shells;
+
+		nlohmann::json json_runes = nlohmann::json::array();
+		for (const RuneEffect& rune : runes) {
+			json_runes.push_back(rune.json());
+		}
+
+		result["runes"] = json_runes;
 
 		return result;
 	}

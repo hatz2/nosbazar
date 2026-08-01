@@ -131,11 +131,15 @@ namespace nosbazar::packets {
 			int price{};
 			int unknown_1{};
 			int unknown_2{};
-			int unknown_3{};
+			int owner_id{};
 			int shell_count{};
 			int unknown_4{};
 			std::vector<ShellEffect> shells;
-			int unknown_5{};
+			int display_runes_count{};
+			int unknown_6{};
+			int runes_count{};
+			std::vector<RuneEffect> runes;
+			int unknown_7{};
 
 			ArmourData() = default;
 			ArmourData(std::string_view item_data);
