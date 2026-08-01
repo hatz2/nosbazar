@@ -2,7 +2,7 @@ import type { LanguageCode } from '$lib/stores/lang.svelte';
 import type { ConstStringKey } from '$lib/types/constStringKeys';
 import { lang } from '$lib/stores/lang.svelte';
 
-const ALL_LANGS: LanguageCode[] = ['ES', 'UK', 'FR', 'DE', 'TR', 'IT', 'RU', 'PL', 'CZ'];
+const ALL_LANGS: LanguageCode[] = ['ES', 'UK', 'FR', 'DE', 'TR', 'IT', 'PL', 'CZ'];
 const cache: Record<number, Record<LanguageCode, string> | undefined> = $state({});
 
 function emptyTranslations(): Record<LanguageCode, string> {

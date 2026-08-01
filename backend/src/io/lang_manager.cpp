@@ -119,7 +119,7 @@ namespace nosbazar::io {
 		lang_files.emplace(Language::german, std::make_unique<LangFile>(Language::german));
 		lang_files.emplace(Language::turkish, std::make_unique<LangFile>(Language::turkish));
 		lang_files.emplace(Language::italian, std::make_unique<LangFile>(Language::italian));
-		lang_files.emplace(Language::russian, std::make_unique<LangFile>(Language::russian));
+		//lang_files.emplace(Language::russian, std::make_unique<LangFile>(Language::russian));
 		lang_files.emplace(Language::polish, std::make_unique<LangFile>(Language::polish));
 		lang_files.emplace(Language::czech, std::make_unique<LangFile>(Language::czech));
 	}

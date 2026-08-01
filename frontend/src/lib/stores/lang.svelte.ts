@@ -1,5 +1,5 @@
 // Available languages based on backend LangManager
-export type LanguageCode = 'ES' | 'UK' | 'FR' | 'DE' | 'TR' | 'IT' | 'RU' | 'PL' | 'CZ';
+export type LanguageCode = 'ES' | 'UK' | 'FR' | 'DE' | 'TR' | 'IT' | 'PL' | 'CZ';
 
 const savedLang =
 	typeof localStorage !== 'undefined'

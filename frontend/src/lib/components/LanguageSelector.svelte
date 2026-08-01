@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { lang} from '$lib/stores/lang.svelte';
+	import { lang } from '$lib/stores/lang.svelte';
 
 	// Sync to localStorage when language changes
 	$effect(() => {
@@ -16,7 +16,6 @@
 		<option value="DE">German</option>
 		<option value="TR">Turkish</option>
 		<option value="IT">Italian</option>
-		<option value="RU">Russian</option>
 		<option value="PL">Polish</option>
 		<option value="CZ">Czech</option>
 	</select>
