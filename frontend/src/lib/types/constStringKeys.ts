@@ -378,6 +378,7 @@ export enum ConstStringKey {
 	ShellSticksOnly = 2985,
 	ShellMainWeaponOnly = 2986,
 	ThisIsSomeoneElseWeapon = 2942,
+	ThisIsSomeoneElseArmour = 2994,
 	CurrentShellLevel = 4966,
 	CarveRunes = 4491,
 	RuneSkills = 4518,

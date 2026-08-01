@@ -20,6 +20,7 @@
 	import {
 		get_display_icon_id,
 		isAccessory,
+		isArmour,
 		itemHasFlagsToDisplay,
 		shouldShowDescription,
 		shouldShowFlags
@@ -228,7 +229,10 @@
 		{/if}
 
 		{#if 'owner_id' in item.data && item.data.owner_id != 0}
-			<p class="red">{get_const_string(ConstStringKey.ThisIsSomeoneElseWeapon)}</p>
+			{#if isArmour(item.data)}
+				<p class="red">{get_const_string(ConstStringKey.ThisIsSomeoneElseArmour)}</p>
+			{:else}
+				<p class="red">{get_const_string(ConstStringKey.ThisIsSomeoneElseWeapon)}</p>{/if}
 		{/if}
 
 		<ItemShellSection {item} />
