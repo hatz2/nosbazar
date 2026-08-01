@@ -49,7 +49,16 @@ namespace nosbazar::packets {
 			shells.emplace_back(ShellEffect(shell_effect_data));
 		}
 
+		display_runes_count = strings::token<int>(item_data, data_separator);
 		unknown_7 = strings::token<int>(item_data, data_separator);
+		runes_count = strings::token<int>(item_data, data_separator);
+		runes.reserve(runes_count);
+		for (int i = 0; i < runes_count; ++i) {
+			std::string_view rune_effect_data = strings::token<std::string_view>(item_data, data_separator);
+			runes.emplace_back(RuneEffect(rune_effect_data));
+		}
+
+		unknown_8 = strings::token<int>(item_data, data_separator);
 	}
 
 	nlohmann::json RcBlist::WeaponData::json() const
@@ -63,7 +72,9 @@ namespace nosbazar::packets {
 			{ "min_dmg", min_dmg },
 			{ "max_dmg", max_dmg },
 			{ "price", price },
-			{ "shell_count", shell_count }
+			{ "shell_count", shell_count },
+			{ "owner_id", owner_id},
+			{ "display_runes_count", display_runes_count}
 		};
 
 		nlohmann::json json_shells = nlohmann::json::array();
@@ -72,6 +83,13 @@ namespace nosbazar::packets {
 		}
 
 		result["shells"] = json_shells;
+
+		nlohmann::json json_runes = nlohmann::json::array();
+		for (const RuneEffect& rune : runes) {
+			json_runes.push_back(rune.json());
+		}
+
+		result["runes"] = json_runes;
 
 		return result;
 	}
@@ -777,6 +795,26 @@ namespace nosbazar::packets {
 			{"price", price},
 			{"shell_options", json_options},
 			{"do_not_show_description", true},
+		};
+	}
+
+	RcBlist::RuneEffect::RuneEffect(std::string_view item_data)
+	{
+		bcard_vnum = strings::token<int>(item_data, shell_separator);
+		bcard_sub = strings::token<int>(item_data, shell_separator);
+		bcard_value_1 = strings::token<int>(item_data, shell_separator);
+		bcard_value_2 = strings::token<int>(item_data, shell_separator);
+		upgrade = strings::token<int>(item_data, shell_separator);
+	}
+
+	nlohmann::json RcBlist::RuneEffect::json() const
+	{
+		return {
+			{"bcard_vnum", bcard_vnum},
+			{"bcard_sub", bcard_sub},
+			{"bcard_value_1", bcard_value_1},
+			{"bcard_value_2", bcard_value_2},
+			{"upgrade", upgrade}
 		};
 	}
 

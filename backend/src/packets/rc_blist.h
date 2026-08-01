@@ -55,6 +55,19 @@ namespace nosbazar::packets {
 			nlohmann::json json() const;
 		};
 
+		struct RuneEffect {
+			int bcard_vnum{};
+			int bcard_sub{};
+			int bcard_value_1{};
+			int bcard_value_2{};
+			int upgrade{};
+
+			RuneEffect() = default;
+			RuneEffect(std::string_view item_data);
+
+			nlohmann::json json() const;
+		};
+
 		struct WeaponData {
 			int vnum{};
 			int rare{};
@@ -75,7 +88,11 @@ namespace nosbazar::packets {
 			int shell_count{};
 			int unknown_6{};
 			std::vector<ShellEffect> shells;
+			int display_runes_count{};
 			int unknown_7{};
+			int runes_count{};
+			std::vector<RuneEffect> runes;
+			int unknown_8{};
 
 			WeaponData() = default;
 			WeaponData(std::string_view item_data);
