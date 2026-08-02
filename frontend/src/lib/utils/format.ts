@@ -6,7 +6,12 @@ import {
 	WeaponShellOptionsConstStrings,
 	ShellQualifierKeys
 } from '$lib/types/constStringKeys';
-import type { CellonOption, ShellEffect, ShellOptionData, EnrichedSearchResult } from '$lib/types/search';
+import type {
+	CellonOption,
+	ShellEffect,
+	ShellOptionData,
+	EnrichedSearchResult
+} from '$lib/types/search';
 import { WeaponShellOption, ArmorShellOption, RequiredClass, Element } from '$lib/types/enums';
 
 export function formatString(template: string, ...args: (string | number)[]): string {
@@ -63,7 +68,7 @@ export const ShellGradeColor: Record<number, string> = {
 	21: '#FF7AB2',
 	22: '#FF7AB2',
 	23: '#FF7AB2',
-	24: '#FF7AB2',
+	24: '#FF7AB2'
 };
 
 const ShellGradeLabel: Record<number, string> = {
@@ -90,7 +95,19 @@ const ShellGradeLabel: Record<number, string> = {
 	21: 'C',
 	22: 'B',
 	23: 'A',
-	24: 'S',
+	24: 'S'
+};
+
+export const RarityLevelColor: Record<number, string> = {
+	0: '#F5C478',
+	1: '#C0BDFC',
+	2: '#72FF85',
+	3: '#91CDFF',
+	4: '#0EF902',
+	5: '#F8E2B3',
+	6: '#FEDD02',
+	7: '#B2F304',
+	8: '#FF5E00'
 };
 
 export function formatShellOptionString(shellOption: ShellOptionData): string {
@@ -168,7 +185,7 @@ const WeaponShellUpgradeBaseValue: Partial<Record<number, number>> = {
 	[WeaponShellOption.IgnorePvpShadowResistance]: 2,
 	[WeaponShellOption.SpRecoveryPerKill]: 2,
 	[WeaponShellOption.IncreasedAccuracy]: 2,
-	[WeaponShellOption.IncreasedConcentration]: 2,
+	[WeaponShellOption.IncreasedConcentration]: 2
 };
 
 const ArmorShellUpgradeBaseValue: Partial<Record<number, number>> = {
@@ -213,7 +230,7 @@ const ArmorShellUpgradeBaseValue: Partial<Record<number, number>> = {
 	[ArmorShellOption.ImmuneToPvpFireDamage]: 4,
 	[ArmorShellOption.ImmuneToPvpWaterDamage]: 4,
 	[ArmorShellOption.ImmuneToPvpLightDamage]: 4,
-	[ArmorShellOption.ImmuneToPvpShadowDamage]: 4,
+	[ArmorShellOption.ImmuneToPvpShadowDamage]: 4
 };
 
 function getShellUpgradeBonus(grade: number, vnum: number, upgrade: number): number {
@@ -222,9 +239,7 @@ function getShellUpgradeBonus(grade: number, vnum: number, upgrade: number): num
 	return upgrade * baseValue;
 }
 
-export function formatAppliedShellEffectString(
-	shellEffect: ShellEffect
-): string {
+export function formatAppliedShellEffectString(shellEffect: ShellEffect): string {
 	const base = formatShellOptionString(shellEffect);
 	if (shellEffect.upgrade === 0) {
 		return base;

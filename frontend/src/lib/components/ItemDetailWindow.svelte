@@ -15,7 +15,8 @@
 		formatString,
 		get_required_class_string,
 		get_required_level,
-		get_element
+		get_element,
+		RarityLevelColor
 	} from '$lib/utils/format';
 	import {
 		get_display_icon_id,
@@ -106,6 +107,14 @@
 		fetchConstString(ConstStringKey.PartnerLightResBonus);
 		fetchConstString(ConstStringKey.PartnerShadowResBonus);
 	});
+
+	function getRarityColor(item: EnrichedSearchResult): string {
+		if ('rare' in item.data) {
+			return RarityLevelColor[item.data.rare];
+		} else {
+			return RarityLevelColor[0];
+		}
+	}
 </script>
 
 <DetailWindow {left} {top} {onclose} iconId={get_display_icon_id(item)}>
@@ -113,8 +122,11 @@
 
 	<!-- Name -->
 	<div class="body-text">
-		<p class="light-orange">
+		<p style="color: {getRarityColor(item)}">
 			{item.item_name[lang.current]}
+			{#if 'upgrade' in item.data && item.data.upgrade !== 0}
+				+{item.data.upgrade}
+			{/if}
 			{#if 'fairy_level_percent' in item.data}
 				<br />{get_const_string(ConstStringKey.Attribute)}: {get_element(item)}<br />
 				{formatString(
