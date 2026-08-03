@@ -98,6 +98,69 @@ const ShellGradeLabel: Record<number, string> = {
 	24: 'S'
 };
 
+const WeaponTypeConstStrings: Partial<Record<number, ConstStringKey>> = {
+	0: ConstStringKey.GeneralWeapon,
+	1: ConstStringKey.OneHandedSword,
+	3: ConstStringKey.Dagger,
+	4: ConstStringKey.Claw,
+	5: ConstStringKey.CrossbowAndCatapult,
+	6: ConstStringKey.ShortBow,
+	8: ConstStringKey.SpellGun,
+	9: ConstStringKey.Wand,
+	11: ConstStringKey.Shield,
+	12: ConstStringKey.PartnersWeapon
+};
+
+const ArmourTypeConstStrings: Partial<Record<number, ConstStringKey>> = {
+	0: ConstStringKey.GeneralCostumes,
+	1: ConstStringKey.SpiritSpeciesCostumes,
+	2: ConstStringKey.DexteritySpeciesCostumes,
+	3: ConstStringKey.BodySpeciesCostumes,
+	4: ConstStringKey.PartnerCostume
+};
+
+const EquipmentTypeConstStrings: Partial<Record<number, ConstStringKey>> = {
+	0: ConstStringKey.Hat,
+	1: ConstStringKey.FashionAccessories,
+	2: ConstStringKey.Glove,
+	3: ConstStringKey.Shoes,
+	4: ConstStringKey.CostumeDress,
+	5: ConstStringKey.CostumeHat
+};
+
+const ShellTypeConstStrings: Partial<Record<number, ConstStringKey>> = {
+	0: ConstStringKey.ForWeapons,
+	1: ConstStringKey.ForClothes
+};
+
+const MainTypeConstStrings: Partial<Record<number, ConstStringKey>> = {
+	0: ConstStringKey.GeneralItems,
+	1: ConstStringKey.EquipmentSetting,
+	2: ConstStringKey.ProducingItems,
+	4: ConstStringKey.HealingPotion,
+	5: ConstStringKey.Event,
+	6: ConstStringKey.Titles
+};
+
+const EquipTypeConstStrings: Partial<Record<number, Partial<Record<number, ConstStringKey>>>> = {
+	0: WeaponTypeConstStrings,
+	1: ArmourTypeConstStrings,
+	2: EquipmentTypeConstStrings,
+	6: ShellTypeConstStrings
+};
+
+export function get_item_type_string(item: EnrichedSearchResult): string {
+	const static_data = item.static_data;
+	if (!static_data) return '';
+	let key: ConstStringKey | undefined;
+	if (static_data.inventory_tab === 1) {
+		key = MainTypeConstStrings[static_data.item_type];
+	} else {
+		key = EquipTypeConstStrings[static_data.item_type]?.[static_data.item_subtype];
+	}
+	return key === undefined ? '' : get_const_string(key);
+}
+
 export const RarityLevelColor: Record<number, string> = {
 	0: '#F5C478',
 	1: '#C0BDFC',

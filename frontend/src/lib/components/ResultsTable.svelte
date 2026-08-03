@@ -5,6 +5,8 @@
 	import { onMount } from 'svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
 	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
+	import Tooltip from './Tooltip.svelte';
+	import TooltipContent from './TooltipContent.svelte';
 
 	type Props = {
 		results: EnrichedSearchResult[];
@@ -50,15 +52,24 @@
 		{#if results.length > 0}
 			{#each results as item, i (i)}
 				<tr>
-					<td class="name-cell"
-						><!-- svelte-ignore a11y_no_static_element_interactions --><span
+					<td class="name-cell">
+						<!-- svelte-ignore a11y_no_static_element_interactions --><span
 							oncontextmenu={(e) => {
 								e.preventDefault();
 								onContextMenu?.(item, e);
 							}}
-							style="cursor: pointer"><ItemIcon iconId={get_display_icon_id(item)} /></span
-						>{item.item_name[lang.current] || item.item_name['UK'] || item.item_vnum.toString()}</td
-					>
+							style="cursor: pointer"
+						>
+							<Tooltip>
+								<ItemIcon iconId={get_display_icon_id(item)} />
+								{#snippet tooltipText()}
+									<TooltipContent {item}></TooltipContent>
+								{/snippet}
+							</Tooltip>
+						</span>{item.item_name[lang.current] ||
+							item.item_name['UK'] ||
+							item.item_vnum.toString()}
+					</td>
 					<td>{item.amount}</td>
 					<td>{item.bazar_price.toLocaleString('en-US')}</td>
 					<td>{formatTime(item.minutes_left)}</td>

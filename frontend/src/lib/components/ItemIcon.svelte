@@ -14,6 +14,7 @@
 			width={32}
 			height={32}
 			class="orange-outline"
+			draggable="false"
 		/>
 	</span>
 {/if}

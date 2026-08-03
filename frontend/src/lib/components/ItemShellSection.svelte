@@ -7,23 +7,13 @@
 	} from '$lib/utils/format';
 	import { get_const_string } from '$lib/services/constStringService.svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
-	import { isShellData } from '$lib/types/search';
+	import { getCurrentShellLevel, isShellData } from '$lib/types/search';
 
 	type Props = {
 		item: EnrichedSearchResult;
 	};
 
 	let { item }: Props = $props();
-
-	function getCurrentShellLevel(item: EnrichedSearchResult) {
-		let level = 0;
-		if ('shells' in item.data) {
-			item.data.shells.forEach((shell) => {
-				level += Math.abs(shell.upgrade);
-			});
-		}
-		return level;
-	}
 
 	let shell_level = $derived(getCurrentShellLevel(item));
 </script>

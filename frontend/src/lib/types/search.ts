@@ -348,3 +348,13 @@ export function get_display_icon_id(item: EnrichedSearchResult): number {
 	}
 	return item.contained_item_static_data?.icon_id ?? item.static_data?.icon_id ?? 0;
 }
+
+export function getCurrentShellLevel(item: EnrichedSearchResult): number {
+	let level = 0;
+	if ('shells' in item.data) {
+		item.data.shells.forEach((shell) => {
+			level += Math.abs(shell.upgrade);
+		});
+	}
+	return level;
+}
