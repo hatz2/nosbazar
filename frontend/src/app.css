@@ -6,8 +6,16 @@ body {
     font-style: normal;
     font-weight: normal;
     font-variant: normal;
+    background-color: #AEAEB2;
 }
 
 .orange-outline:hover {
     outline: solid 1px #f6b626;
+}
+
+.gray-panel {
+    background-color: #4b5665;
+    border: 1px solid #788496;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px #001818;
 }

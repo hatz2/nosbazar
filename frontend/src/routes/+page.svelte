@@ -19,7 +19,7 @@
 		display: flex;
 		justify-content: flex-start;
 		padding: 0.5rem 1rem;
-		background: #ffffff;
+		/* background: #ffffff; */
 		border-bottom: 1px solid #e5e7eb;
 	}
 

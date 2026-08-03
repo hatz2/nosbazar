@@ -27,8 +27,7 @@
 		left: 0;
 		bottom: calc(100% + 0px);
 
-		/* background: #222; */
-		background: rgba(27, 27, 27, 0.9);
+		background: rgba(10, 10, 10, 0.9);
 		color: white;
 		padding: 6px 10px;
 		white-space: nowrap;

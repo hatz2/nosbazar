@@ -58,7 +58,7 @@
 								e.preventDefault();
 								onContextMenu?.(item, e);
 							}}
-							style="cursor: pointer"
+							style="cursor: pointer;"
 						>
 							<Tooltip>
 								<ItemIcon iconId={get_display_icon_id(item)} />
@@ -88,16 +88,38 @@
 <style>
 	table {
 		width: 100%;
-		border: 1px solid red;
-		border-collapse: collapse;
+		margin: 5px 0 5px 0;
+		color: white;
+
+		border: 1px solid #606467;
+		border-radius: 4px;
+		border-collapse: separate;
+		box-shadow: 0 0 0 1px #111517;
+		background-color: #111517;
+		border-spacing: 0;
 	}
 
 	thead {
-		border: 1px solid green;
+		box-shadow: inset 0 -1px 0 #606467;
 	}
 
-	td {
+	thead th {
+		font-weight: normal;
+	}
+
+	tbody td {
 		text-align: center;
+		border-bottom: 1px solid #353a40;
+		background: linear-gradient(#1f1f1f 0% #030303 99% #141414 100%);
+	}
+
+	tbody tr:hover {
+		outline: 1px solid white;
+		border-radius: 2px;
+	}
+
+	tbody tr:last-child td {
+		border-bottom: none;
 	}
 
 	.name-cell {
@@ -107,5 +129,11 @@
 	p {
 		text-align: center;
 		font-size: large;
+		color: white;
+		text-shadow:
+			-1px -1px black,
+			-1px 1px black,
+			1px 1px black,
+			1px -1px black;
 	}
 </style>

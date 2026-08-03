@@ -7,7 +7,6 @@
 	import {
 		get_item_type_string,
 		get_required_class_string,
-		get_required_level,
 		RarityLevelColor
 	} from '$lib/utils/format';
 

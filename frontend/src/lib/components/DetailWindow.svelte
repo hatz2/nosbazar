@@ -31,8 +31,10 @@
 
 <style>
 	.window {
-		border: 1px solid gray;
-		background: rgba(27, 27, 27, 0.9);
+		border: 1px solid #828282;
+		border-radius: 4px;
+		background: rgba(15, 15, 15, 0.9);
+		box-shadow: 0 0 2px 2px rgba(15, 15, 15, 0.9);
 		padding: 0.5rem;
 		width: 300px;
 		text-align: center;

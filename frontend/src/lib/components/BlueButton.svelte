@@ -7,12 +7,12 @@
 </button>
 
 <style>
-	/* .blue-btn {
+	.blue-btn {
 		color: #dcecff;
 		background: linear-gradient(#5aa8d8 0%, #5aa8d8 10%, #3475be 25%, #3475be 85%, #588dc9 100%);
 		border: 1px solid #0e2752;
-		border-radius: 8px;
-		padding: 7px 15px;
+		border-radius: 6px;
+		padding: 5px 0px;
 		text-shadow:
 			2px 0 #1052c6,
 			-2px 0 #1052c6,
@@ -29,6 +29,11 @@
 	}
 
 	.blue-btn:active {
-		background: linear-gradient(#296fbe 0%, #296fbe 90%, #4ba2d8 100%);
-	} */
+		background: linear-gradient(#588dc9 0%, #3475be 15%, #3475be 75%, #5aa8d8 90%, #7dcdf8 100%);
+	}
+
+	.blue-btn:disabled {
+		color: #848aa2;
+		background: linear-gradient(#588dc9 0%, #3475be 15%, #3475be 75%, #5aa8d8 90%, #7dcdf8 100%);
+	}
 </style>

@@ -11,8 +11,6 @@
 		<img
 			src="http://localhost:8080/icon/{iconId}"
 			alt="Item icon"
-			width={32}
-			height={32}
 			class="orange-outline"
 			draggable="false"
 		/>
@@ -26,12 +24,17 @@
 		justify-content: center;
 		vertical-align: middle;
 		margin-right: 6px;
-		width: 32px;
-		height: 32px;
+		width: 36px;
+		height: 36px;
+		background-color: #12171b;
+		border: 1px solid #6d6e6d;
+		box-shadow: 0 0 0 1px #12171b;
+		border-radius: 2px;
 	}
 
 	img {
 		display: block;
-		image-rendering: pixelated;
+		max-width: 36px;
+		max-height: 36px;
 	}
 </style>

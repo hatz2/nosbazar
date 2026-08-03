@@ -133,10 +133,8 @@
 						(isPetBeadItem(item.data) && item.data.has_pet_inside);
 					const containedData = containsData
 						? (itemService.getSync(
-								isPartnerSpecialistItem(item.data)
-									? item.data.partner_sp_vnum
-									: item.data.vnum
-						  ) ?? undefined)
+								isPartnerSpecialistItem(item.data) ? item.data.partner_sp_vnum : item.data.vnum
+							) ?? undefined)
 						: undefined;
 					const containedMonsterData =
 						isPetBeadItem(item.data) && item.data.has_pet_inside
@@ -189,54 +187,61 @@
 <!-- <Draggable left={200} top={200}> -->
 <div class="content">
 	<TitleBar title={get_const_string(ConstStringKey.NosBazar)}></TitleBar>
-	<Toolbar>
-		<span>{get_const_string(ConstStringKey.Name)}</span>
-		<span>{get_const_string(ConstStringKey.Category)}</span>
-		<span></span>
-		<span></span>
 
-		<input type="text" />
-		<Category bind:value={category}></Category>
-		<SubCategory bind:value={subCategory} {category}></SubCategory>
-		<BlueButton text="Search" onclick={on_search_clicked} disabled={isCooldown}></BlueButton>
+	<div class="content-body">
+		<Toolbar>
+			<span class="category_label">{get_const_string(ConstStringKey.Name)}</span>
+			<span class="category_label">{get_const_string(ConstStringKey.Category)}</span>
+			<span></span>
+			<span></span>
 
-		<span>{get_const_string(ConstStringKey.Level)}</span>
-		<span>{get_const_string(ConstStringKey.RarityLevel)}</span>
-		<span>{get_const_string(ConstStringKey.UpgradeLevel)}</span>
-		<span>{get_const_string(ConstStringKey.SortBy)}</span>
+			<input type="text" />
+			<Category bind:value={category}></Category>
+			<SubCategory bind:value={subCategory} {category}></SubCategory>
+			<BlueButton
+				text={get_const_string(ConstStringKey.Search)}
+				onclick={on_search_clicked}
+				disabled={isCooldown}
+			></BlueButton>
 
-		<LevelCategory bind:value={level} {category}></LevelCategory>
-		<RarityLevelCategory bind:value={rarityLevel} {category}></RarityLevelCategory>
-		<UpgradeLevelCategory bind:value={upgradeLevel} {category}></UpgradeLevelCategory>
-		<SortByFilter bind:value={order}></SortByFilter>
-	</Toolbar>
+			<span class="category_label">{get_const_string(ConstStringKey.Level)}</span>
+			<span class="category_label">{get_const_string(ConstStringKey.RarityLevel)}</span>
+			<span class="category_label">{get_const_string(ConstStringKey.UpgradeLevel)}</span>
+			<span class="category_label">{get_const_string(ConstStringKey.SortBy)}</span>
 
-	<ResultsTable
-		{results}
-		onContextMenu={(item, e) => {
-			openWindows = [
-				...openWindows,
-				{
-					item,
-					left: e.pageX + 35,
-					top: e.pageY - 20,
-					id: nextWindowId++
-				}
-			];
-		}}
-	/>
+			<LevelCategory bind:value={level} {category}></LevelCategory>
+			<RarityLevelCategory bind:value={rarityLevel} {category}></RarityLevelCategory>
+			<UpgradeLevelCategory bind:value={upgradeLevel} {category}></UpgradeLevelCategory>
+			<SortByFilter bind:value={order}></SortByFilter>
+		</Toolbar>
 
-	<div class="pagination">
-		<BlueButton text="< Previous" onclick={go_previous_page} disabled={isCooldown} />
-		<input
-			type="number"
-			bind:value={pageIndex}
-			min="0"
-			onchange={() => do_search()}
-			class="page-input"
-			disabled={isCooldown}
+		<ResultsTable
+			{results}
+			onContextMenu={(item, e) => {
+				openWindows = [
+					...openWindows,
+					{
+						item,
+						left: e.pageX + 35,
+						top: e.pageY - 20,
+						id: nextWindowId++
+					}
+				];
+			}}
 		/>
-		<BlueButton text="Next >" onclick={go_next_page} disabled={isCooldown} />
+
+		<div class="pagination gray-panel">
+			<button onclick={go_previous_page} disabled={isCooldown}>&lt</button>
+			<input
+				type="number"
+				bind:value={pageIndex}
+				min="0"
+				onchange={() => do_search()}
+				class="page-input"
+				disabled={isCooldown}
+			/>
+			<button onclick={go_next_page} disabled={isCooldown}>&gt</button>
+		</div>
 	</div>
 </div>
 
@@ -261,10 +266,16 @@
 
 <style>
 	.content {
-		margin-top: 0;
 		padding-top: 0;
-		border: 1px solid gray;
-		max-width: 800px;
+		max-width: 725px;
+		background-color: #373d42;
+		box-shadow: 0 0 10px 2px #373d42;
+		align-self: center;
+		margin: 10px;
+	}
+
+	.content-body {
+		padding: 5px;
 	}
 
 	.pagination {
@@ -278,5 +289,14 @@
 	.pagination .page-input {
 		width: 50px;
 		text-align: center;
+	}
+
+	.category_label {
+		color: white;
+		text-shadow:
+			-1px -1px 0 black,
+			1px -1px 0 black,
+			-1px 1px 0 black,
+			1px 1px 0 black;
 	}
 </style>
