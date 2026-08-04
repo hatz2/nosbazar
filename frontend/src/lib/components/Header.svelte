@@ -30,30 +30,54 @@
 </script>
 
 <header class="top-bar">
-	<h1 class="app-title">NosBazar</h1>
-	<div class="spacer"></div>
-	<ServerSelector bind:value={server} />
-	<LanguageSelector />
-	<nav class="links">
-		{#each links as link (link.name)}
-			<HeaderButton href={link.href} label={link.name} iconPath={link.iconPath} />
-		{/each}
-	</nav>
+	<div class="top-row">
+		<div class="brand">
+			<h1 class="app-title">NosBazar</h1>
+			<p class="app-subtitle">Online bazar search for the MMORPG NosTale</p>
+		</div>
+		<div class="spacer"></div>
+		<nav class="links">
+			{#each links as link (link.name)}
+				<HeaderButton href={link.href} label={link.name} iconPath={link.iconPath} />
+			{/each}
+		</nav>
+		<ServerSelector bind:value={server} />
+		<LanguageSelector />
+	</div>
 </header>
 
 <style>
 	.top-bar {
 		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 1rem;
+		padding-bottom: 5rem;
+		background: linear-gradient(
+			rgba(47, 47, 47, 1) 0%,
+			rgba(47, 47, 47, 0.8) 50%,
+			rgba(47, 47, 47, 0.8) 50%,
+			rgba(27, 27, 27, 0) 100%
+		);
+		/* border-bottom: 1px solid #0a0a0a; */
+	}
+
+	.top-row {
+		display: flex;
 		align-items: center;
 		gap: 0.75rem;
-		padding: 0.5rem 1rem;
-		background: linear-gradient(#2f2f2f, #1b1b1b);
-		border-bottom: 1px solid #0a0a0a;
+		width: 100%;
+	}
+
+	.brand {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
 	}
 
 	.app-title {
 		margin: 0;
-		font-size: 1rem;
+		font-size: 1.5rem;
 		font-weight: bold;
 		color: #ffffff;
 		text-shadow:
@@ -67,6 +91,12 @@
 			-1px 1px #0d0d0d;
 	}
 
+	.app-subtitle {
+		margin: 0;
+		font-size: 0.9rem;
+		color: #9a9a9a;
+	}
+
 	.spacer {
 		flex: 1;
 	}
@@ -74,6 +104,6 @@
 	.links {
 		display: flex;
 		align-items: center;
-		gap: 0.4rem;
+		gap: 0.5rem;
 	}
 </style>
