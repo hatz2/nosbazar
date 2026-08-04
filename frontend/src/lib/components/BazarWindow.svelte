@@ -231,7 +231,7 @@
 		/>
 
 		<div class="pagination gray-panel">
-			<button onclick={go_previous_page} disabled={isCooldown}>&lt</button>
+			<button onclick={go_previous_page} disabled={isCooldown}>◀</button>
 			<input
 				type="number"
 				bind:value={pageIndex}
@@ -240,7 +240,7 @@
 				class="page-input"
 				disabled={isCooldown}
 			/>
-			<button onclick={go_next_page} disabled={isCooldown}>&gt</button>
+			<button onclick={go_next_page} disabled={isCooldown}>▶</button>
 		</div>
 	</div>
 </div>
@@ -328,5 +328,29 @@
 	input[type='number'] {
 		appearance: textfield;
 		-moz-appearance: textfield;
+	}
+
+	button {
+		background-color: transparent;
+		border: none;
+		color: #6ebce2;
+		text-shadow:
+			2px 2px 2px #001d41,
+			-2px 2px 2px #001d41;
+		font-size: x-large;
+	}
+
+	button:hover {
+		background-color: transparent;
+		border: none;
+		color: #a5d6ee;
+	}
+
+	button:disabled {
+		color: #3e667b;
+	}
+
+	button:active {
+		color: #487891;
 	}
 </style>
