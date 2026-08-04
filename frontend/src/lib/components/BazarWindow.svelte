@@ -36,6 +36,18 @@
 		id: number;
 	};
 
+	type Anchor = 'left' | 'center' | 'right';
+
+	const ANCHOR_STORAGE_KEY = 'bazar-anchor';
+
+	function readAnchorFromStorage(): Anchor {
+		if (typeof localStorage === 'undefined') {
+			return 'center';
+		}
+		const value = localStorage.getItem(ANCHOR_STORAGE_KEY);
+		return value === 'left' || value === 'right' || value === 'center' ? value : 'center';
+	}
+
 	let { server = $bindable(1) } = $props();
 	let category = $state(BazarCategory.All);
 	let subCategory = $state(0);
@@ -47,6 +59,11 @@
 	let resultsPageIndex = $state(0);
 	let isCooldown = $state(false);
 	let isSearching = $state(false);
+	let anchor = $state<Anchor>(readAnchorFromStorage());
+
+	$effect(() => {
+		localStorage.setItem(ANCHOR_STORAGE_KEY, anchor);
+	});
 	let results = $state<EnrichedSearchResult[]>([]);
 	let openWindows = $state<OpenWindow[]>([]);
 
@@ -218,71 +235,98 @@
 </script>
 
 <!-- <Draggable left={200} top={200}> -->
-<div class="content">
-	<TitleBar title={get_const_string(ConstStringKey.NosBazar)}></TitleBar>
+<div
+	class="window-host"
+	class:anchor-left={anchor === 'left'}
+	class:anchor-right={anchor === 'right'}
+>
+	<div class="content">
+		<TitleBar title={get_const_string(ConstStringKey.NosBazar)}>
+			<div class="anchor-group">
+				<button
+					class="anchor-btn"
+					class:active={anchor === 'left'}
+					title="Left"
+					onclick={() => (anchor = 'left')}>◀</button
+				>
+				<button
+					class="anchor-btn"
+					class:active={anchor === 'center'}
+					title="Center"
+					onclick={() => (anchor = 'center')}>◉</button
+				>
+				<button
+					class="anchor-btn"
+					class:active={anchor === 'right'}
+					title="Right"
+					onclick={() => (anchor = 'right')}>▶</button
+				>
+			</div>
+		</TitleBar>
 
-	<div class="content-body">
-		<Toolbar>
-			<span class="category_label">{get_const_string(ConstStringKey.Name)}</span>
-			<span class="category_label">{get_const_string(ConstStringKey.Category)}</span>
-			<span></span>
-			<span></span>
+		<div class="content-body">
+			<Toolbar>
+				<span class="category_label">{get_const_string(ConstStringKey.Name)}</span>
+				<span class="category_label">{get_const_string(ConstStringKey.Category)}</span>
+				<span></span>
+				<span></span>
 
-			<input type="text" />
-			<Category bind:value={category}></Category>
-			<SubCategory bind:value={subCategory} {category}></SubCategory>
-			<BlueButton
-				text={get_const_string(ConstStringKey.Search)}
-				onclick={on_search_clicked}
-				disabled={isCooldown}
-			></BlueButton>
+				<input type="text" />
+				<Category bind:value={category}></Category>
+				<SubCategory bind:value={subCategory} {category}></SubCategory>
+				<BlueButton
+					text={get_const_string(ConstStringKey.Search)}
+					onclick={on_search_clicked}
+					disabled={isCooldown}
+				></BlueButton>
 
-			<span class="category_label">{get_const_string(ConstStringKey.Level)}</span>
-			<span class="category_label">{get_const_string(ConstStringKey.RarityLevel)}</span>
-			<span class="category_label">{get_const_string(ConstStringKey.UpgradeLevel)}</span>
-			<span class="category_label">{get_const_string(ConstStringKey.SortBy)}</span>
+				<span class="category_label">{get_const_string(ConstStringKey.Level)}</span>
+				<span class="category_label">{get_const_string(ConstStringKey.RarityLevel)}</span>
+				<span class="category_label">{get_const_string(ConstStringKey.UpgradeLevel)}</span>
+				<span class="category_label">{get_const_string(ConstStringKey.SortBy)}</span>
 
-			<LevelCategory bind:value={level} {category}></LevelCategory>
-			<RarityLevelCategory bind:value={rarityLevel} {category}></RarityLevelCategory>
-			<UpgradeLevelCategory bind:value={upgradeLevel} {category}></UpgradeLevelCategory>
-			<SortByFilter bind:value={order}></SortByFilter>
-		</Toolbar>
+				<LevelCategory bind:value={level} {category}></LevelCategory>
+				<RarityLevelCategory bind:value={rarityLevel} {category}></RarityLevelCategory>
+				<UpgradeLevelCategory bind:value={upgradeLevel} {category}></UpgradeLevelCategory>
+				<SortByFilter bind:value={order}></SortByFilter>
+			</Toolbar>
 
-		<ResultsTable
-			{results}
-			{visualIndex}
-			{isSearching}
-			onContextMenu={(item, e) => {
-				openWindows = [
-					...openWindows,
-					{
-						item,
-						left: e.pageX + 35,
-						top: e.pageY - 20,
-						id: nextWindowId++
-					}
-				];
-			}}
-		/>
-
-		<div class="pagination gray-panel">
-			<button onclick={go_previous_page}>◀</button>
-			<input
-				type="number"
-				bind:value={visualIndex}
-				min="1"
-				onchange={() => {
-					if (getPageIndex() !== resultsPageIndex && isCooldown) {
-						visualIndex = resultsPageIndex * BAZAR_PAGES_PER_SEARCH + 1;
-						return;
-					}
-					if (getPageIndex() !== resultsPageIndex) {
-						do_search();
-					}
+			<ResultsTable
+				{results}
+				{visualIndex}
+				{isSearching}
+				onContextMenu={(item, e) => {
+					openWindows = [
+						...openWindows,
+						{
+							item,
+							left: e.pageX + 35,
+							top: e.pageY - 20,
+							id: nextWindowId++
+						}
+					];
 				}}
-				class="page-input"
 			/>
-			<button onclick={go_next_page}>▶</button>
+
+			<div class="pagination gray-panel">
+				<button onclick={go_previous_page}>◀</button>
+				<input
+					type="number"
+					bind:value={visualIndex}
+					min="1"
+					onchange={() => {
+						if (getPageIndex() !== resultsPageIndex && isCooldown) {
+							visualIndex = resultsPageIndex * BAZAR_PAGES_PER_SEARCH + 1;
+							return;
+						}
+						if (getPageIndex() !== resultsPageIndex) {
+							do_search();
+						}
+					}}
+					class="page-input"
+				/>
+				<button onclick={go_next_page}>▶</button>
+			</div>
 		</div>
 	</div>
 </div>
@@ -307,12 +351,25 @@
 />
 
 <style>
+	.window-host {
+		display: flex;
+		width: 100%;
+		justify-content: center;
+	}
+
+	.window-host.anchor-left {
+		justify-content: flex-start;
+	}
+
+	.window-host.anchor-right {
+		justify-content: flex-end;
+	}
+
 	.content {
 		padding-top: 0;
 		max-width: 725px;
 		background-color: #373d42;
 		box-shadow: 0 0 10px 2px #373d42;
-		align-self: center;
 		margin: 10px;
 	}
 
@@ -394,5 +451,28 @@
 
 	button:active {
 		color: #487891;
+	}
+
+	.anchor-group {
+		display: flex;
+		gap: 4px;
+	}
+
+	.anchor-btn {
+		font-size: 14px;
+		line-height: 1;
+		padding: 1px 4px;
+		border: 1px solid transparent;
+		border-radius: 3px;
+	}
+
+	.anchor-btn:hover {
+		border: 1px solid #7c7c7c;
+		/* border-radius: 3px; */
+	}
+
+	.anchor-btn.active {
+		color: #dcecff;
+		border: 1px solid #6ebce2;
 	}
 </style>

@@ -1,11 +1,17 @@
 <script lang="ts">
-	let { title } = $props();
+	let { title, children } = $props();
 </script>
 
-<div class="title-bar">{title}</div>
+<div class="title-bar">
+	<span>{title}</span>
+	{@render children?.()}
+</div>
 
 <style>
 	.title-bar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		font-size: 18px;
 		color: white;
 		background: linear-gradient(
