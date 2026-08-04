@@ -370,7 +370,7 @@
 		max-width: 725px;
 		background-color: #373d42;
 		box-shadow: 0 0 10px 2px #373d42;
-		margin: 10px;
+		margin: 0;
 	}
 
 	.content-body {

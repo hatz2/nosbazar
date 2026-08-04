@@ -10,14 +10,14 @@
 	};
 
 	const languages: Language[] = [
-		{ code: 'ES', flagClass: 'es', name: 'Spanish' },
+		{ code: 'ES', flagClass: 'es', name: 'Español' },
 		{ code: 'UK', flagClass: 'gb', name: 'English' },
-		{ code: 'FR', flagClass: 'fr', name: 'French' },
-		{ code: 'DE', flagClass: 'de', name: 'German' },
-		{ code: 'TR', flagClass: 'tr', name: 'Turkish' },
-		{ code: 'IT', flagClass: 'it', name: 'Italian' },
-		{ code: 'PL', flagClass: 'pl', name: 'Polish' },
-		{ code: 'CZ', flagClass: 'cz', name: 'Czech' }
+		{ code: 'FR', flagClass: 'fr', name: 'Français' },
+		{ code: 'DE', flagClass: 'de', name: 'Deutsch' },
+		{ code: 'TR', flagClass: 'tr', name: 'Türkçe' },
+		{ code: 'IT', flagClass: 'it', name: 'Italiano' },
+		{ code: 'PL', flagClass: 'pl', name: 'Polski' },
+		{ code: 'CZ', flagClass: 'cz', name: 'Čeština' }
 	];
 
 	const current = $derived(languages.find((l) => l.code === lang.current) ?? languages[0]);

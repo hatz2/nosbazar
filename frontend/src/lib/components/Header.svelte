@@ -52,7 +52,7 @@
 		flex-direction: column;
 		gap: 0.5rem;
 		padding: 1rem;
-		padding-bottom: 5rem;
+		padding-bottom: 4rem;
 		background: linear-gradient(
 			rgba(47, 47, 47, 1) 0%,
 			rgba(47, 47, 47, 0.8) 50%,
