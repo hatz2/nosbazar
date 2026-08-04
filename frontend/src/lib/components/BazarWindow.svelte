@@ -27,6 +27,7 @@
 	import { onMount } from 'svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
 	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
+	import { BAZAR_PAGES_PER_SEARCH } from '$lib/constants';
 
 	type OpenWindow = {
 		item: EnrichedSearchResult;
@@ -42,10 +43,16 @@
 	let rarityLevel = $state(0);
 	let upgradeLevel = $state(0);
 	let order = $state(0);
-	let pageIndex = $state(0);
+	let visualIndex = $state(1);
+	let resultsPageIndex = $state(0);
 	let isCooldown = $state(false);
+	let isSearching = $state(false);
 	let results = $state<EnrichedSearchResult[]>([]);
 	let openWindows = $state<OpenWindow[]>([]);
+
+	function getPageIndex() {
+		return Math.floor((visualIndex - 1) / BAZAR_PAGES_PER_SEARCH);
+	}
 
 	// Reset category-dependent filters when category changes
 	$effect(() => {
@@ -54,7 +61,7 @@
 		level = 0;
 		rarityLevel = 0;
 		upgradeLevel = 0;
-		pageIndex = 0;
+		visualIndex = 1;
 	});
 
 	let nextWindowId = $state(0);
@@ -69,9 +76,17 @@
 		fetchConstString(ConstStringKey.Category);
 	});
 
-	async function do_search() {
-		if (isCooldown) return;
+	async function do_search(force = false) {
+		const index = getPageIndex();
+		if (!force && index === resultsPageIndex) {
+			return;
+		}
+		if (isCooldown) {
+			return;
+		}
 		isCooldown = true;
+		isSearching = true;
+		results = [];
 		try {
 			const response = await fetch('http://localhost:8080/search', {
 				method: 'POST',
@@ -79,7 +94,7 @@
 				body: JSON.stringify({
 					server,
 					filters: {
-						index: pageIndex,
+						index,
 						category,
 						sub_category: subCategory,
 						level,
@@ -92,7 +107,6 @@
 			});
 			const data = await response.json();
 			console.log(data);
-			pageIndex = data.page_index ?? pageIndex;
 			const rawItems = (data.items ?? []) as SearchResult[];
 
 			if (rawItems.length > 0) {
@@ -158,10 +172,12 @@
 			} else {
 				results = [];
 			}
+			resultsPageIndex = index;
 		} catch (e) {
 			console.error('Search failed', e);
 			results = [];
 		} finally {
+			isSearching = false;
 			setTimeout(() => {
 				isCooldown = false;
 			}, 3000);
@@ -169,18 +185,35 @@
 	}
 
 	async function on_search_clicked() {
-		pageIndex = 0;
-		await do_search();
+		visualIndex = 1;
+		await do_search(true);
 	}
 
 	function go_next_page() {
-		pageIndex++;
-		do_search();
+		const newVisual = visualIndex + 1;
+		const newIndex = Math.floor((newVisual - 1) / BAZAR_PAGES_PER_SEARCH);
+		if (newIndex !== resultsPageIndex && isCooldown) {
+			return;
+		}
+		visualIndex = newVisual;
+		if (newIndex !== resultsPageIndex) {
+			do_search();
+		}
 	}
 
 	function go_previous_page() {
-		if (pageIndex > 0) pageIndex--;
-		do_search();
+		if (visualIndex <= 1) {
+			return;
+		}
+		const newVisual = visualIndex - 1;
+		const newIndex = Math.floor((newVisual - 1) / BAZAR_PAGES_PER_SEARCH);
+		if (newIndex !== resultsPageIndex && isCooldown) {
+			return;
+		}
+		visualIndex = newVisual;
+		if (newIndex !== resultsPageIndex) {
+			do_search();
+		}
 	}
 </script>
 
@@ -217,6 +250,8 @@
 
 		<ResultsTable
 			{results}
+			{visualIndex}
+			{isSearching}
 			onContextMenu={(item, e) => {
 				openWindows = [
 					...openWindows,
@@ -231,16 +266,23 @@
 		/>
 
 		<div class="pagination gray-panel">
-			<button onclick={go_previous_page} disabled={isCooldown}>◀</button>
+			<button onclick={go_previous_page}>◀</button>
 			<input
 				type="number"
-				bind:value={pageIndex}
-				min="0"
-				onchange={() => do_search()}
+				bind:value={visualIndex}
+				min="1"
+				onchange={() => {
+					if (getPageIndex() !== resultsPageIndex && isCooldown) {
+						visualIndex = resultsPageIndex * BAZAR_PAGES_PER_SEARCH + 1;
+						return;
+					}
+					if (getPageIndex() !== resultsPageIndex) {
+						do_search();
+					}
+				}}
 				class="page-input"
-				disabled={isCooldown}
 			/>
-			<button onclick={go_next_page} disabled={isCooldown}>▶</button>
+			<button onclick={go_next_page}>▶</button>
 		</div>
 	</div>
 </div>

@@ -7,13 +7,21 @@
 	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
 	import Tooltip from './Tooltip.svelte';
 	import TooltipContent from './TooltipContent.svelte';
+	import { BAZAR_PAGES_PER_SEARCH, BAZAR_ROWS_PER_PAGE } from '$lib/constants';
 
 	type Props = {
 		results: EnrichedSearchResult[];
+		visualIndex: number;
+		isSearching: boolean;
 		onContextMenu?: (item: EnrichedSearchResult, event: MouseEvent) => void;
 	};
 
-	let { results, onContextMenu }: Props = $props();
+	let { results, visualIndex, isSearching, onContextMenu }: Props = $props();
+
+	const visibleResults = $derived.by(() => {
+		const visibleStart = ((visualIndex - 1) % BAZAR_PAGES_PER_SEARCH) * BAZAR_ROWS_PER_PAGE;
+		return results.slice(visibleStart, visibleStart + BAZAR_ROWS_PER_PAGE);
+	});
 
 	onMount(() => {
 		fetchConstString(ConstStringKey.Name);
@@ -22,6 +30,7 @@
 		fetchConstString(ConstStringKey.PricePerUnit);
 		fetchConstString(ConstStringKey.TimePeriod);
 		fetchConstString(ConstStringKey.NoItemHasBeenFound);
+		fetchConstString(ConstStringKey.Searching3);
 	});
 
 	function formatTime(minutes: number) {
@@ -50,7 +59,7 @@
 
 	<tbody>
 		{#if results.length > 0}
-			{#each results as item, i (i)}
+			{#each visibleResults as item, i (i)}
 				<tr>
 					<td class="name-cell">
 						<!-- svelte-ignore a11y_no_static_element_interactions --><span
@@ -81,7 +90,9 @@
 
 	<tfoot> </tfoot>
 </table>
-{#if results.length == 0}
+{#if isSearching}
+	<p>{get_const_string(ConstStringKey.Searching3)}</p>
+{:else if results.length === 0}
 	<p>{get_const_string(ConstStringKey.NoItemHasBeenFound)}</p>
 {/if}
 
