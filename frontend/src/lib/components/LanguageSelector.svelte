@@ -51,13 +51,14 @@
 		gap: 0.5rem;
 		font-size: 0.875rem;
 		padding: 0.25rem 0.5rem;
-		background: #f3f4f6;
+		background: rgba(10, 10, 10, 0.4);
 		border-radius: 0.25rem;
-		border: 1px solid #d1d5db;
+		border: 1px solid #3a3a3a;
 	}
 
 	label {
 		font-weight: 500;
+		color: #c8c8c8;
 	}
 
 	:global(.fi) {

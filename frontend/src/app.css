@@ -1,6 +1,8 @@
 body {
     font-family: Tahoma, Arial, sans-serif;
     font-size: 10pt;
+    margin: 0;
+    padding: 0;
     -webkit-font-smoothing: none;
     font-smooth: never;
     font-style: normal;

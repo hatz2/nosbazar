@@ -95,8 +95,9 @@
 		align-items: center;
 		gap: 0.4rem;
 		padding: 0.15rem 0.4rem;
-		background: #fff;
-		border: 1px solid #d1d5db;
+		color: #e5e7eb;
+		background: linear-gradient(#2f2f2f, #1d1d1d);
+		border: 1px solid #606467;
 		border-radius: 0.25rem;
 		cursor: pointer;
 		font-family: inherit;
@@ -104,12 +105,12 @@
 	}
 
 	.dropdown-toggle:hover {
-		border-color: #9ca3af;
+		border-color: #f6b626;
 	}
 
 	.caret {
 		font-size: 1.5em;
-		color: #6b7280;
+		color: #9a9a9a;
 	}
 
 	.dropdown-menu {
@@ -122,10 +123,10 @@
 		list-style: none;
 		margin: 0;
 		padding: 0.25rem;
-		background: #f3f4f6;
-		border: 1px solid #d1d5db;
+		background: #1b1b1b;
+		border: 1px solid #606467;
 		border-radius: 0.25rem;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 	}
 
 	.dropdown-option {
@@ -134,6 +135,7 @@
 		gap: 0.4rem;
 		width: 100%;
 		padding: 0.3rem 0.5rem;
+		color: #dcecff;
 		background: transparent;
 		border: none;
 		border-radius: 0.25rem;
@@ -147,10 +149,11 @@
 	}
 
 	.dropdown-option:hover {
-		background: #e5e7eb;
+		background: #2b2b2b;
 	}
 
 	.dropdown-option.selected {
-		background: #dbeafe;
+		color: #ffffff;
+		background: #3475be;
 	}
 </style>
