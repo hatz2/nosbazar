@@ -92,6 +92,17 @@ Linting via `eslint.config.js`, formatting via `.prettierrc`. Run lint/format be
 
 ---
 
+## Git commit conventions
+
+- **Use conventional commits** — follow the format: `<type>(scope): description`.
+- **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+- **Scope**: the area being changed (e.g., `backend`, `frontend`, `format`, `agent`).
+- **Description**: imperative mood, lowercase, no period at the end (e.g., `feat(frontend): add shell effect formatting`).
+- **Multi-line bodies**: add a blank line after the subject, then the body for context. Keep body wrapped at 72 characters.
+- **Breaking changes**: include a `!` before `:` and add a `BREAKING CHANGE:` footer if the change is not backward compatible (e.g., `feat!: rename search endpoint`).
+
+---
+
 ## Shell effects on weapons/armor (applied shells)
 
 - `WeaponData` and `ArmourData` carry a `shells: ShellEffect[]` array serialized by the backend.
