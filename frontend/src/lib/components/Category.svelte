@@ -26,7 +26,7 @@
 	});
 </script>
 
-<select bind:value {onchange}>
+<select bind:value {onchange} class="bazar-select">
 	<option value={BazarCategory.All} selected>{get_const_string(ConstStringKey.All)}</option>
 	<option value={BazarCategory.Weapon}
 		>{get_const_string(ConstStringKey.BazarCategoryWeapon)}</option

@@ -12,13 +12,10 @@
 	let { options = [], value = $bindable() }: Props = $props();
 </script>
 
-<select bind:value>
+<select bind:value class="bazar-select">
 	{#each options as option (option.value)}
 		<option value={option.value}>
 			{option.label}
 		</option>
 	{/each}
 </select>
-
-<style>
-</style>

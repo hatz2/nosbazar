@@ -19,3 +19,31 @@ body {
     border-radius: 4px;
     box-shadow: 0 0 0 1px #001818;
 }
+
+.bazar-select {
+    background: linear-gradient(
+        #373737 1px,
+        #1b1b1b 1px,
+        #1b1b1b calc(100% - 1px),
+        #030303 calc(100% - 1px),
+        #030303 100%
+    );
+    color: #b1f204;
+    text-shadow: 2px 2px 0 black;
+    border: 1px solid #1b1b1b;
+    border-radius: 4px;
+    padding: 3px;
+}
+
+.bazar-select:focus {
+    outline: none;
+}
+
+.bazar-select option {
+    background-color: #1b1b1b;
+    color: #b1f204;
+}
+
+.bazar-select option:hover {
+    background-color: green;
+}

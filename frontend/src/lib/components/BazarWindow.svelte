@@ -164,7 +164,7 @@
 		} finally {
 			setTimeout(() => {
 				isCooldown = false;
-			}, 4000);
+			}, 3000);
 		}
 	}
 
@@ -298,5 +298,35 @@
 			1px -1px 0 black,
 			-1px 1px 0 black,
 			1px 1px 0 black;
+	}
+
+	input {
+		background-color: #111517;
+		border: 1px solid #606467;
+		border-radius: 4px;
+		color: white;
+		padding: 5px;
+		caret-color: #6888dd;
+	}
+
+	input:focus {
+		outline: none;
+		background-color: #111517;
+		border: 1px solid #606467;
+		border-radius: 4px;
+		color: white;
+	}
+
+	/* Chrome, Edge, Safari, Opera */
+	input[type='number']::-webkit-outer-spin-button,
+	input[type='number']::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	/* Firefox */
+	input[type='number'] {
+		appearance: textfield;
+		-moz-appearance: textfield;
 	}
 </style>

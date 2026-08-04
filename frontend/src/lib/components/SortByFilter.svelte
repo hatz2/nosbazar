@@ -18,7 +18,7 @@
 	});
 </script>
 
-<select bind:value>
+<select bind:value class="bazar-select">
 	<option value={SortFilter.PriceAscending} selected>{get_const_string(ConstStringKey.SortByPriceAscending)}</option>
 	<option value={SortFilter.PriceDescending}>{get_const_string(ConstStringKey.SortByPriceDescending)}</option>
 	<option value={SortFilter.AmountAscending}>{get_const_string(ConstStringKey.SortByAmountAscending)}</option>

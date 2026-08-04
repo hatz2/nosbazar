@@ -111,6 +111,7 @@
 		text-align: center;
 		border-bottom: 1px solid #353a40;
 		background: linear-gradient(#1f1f1f 0% #030303 99% #141414 100%);
+		padding: 3px;
 	}
 
 	tbody tr:hover {
