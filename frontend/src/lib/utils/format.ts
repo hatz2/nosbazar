@@ -309,7 +309,8 @@ export function formatAppliedShellEffectString(shellEffect: ShellEffect): string
 	}
 	const absUpgrade = Math.abs(shellEffect.upgrade);
 	const bonus = getShellUpgradeBonus(shellEffect.grade, shellEffect.vnum, absUpgrade);
-	const text = `++ ${base}(+${bonus})`;
+	const plus = '+'.repeat(absUpgrade);
+	const text = `${plus} ${base}(+${bonus})`;
 	if (shellEffect.upgrade < 0) {
 		return `[ ${text} ]`;
 	}
