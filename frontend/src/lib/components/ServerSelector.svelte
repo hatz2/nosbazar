@@ -1,8 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Dropdown from '$lib/components/Dropdown.svelte';
+
+	type Server = {
+		id: number;
+		name: string;
+	};
 
 	let { value = $bindable<number>() } = $props();
-	let servers: { id: number; name: string }[] = $state([]);
+	let servers: Server[] = $state([]);
+
+	const selected = $derived(servers.find((s) => s.id === value));
 
 	onMount(async () => {
 		try {
@@ -14,7 +22,7 @@
 	});
 
 	$effect(() => {
-		if (servers.length > 0 && !servers.some(s => s.id === value)) {
+		if (servers.length > 0 && !servers.some((s) => s.id === value)) {
 			value = servers[0].id;
 		}
 	});
@@ -22,13 +30,17 @@
 
 <div class="server-selector">
 	<label for="server-select">Server: </label>
-	<select id="server-select" bind:value>
-		{#each servers as server (server.id)}
-			<option value={server.id}>
-				{server.name}
-			</option>
-		{/each}
-	</select>
+	<Dropdown
+		options={servers}
+		value={selected}
+		onselect={(server) => (value = server.id)}
+		buttonId="server-select"
+		getKey={(server) => server.id}
+	>
+		{#snippet children(server)}
+			{server.name}
+		{/snippet}
+	</Dropdown>
 </div>
 
 <style>
@@ -45,14 +57,5 @@
 
 	label {
 		font-weight: 500;
-	}
-
-	select {
-		background: transparent;
-		border: none;
-		outline: none;
-		cursor: pointer;
-		font-family: inherit;
-		font-size: inherit;
 	}
 </style>
