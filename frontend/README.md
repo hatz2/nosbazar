@@ -1,42 +1,47 @@
-# sv
+# NosBazar frontend
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+SvelteKit web UI for the NosBazar bazaar search. It talks to the NosBazar
+backend HTTP API on `localhost:8080`.
 
-## Creating a project
+## Requirements
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Node.js 18+ (comes with npm/pnpm/yarn)
 
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
+## Setup
 
 ```sh
-# recreate this project
-npx sv@0.15.3 create --template minimal --types ts --add prettier eslint --install npm frontend
+npm install
 ```
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Run the dev server
 
 ```sh
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+The app runs at `http://localhost:5173`. The backend must be running on
+`localhost:8080` for the search and selectors to work — see the root
+[README](../README.md#how-to-run-locally) or
+[backend/README.md](../backend/README.md).
 
-To create a production version of your app:
+## Checks
+
+```sh
+npm run check    # Svelte/TypeScript check
+npm run lint     # Prettier + ESLint
+```
+
+## Production build
 
 ```sh
 npm run build
+npm run preview  # preview the production build locally
 ```
 
-You can preview the production build with `npm run preview`.
+> To deploy, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters)
+> for your target environment.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Legal
+
+All game content and images belong to Gameforge 4D GmbH and Entwell
+Co., Ltd. NosBazar is an unofficial, non-commercial fan project.

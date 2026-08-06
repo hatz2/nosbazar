@@ -35,7 +35,7 @@ cmake --build --preset x64-debug   # or linux-debug
 1. `src/main.cpp` starts a Crow HTTP server on port **8080**.
 2. A detached thread runs `Clientless` — logs into Nostale's login server, then a world server, subscribing to bazaar list packets.
 3. GET `/search` accepts JSON with item filters, queues a `BazarSearchTask`, and blocks until the game-server response arrives via future/promise in the packet publisher.
-4. The hard-coded path `C:/Program Files (x86)/Nostale/NostaleData/NSgtdData.NOS` is used to bootstrap item metadata parsing. On Linux or different installs, this likely needs adjustment. Check `io/nos_file_text_reader.h` / `io/item_dat_parser.cpp`.
+4. `src/main.cpp` calls `nosclient::check_and_download_outdated_files()` on startup, which downloads missing or outdated game data (`NSgtdData.NOS`, `NSipData.NOS`, language files, client exes) from Gameforge patch servers into `assets/NostaleData/` (relative to the working directory), verifying SHA1 against the remote manifest. Item metadata is then parsed from `assets/NostaleData/NSgtdData.NOS` (see `io/nos_file_text_reader.h` / `io/item_dat_parser.cpp`). Internet access is required on first run.
 
 ---
 
@@ -58,7 +58,7 @@ Third-party code lives in `third_party/astar/`.
 
 - `.env` at the backend root provides game credentials and server config. It is **gitignored** (`*.env` in `.gitignore`). The build copies it into the output directory via a CMake post-build step.
 - `IDENTITY_PATH` points to a local JSON file holding persistent login state.
-- Game data archive (`NostaleData`) is also gitignored. Ensure it exists at the expected path or update the code before running.
+- Game data files (`assets/NostaleData/`) are downloaded automatically on startup and are gitignored. Run the binary from its build output directory so the relative path resolves.
 
 ---
 
