@@ -33,6 +33,7 @@ add_executable (backend "src/main.cpp"  "src/noscrypto.h" "src/noscrypto.cpp" "s
 
 target_compile_definitions(backend PRIVATE
     $<$<CONFIG:Debug>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE>
+    $<$<CONFIG:Debug>:NOSBAZAR_DEV=1>
     $<$<CONFIG:Release>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO>
 )
 
@@ -59,12 +60,14 @@ add_custom_command(TARGET backend POST_BUILD
         $<TARGET_FILE_DIR:backend>/assets
 )
 
-# Copy .env to build folder
-add_custom_command(TARGET backend POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_SOURCE_DIR}/.env
-        $<TARGET_FILE_DIR:backend>/.env
-)
+# Copy .env to build folder (if present)
+if (EXISTS ${CMAKE_SOURCE_DIR}/.env)
+  add_custom_command(TARGET backend POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy
+          ${CMAKE_SOURCE_DIR}/.env
+          $<TARGET_FILE_DIR:backend>/.env
+  )
+endif()
 
 
 

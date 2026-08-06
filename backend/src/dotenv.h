@@ -1,20 +1,33 @@
 #pragma once
 
+#include <cstdlib>
 #include <fstream>
-#include <string>
 #include <optional>
+#include <string>
+#include <string_view>
 
 namespace dotenv {
 	inline void init() {
+		static bool loaded = false;
+		if (loaded) {
+			return;
+		}
+		loaded = true;
+
         std::ifstream file(".env");
 
         std::string line;
 
         while (std::getline(file, line)) {
+            if (line.empty() || line[0] == '#') {
+                continue;
+            }
+
             auto pos = line.find('=');
 
-            if (pos == std::string::npos)
+            if (pos == std::string::npos) {
                 continue;
+            }
 
             std::string key = line.substr(0, pos);
             std::string value = line.substr(pos + 1);
@@ -28,17 +41,12 @@ namespace dotenv {
 	}
 
     inline std::optional<std::string> get(std::string_view key) {
-        char* buffer = nullptr;
-        size_t size = 0;
+        const char* buffer = std::getenv(key.data());
 
-        if (_dupenv_s(&buffer, &size, key.data()) != 0 || buffer == nullptr) {
+        if (buffer == nullptr) {
             return std::nullopt;
         }
 
-        std::string value(buffer);
-
-        free(buffer);
-
-        return value;
+        return std::string(buffer);
     }
 }

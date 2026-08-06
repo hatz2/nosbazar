@@ -1,7 +1,40 @@
 #pragma once
 
 #include "dotenv.h"
+#include <cstdlib>
+#include <stdexcept>
 #include <string>
+#include <string_view>
+
+namespace {
+
+bool is_dev_mode()
+{
+	const char* override = std::getenv("NOSBAZAR_DEV");
+	if (override != nullptr) {
+		return std::string(override) == "1";
+	}
+
+#ifdef NOSBAZAR_DEV
+	return true;
+#else
+	return false;
+#endif
+}
+
+std::string get_required_env(const char* key, std::string_view fallback = {})
+{
+	const char* value = std::getenv(key);
+	if (value == nullptr) {
+		if (!fallback.empty()) {
+			return std::string(fallback);
+		}
+		throw std::runtime_error(std::string("missing required env var: ") + key);
+	}
+	return value;
+}
+
+} // anonymous namespace
 
 struct Env {
 	std::string identity_path;
@@ -13,20 +46,15 @@ struct Env {
 	uint16_t max_clients;
 
 	Env() {
-		if (!initialized) {
+		if (is_dev_mode()) {
 			dotenv::init();
-			initialized = true;
 		}
-
-		identity_path = dotenv::get("IDENTITY_PATH").value();
-		gf_email = dotenv::get("GF_EMAIL").value();
-		gf_password = dotenv::get("GF_PASSWORD").value();
-		installation_id = dotenv::get("INSTALLATION_ID").value();
-		login_server_ip = dotenv::get("LOGIN_SERVER_IP").value();
-		login_server_port = std::stoi(dotenv::get("LOGIN_SERVER_PORT").value());
-		max_clients = std::stoi(dotenv::get("MAX_CLIENTS").value_or("5"));
+		identity_path = get_required_env("IDENTITY_PATH");
+		gf_email = get_required_env("GF_EMAIL");
+		gf_password = get_required_env("GF_PASSWORD");
+		installation_id = get_required_env("INSTALLATION_ID");
+		login_server_ip = get_required_env("LOGIN_SERVER_IP");
+		login_server_port = std::stoi(get_required_env("LOGIN_SERVER_PORT"));
+		max_clients = std::stoi(get_required_env("MAX_CLIENTS", "5"));
 	}
-
-private:
-	static inline bool initialized = false;
 };
