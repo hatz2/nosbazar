@@ -12,10 +12,17 @@
 		children: Snippet;
 	};
 
-	let { left = 0, top = 0, height, iconId, onclose, children }: Props = $props();
+	let {
+		left = $bindable(0),
+		top = $bindable(0),
+		height,
+		iconId,
+		onclose,
+		children
+	}: Props = $props();
 </script>
 
-<Draggable {left} {top}>
+<Draggable bind:left bind:top>
 	<div class="window" style:height={height ? `${height}px` : undefined}>
 		<div class="window-header">
 			<CloseButton onclick={onclose} />

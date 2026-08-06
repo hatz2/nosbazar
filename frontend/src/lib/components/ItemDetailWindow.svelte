@@ -39,7 +39,7 @@
 		onclose?: () => void;
 	};
 
-	let { item, left = 0, top = 0, onclose }: Props = $props();
+	let { item, left = $bindable(0), top = $bindable(0), onclose }: Props = $props();
 
 	let runes_window_open = $state(false);
 	let runes_window_left = $state(0);
@@ -117,7 +117,7 @@
 	}
 </script>
 
-<DetailWindow {left} {top} {onclose} iconId={get_display_icon_id(item)}>
+<DetailWindow bind:left bind:top {onclose} iconId={get_display_icon_id(item)}>
 	<RunesIcon {item} oncontextmenu={onRunesContextMenu}></RunesIcon>
 
 	<!-- Name -->

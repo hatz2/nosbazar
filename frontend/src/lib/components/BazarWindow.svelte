@@ -334,8 +334,8 @@
 {#each openWindows as window (window.id)}
 	<ItemDetailWindow
 		item={window.item}
-		left={window.left}
-		top={window.top}
+		bind:left={window.left}
+		bind:top={window.top}
 		onclose={() => {
 			openWindows = openWindows.filter((w) => w.id !== window.id);
 		}}
