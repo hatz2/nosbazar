@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <spdlog/spdlog.h>
 
 namespace dotenv {
 	inline void init() {
@@ -33,8 +34,10 @@ namespace dotenv {
             std::string value = line.substr(pos + 1);
 
 #ifdef _WIN32
+            SPDLOG_DEBUG("Setting env variable {}={}", key, value);
             _putenv_s(key.c_str(), value.c_str());
 #else
+            SPDLOG_DEBUG("Setting env variable {}={}", key, value);
             setenv(key.c_str(), value.c_str(), 1);
 #endif
         }
