@@ -300,7 +300,7 @@ nosbazar::net::WorldSession::WorldSession(std::unique_ptr<TCPClient> client, pac
     : Session(std::move(client), publisher)
     , session_id(session_id)
     , acumulator(0xFF)
-    , packet_counter(random::random_int(static_cast<uint16_t>(0), UINT16_MAX))
+    , packet_counter(random::random_int(static_cast<uint16_t>(0), static_cast<uint16_t>(UINT16_MAX)))
 {
 }
 

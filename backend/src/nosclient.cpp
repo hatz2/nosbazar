@@ -169,7 +169,10 @@ void nosbazar::nosclient::download_files(std::span<const FileInfo> files_info)
 			continue;
 		}
 
-		std::filesystem::create_directories(std::filesystem::path(info.output_path).parent_path());
+		std::filesystem::path output_dir = std::filesystem::path(info.output_path).parent_path();
+		if (!output_dir.empty()) {
+			std::filesystem::create_directories(output_dir);
+		}
 
 		std::ofstream file(info.output_path, std::ios_base::binary);
 		if (file.is_open()) {

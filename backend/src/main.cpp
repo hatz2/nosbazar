@@ -14,6 +14,7 @@
 #include <io/nsip_data_reader.h>
 #include <io/const_string_parser.h>
 #include <thread>
+#include <filesystem>
 #include "api/routes.h"
 
 namespace {

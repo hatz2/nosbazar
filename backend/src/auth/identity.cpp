@@ -7,6 +7,7 @@
 #include <crypto/base64.h>
 #include <random/random.h>
 #include <net.h>
+#include <spdlog/spdlog.h>
 
 using json = nlohmann::json;
 
@@ -85,6 +86,7 @@ namespace nosbazar::auth {
 		std::ostringstream content;
 
 		if (!file.is_open()) {
+			SPDLOG_ERROR("Identity file not found at {}", file_path);
 			return;
 		}
 

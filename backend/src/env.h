@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dotenv.h"
+#include <cstdint>
 #include <cstdlib>
 #include <stdexcept>
 #include <string>

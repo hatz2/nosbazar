@@ -16,8 +16,8 @@ namespace nosbazar::io {
             return files.at(filename);
         }
         else {
-            SPDLOG_DEBUG("Could not find file with name: {}", filename);
-            return {};
+            SPDLOG_ERROR("Could not find file with name: {}", filename);
+            return files.begin()->second;
         }
         
 	}
