@@ -89,7 +89,7 @@ bool authenticate_and_spawn_clients(Env& env)
             if (auth_result == nosbazar::auth::NosAuth::AuthResult::captcha) {
                 SPDLOG_ERROR("Captcha required - not implemented yet");
             } else {
-                SPDLOG_ERROR("Authentication failed");
+                SPDLOG_ERROR("Authentication failed. Auth result {}", auth_result);
             }
             return false;
         }
