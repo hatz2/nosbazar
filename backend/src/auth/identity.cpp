@@ -102,6 +102,8 @@ namespace nosbazar::auth {
 
 		fingerprint = json::parse(content.str());
 
+		SPDLOG_DEBUG("Identity file loaded:\n{}", fingerprint.dump(2));
+
 		file.close();
 	}
 
