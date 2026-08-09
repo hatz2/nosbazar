@@ -55,8 +55,6 @@ nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const 
 
 	auto result = net::post(url, body.dump(), headers);
 
-	
-
 	if (result) {
 		auto json_response = json::parse(result->body);
 
@@ -86,6 +84,8 @@ nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const 
 			TokenRepository::instance().save();
 			return AuthResult::ok;
 		}
+
+		SPDLOG_ERROR("Unknown status code: {}", result->status_code);
 
 		return AuthResult::unknown_error;
 	}
