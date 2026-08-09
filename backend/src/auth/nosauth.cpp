@@ -90,7 +90,7 @@ nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const 
 		return AuthResult::unknown_error;
 	}
 	else {
-		SPDLOG_ERROR("Curl error: {}", result.error());
+		SPDLOG_ERROR("Curl error: {}", fmt::underlying(result.error()));
 		return AuthResult::unknown_error;
 	}
 }
