@@ -82,5 +82,15 @@
         }
       }
     }
+  ],
+  "buildPresets": [
+    {
+      "name": "linux-release",
+      "configurePreset": "linux-release"
+    },
+    {
+      "name": "linux-debug",
+      "configurePreset": "linux-debug"
+    }
   ]
 }
