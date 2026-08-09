@@ -91,7 +91,7 @@ namespace nosbazar::auth {
 			std::error_code ec;
 			const auto status = std::filesystem::status(file_path, ec);
 			if (ec || status.type() == std::filesystem::file_type::not_found) {
-				SPDLOG_ERROR("Identity file does not exist at {}", file_path);
+				SPDLOG_ERROR("Identity file does not exist at {} (errno={}: {})", file_path, ec.value(), ec.message());
 			} else {
 				SPDLOG_ERROR("Identity file exists at {} but could not be opened (permission denied?)", file_path);
 			}

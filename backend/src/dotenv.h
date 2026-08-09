@@ -8,6 +8,15 @@
 #include <spdlog/spdlog.h>
 
 namespace dotenv {
+	inline std::string trim(std::string value) {
+		auto start = value.find_first_not_of(" \t\r");
+		if (start == std::string::npos) {
+			return {};
+		}
+		auto end = value.find_last_not_of(" \t\r");
+		return value.substr(start, end - start + 1);
+	}
+
 	inline void init() {
 		static bool loaded = false;
 		if (loaded) {
@@ -30,8 +39,13 @@ namespace dotenv {
                 continue;
             }
 
-            std::string key = line.substr(0, pos);
-            std::string value = line.substr(pos + 1);
+            std::string key = dotenv::trim(line.substr(0, pos));
+            std::string value = dotenv::trim(line.substr(pos + 1));
+
+            if (!value.empty() && ((value.front() == '"' && value.back() == '"') ||
+                                   (value.front() == '\'' && value.back() == '\''))) {
+                value = value.substr(1, value.size() - 2);
+            }
 
 #ifdef _WIN32
             SPDLOG_DEBUG("Setting env variable {}={}", key, value);
