@@ -24,26 +24,31 @@ namespace {
 
 void setup_log_level()
 {
+    spdlog::level::level_enum log_level = spdlog::level::info;
+
 #ifdef NOSBAZAR_DEV
-	spdlog::set_level(spdlog::level::trace);
+    log_level = spdlog::level::trace;
 #else
 	const char* level = std::getenv("LOG_LEVEL");
 	if (level == nullptr) {
-		spdlog::set_level(spdlog::level::info);
-		return;
+        log_level = spdlog::level::info;
 	}
+    else {
+        std::string value(level);
+        std::transform(value.begin(), value.end(), value.begin(),
+            [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
-	std::string value(level);
-	std::transform(value.begin(), value.end(), value.begin(),
-		[](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+        log_level = spdlog::level::from_str(value);
+        if (log_level == spdlog::level::off && value != "off") {
+            SPDLOG_WARN("Unknown LOG_LEVEL '{}', defaulting to info", value);
+            log_level = spdlog::level::info;
+        }
+    }
 
-	auto parsed = spdlog::level::from_str(value);
-	if (parsed == spdlog::level::off && value != "off") {
-		SPDLOG_WARN("Unknown LOG_LEVEL '{}', defaulting to info", value);
-		parsed = spdlog::level::info;
-	}
-	spdlog::set_level(parsed);
 #endif
+
+    SPDLOG_INFO("Log level set to {}", spdlog::level::to_string_view(log_level));
+    spdlog::set_level(log_level);
 }
 
 void initialize_game_data()
