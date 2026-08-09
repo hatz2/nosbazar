@@ -1,6 +1,7 @@
 #pragma once
 
 #include <future>
+#include <map>
 #include <mutex>
 #include <queue>
 #include <vector>
@@ -47,6 +48,7 @@ namespace nosbazar {
 		BazarSearchManager(const BazarSearchManager&) = delete;
 		void operator=(const BazarSearchManager&) = delete;
 
-		std::unordered_map<GameServer, BazarSearchQueue> server_queues;
+		std::mutex mutex;
+		std::map<GameServer, BazarSearchQueue> server_queues;
 	};
 }

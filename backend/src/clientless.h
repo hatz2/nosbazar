@@ -27,6 +27,7 @@ namespace nosbazar {
         ~Clientless();
 
         ExitCode run();
+        void stop();
 
     private:
         bool phase_authenticate();

@@ -1,6 +1,7 @@
 #include "clientless.h"
 #include "env.h"
 #include "nosclient.h"
+#include "app_state.h"
 #include "packets/login_packet.h"
 #include "world_server_assigner.h"
 #include "server_registry.h"
@@ -21,6 +22,12 @@ nosbazar::Clientless::Clientless(std::string account_id, std::shared_ptr<auth::N
 
 nosbazar::Clientless::~Clientless()
 {
+}
+
+void nosbazar::Clientless::stop()
+{
+	login_context.stop();
+	world_context.stop();
 }
 
 nosbazar::Clientless::ExitCode nosbazar::Clientless::run()
@@ -132,11 +139,14 @@ void nosbazar::Clientless::phase_game()
     schedule_tick = [&]() {
         agent_timer->expires_after(std::chrono::milliseconds(10));
         agent_timer->async_wait([&](const asio::error_code& ec) {
+            if (!ec && !running) {
+                return;
+            }
             if (!ec) {
                 agent->run(*sensors);
                 schedule_tick();
             }
-            else {
+            else if (running) {
                 SPDLOG_ERROR(ec.message());
             }
         });

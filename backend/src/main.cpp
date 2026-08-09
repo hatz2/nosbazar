@@ -1,5 +1,6 @@
 ﻿#include "env.h"
 #include "clientless.h"
+#include "app_state.h"
 #include "auth/token_repository.h"
 #include "nosclient.h"
 #include <spdlog/spdlog.h>
@@ -14,6 +15,8 @@
 #include <io/nsip_data_reader.h>
 #include <io/const_string_parser.h>
 #include <thread>
+#include <vector>
+#include <memory>
 #include <filesystem>
 #include <cctype>
 #include <algorithm>
@@ -72,7 +75,7 @@ void initialize_game_data()
     nosbazar::MapGridRepository::instance();
 }
 
-bool authenticate_and_spawn_clients(Env& env)
+bool authenticate_and_spawn_clients(Env& env, std::vector<std::shared_ptr<nosbazar::Clientless>>& clients, std::vector<std::thread>& threads)
 {
     auto identity = std::make_shared<nosbazar::auth::Identity>(env.identity_path);
     auto auth = std::make_shared<nosbazar::auth::NosAuth>(identity);
@@ -103,10 +106,11 @@ bool authenticate_and_spawn_clients(Env& env)
             break;
         }
         const std::string& id = entry.key();
-        std::thread([id, auth]() {
-            nosbazar::Clientless client(id, auth);
-            return static_cast<int>(client.run());
-        }).detach();
+        auto client = std::make_shared<nosbazar::Clientless>(id, auth);
+        clients.push_back(client);
+        threads.emplace_back([client]() {
+            return static_cast<int>(client->run());
+        });
         ++count;
     }
 
@@ -121,7 +125,9 @@ int main(int argc, char** argv) {
 
 	initialize_game_data();
 
-	if (!authenticate_and_spawn_clients(env)) {
+	std::vector<std::shared_ptr<nosbazar::Clientless>> clients;
+	std::vector<std::thread> threads;
+	if (!authenticate_and_spawn_clients(env, clients, threads)) {
         return EXIT_FAILURE;
     }
 
@@ -137,4 +143,16 @@ int main(int argc, char** argv) {
     CROW_ROUTE(app, "/bcard/string").methods("GET"_method)(nosbazar::api::handle_bcard_string);
 
     app.port(8080).multithreaded().run();
+
+	nosbazar::running = false;
+	for (auto& client : clients) {
+		client->stop();
+	}
+	for (auto& thread : threads) {
+		if (thread.joinable()) {
+			thread.join();
+		}
+	}
+
+	return 0;
 }

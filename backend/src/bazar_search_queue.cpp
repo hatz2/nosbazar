@@ -33,5 +33,7 @@ nosbazar::BazarSearchManager& nosbazar::BazarSearchManager::instance()
 
 nosbazar::BazarSearchQueue& nosbazar::BazarSearchManager::queue(const GameServer server)
 {
-	return instance().server_queues[server];
+	auto& manager = instance();
+	const std::lock_guard<std::mutex> lock(manager.mutex);
+	return manager.server_queues[server];
 }
