@@ -1,6 +1,8 @@
 #include "identity.h"
 #include <fstream>
+#include <filesystem>
 #include <sstream>
+#include <system_error>
 #include <algorithm>
 #include <time/timestamp.h>
 #include <time/datetime.h>
@@ -86,7 +88,13 @@ namespace nosbazar::auth {
 		std::ostringstream content;
 
 		if (!file.is_open()) {
-			SPDLOG_ERROR("Identity file not found at {}", file_path);
+			std::error_code ec;
+			const auto status = std::filesystem::status(file_path, ec);
+			if (ec || status.type() == std::filesystem::file_type::not_found) {
+				SPDLOG_ERROR("Identity file does not exist at {}", file_path);
+			} else {
+				SPDLOG_ERROR("Identity file exists at {} but could not be opened (permission denied?)", file_path);
+			}
 			return;
 		}
 
