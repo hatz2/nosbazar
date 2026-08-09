@@ -47,9 +47,8 @@ struct Env {
 	uint16_t max_clients;
 
 	Env() {
-		if (is_dev_mode()) {
-			dotenv::init();
-		}
+
+		dotenv::init();
 		identity_path = get_required_env("IDENTITY_PATH");
 		gf_email = get_required_env("GF_EMAIL");
 		gf_password = get_required_env("GF_PASSWORD");

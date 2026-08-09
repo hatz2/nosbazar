@@ -34,7 +34,8 @@ add_executable (backend "src/main.cpp"  "src/noscrypto.h" "src/noscrypto.cpp" "s
 target_compile_definitions(backend PRIVATE
     $<$<CONFIG:Debug>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE>
     $<$<CONFIG:Debug>:NOSBAZAR_DEV=1>
-    $<$<CONFIG:Release>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO>
+#    $<$<CONFIG:Release>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO>
+    $<$<CONFIG:Release>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE>
 )
 
 target_link_libraries(backend PRIVATE 

@@ -26,6 +26,10 @@ namespace dotenv {
 
         std::ifstream file(".env");
 
+        if (!file.is_open()) {
+            return;
+        }
+
         std::string line;
 
         while (std::getline(file, line)) {
@@ -48,10 +52,8 @@ namespace dotenv {
             }
 
 #ifdef _WIN32
-            SPDLOG_DEBUG("Setting env variable {}={}", key, value);
             _putenv_s(key.c_str(), value.c_str());
 #else
-            SPDLOG_DEBUG("Setting env variable {}={}", key, value);
             setenv(key.c_str(), value.c_str(), 1);
 #endif
         }
