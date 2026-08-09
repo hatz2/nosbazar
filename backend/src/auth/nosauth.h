@@ -23,6 +23,7 @@ namespace nosbazar::auth {
 		enum class AuthResult {
 			invalid_credentials,
 			captcha,
+			unknown_type_of_captcha,
 			unknown_error,
 			ok
 		};

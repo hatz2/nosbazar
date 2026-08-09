@@ -73,7 +73,7 @@ nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const 
 				return AuthResult::captcha;
 			}
 
-			return AuthResult::unknown_error;
+			return AuthResult::unknown_type_of_captcha;
 		}
 
 		if (result->status_code == 403) {
@@ -90,6 +90,7 @@ nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const 
 		return AuthResult::unknown_error;
 	}
 	else {
+		SPDLOG_ERROR("Curl error: {}", result.error());
 		return AuthResult::unknown_error;
 	}
 }
