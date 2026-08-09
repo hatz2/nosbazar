@@ -15,16 +15,34 @@
 #include <io/const_string_parser.h>
 #include <thread>
 #include <filesystem>
+#include <cctype>
+#include <algorithm>
+#include <string>
 #include "api/routes.h"
 
 namespace {
 
 void setup_log_level()
 {
-#ifdef _DEBUG
-    spdlog::set_level(spdlog::level::trace);
+#ifdef NOSBAZAR_DEV
+	spdlog::set_level(spdlog::level::trace);
 #else
-    spdlog::set_level(spdlog::level::info);
+	const char* level = std::getenv("LOG_LEVEL");
+	if (level == nullptr) {
+		spdlog::set_level(spdlog::level::info);
+		return;
+	}
+
+	std::string value(level);
+	std::transform(value.begin(), value.end(), value.begin(),
+		[](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+	auto parsed = spdlog::level::from_str(value);
+	if (parsed == spdlog::level::off && value != "off") {
+		SPDLOG_WARN("Unknown LOG_LEVEL '{}', defaulting to info", value);
+		parsed = spdlog::level::info;
+	}
+	spdlog::set_level(parsed);
 #endif
 }
 
@@ -93,12 +111,12 @@ bool authenticate_and_spawn_clients(Env& env)
 } // anonymous namespace
 
 int main(int argc, char** argv) {
-    setup_log_level();
+	Env env;
+	setup_log_level();
 
-    initialize_game_data();
+	initialize_game_data();
 
-    Env env;
-    if (!authenticate_and_spawn_clients(env)) {
+	if (!authenticate_and_spawn_clients(env)) {
         return EXIT_FAILURE;
     }
 
