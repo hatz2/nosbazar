@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import * as enums from '$lib/types/enums';
 	import DynamicSelect from './DynamicSelect.svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
-	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
+	import { get_const_string } from '$lib/services/constStringService.svelte';
 
 	type Props = {
 		value?: number;
@@ -11,105 +10,6 @@
 	};
 
 	let { value = $bindable(0), category }: Props = $props();
-
-	onMount(() => {
-		fetchConstString(ConstStringKey.BazarSubcategorySwordsman);
-		fetchConstString(ConstStringKey.BazarSubcategoryArcher);
-		fetchConstString(ConstStringKey.BazarSubcategoryMagician);
-		fetchConstString(ConstStringKey.BazarSubcategoryAdventurer);
-		fetchConstString(ConstStringKey.BazarSubcategoryHat);
-		fetchConstString(ConstStringKey.BazarSubcategoryAccessory);
-		fetchConstString(ConstStringKey.BazarSubcategoryGloves);
-		fetchConstString(ConstStringKey.BazarSubcategoryShoes);
-		fetchConstString(ConstStringKey.BazarSubcategoryCostume);
-		fetchConstString(ConstStringKey.BazarSubcategoryCostumeHat);
-		fetchConstString(ConstStringKey.BazarSubcategoryNecklace);
-		fetchConstString(ConstStringKey.BazarSubcategoryRing);
-		fetchConstString(ConstStringKey.BazarSubcategoryBracelet);
-		fetchConstString(ConstStringKey.BazarSubcategoryFairy);
-		fetchConstString(ConstStringKey.BazarSubcategoryAmulet);
-		fetchConstString(ConstStringKey.BazarSubcategoryEmptyCardHolder);
-		fetchConstString(ConstStringKey.BazarSubcategoryCrusader);
-		fetchConstString(ConstStringKey.BazarSubcategoryBerserker);
-		fetchConstString(ConstStringKey.BazarSubcategoryWarrior);
-		fetchConstString(ConstStringKey.BazarSubcategoryNinja);
-		fetchConstString(ConstStringKey.BazarSubcategoryWildKeeper);
-		fetchConstString(ConstStringKey.BazarSubcategoryAssassin);
-		fetchConstString(ConstStringKey.BazarSubcategoryDestroyer);
-		fetchConstString(ConstStringKey.BazarSubcategoryRanger);
-		fetchConstString(ConstStringKey.BazarSubcategoryHolyMage);
-		fetchConstString(ConstStringKey.BazarSubcategoryDarkGunner);
-		fetchConstString(ConstStringKey.BazarSubcategoryRedMagician);
-		fetchConstString(ConstStringKey.BazarSubcategoryBlueMagician);
-		fetchConstString(ConstStringKey.BazarSubcategoryJajamaru);
-		fetchConstString(ConstStringKey.BazarSubcategoryChickenCostume);
-		fetchConstString(ConstStringKey.BazarSubcategoryPyjama);
-		fetchConstString(ConstStringKey.BazarSubcategoryEmptyPetBead);
-		fetchConstString(ConstStringKey.BazarSubcategoryPetBead);
-		fetchConstString(ConstStringKey.BazarSubcategoryPartnerBead);
-		fetchConstString(ConstStringKey.BazarSubcategoryWeapon);
-		fetchConstString(ConstStringKey.BazarSubcategoryClothing);
-		fetchConstString(ConstStringKey.BazarSubcategoryGeneralItems);
-		fetchConstString(ConstStringKey.BazarSubcategoryMaterial);
-		fetchConstString(ConstStringKey.BazarSubcategoryProductionItem);
-		fetchConstString(ConstStringKey.BazarSubcategorySpecialItems);
-		fetchConstString(ConstStringKey.BazarSubcategoryHealingPotion);
-		fetchConstString(ConstStringKey.BazarSubcategoryEvent);
-		fetchConstString(ConstStringKey.BazarSubcategoryFood);
-		fetchConstString(ConstStringKey.BazarSubcategorySnack);
-		fetchConstString(ConstStringKey.BazarSubcategoryMagicItem);
-		fetchConstString(ConstStringKey.BazarSubcategoryIngredients);
-		fetchConstString(ConstStringKey.BazarSubcategoryPartnerItem);
-		fetchConstString(ConstStringKey.All);
-		fetchConstString(ConstStringKey.MartialArtist);
-		fetchConstString(ConstStringKey.Costume);
-		fetchConstString(ConstStringKey.Weapon);
-		fetchConstString(ConstStringKey.BazarCostumeWings);
-		fetchConstString(ConstStringKey.BazarCostumeFemale);
-		fetchConstString(ConstStringKey.BazarCostumeHatFemale);
-		fetchConstString(ConstStringKey.BazarCostumeMale);
-		fetchConstString(ConstStringKey.BazarCostumeHatMale);
-		fetchConstString(ConstStringKey.MiniPet);
-		fetchConstString(ConstStringKey.BazarSubcategoryPirate);
-		fetchConstString(ConstStringKey.Gladiator);
-		fetchConstString(ConstStringKey.FireCanonneer);
-		fetchConstString(ConstStringKey.Volcano);
-		fetchConstString(ConstStringKey.BattleMonk);
-		fetchConstString(ConstStringKey.Scout);
-		fetchConstString(ConstStringKey.TideLord);
-		fetchConstString(ConstStringKey.DeathReaper);
-		fetchConstString(ConstStringKey.DemonHunter);
-		fetchConstString(ConstStringKey.Seer);
-		fetchConstString(ConstStringKey.Renegade);
-		fetchConstString(ConstStringKey.AvengingAngel);
-		fetchConstString(ConstStringKey.Archmage);
-		fetchConstString(ConstStringKey.DraconicFist);
-		fetchConstString(ConstStringKey.MysticArts);
-		fetchConstString(ConstStringKey.WeddingCostume);
-		fetchConstString(ConstStringKey.MasterWolf);
-		fetchConstString(ConstStringKey.DemonWarrior);
-		fetchConstString(ConstStringKey.WaterfallBerserker);
-		fetchConstString(ConstStringKey.Sunchaser);
-		fetchConstString(ConstStringKey.VodooPriest);
-		fetchConstString(ConstStringKey.FlameDruid);
-		fetchConstString(ConstStringKey.DragonKnight);
-		fetchConstString(ConstStringKey.Blaster);
-		fetchConstString(ConstStringKey.Gravity);
-		fetchConstString(ConstStringKey.HydraulicFist);
-		fetchConstString(ConstStringKey.StoneBreaker);
-		fetchConstString(ConstStringKey.FogHunter);
-		fetchConstString(ConstStringKey.FireStorm);
-		fetchConstString(ConstStringKey.Thunderer);
-		fetchConstString(ConstStringKey.EmptyCardHolder);
-		fetchConstString(ConstStringKey.CloseAttack);
-		fetchConstString(ConstStringKey.RemoteAttack);
-		fetchConstString(ConstStringKey.PartnerMagic);
-		fetchConstString(ConstStringKey.EmptyMountBead);
-		fetchConstString(ConstStringKey.MountBead);
-		fetchConstString(ConstStringKey.BazarSubcategoryTitle);
-		fetchConstString(ConstStringKey.SaleItem);
-		fetchConstString(ConstStringKey.Fish);
-	});
 
 	const weaponOptions = $derived([
 		{ label: get_const_string(ConstStringKey.All), value: enums.WeaponSubcategory.All },

@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { BazarCategory } from '$lib/types/enums';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
-	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
+	import { get_const_string } from '$lib/services/constStringService.svelte';
 
 	type Props = {
 		value?: BazarCategory;
@@ -10,20 +9,6 @@
 	};
 
 	let { value = $bindable(BazarCategory.All), onchange }: Props = $props();
-
-	onMount(() => {
-		fetchConstString(ConstStringKey.BazarCategoryWeapon);
-		fetchConstString(ConstStringKey.BazarCategoryArmour);
-		fetchConstString(ConstStringKey.BazarCategoryEquipment);
-		fetchConstString(ConstStringKey.BazarCategoryAccessories);
-		fetchConstString(ConstStringKey.Specialist);
-		fetchConstString(ConstStringKey.BazarCategoryPet);
-		fetchConstString(ConstStringKey.BazarCategoryPartner);
-		fetchConstString(ConstStringKey.BazarCategoryShell);
-		fetchConstString(ConstStringKey.BazarCategoryMainItem);
-		fetchConstString(ConstStringKey.BazarCategoryConsumerItem);
-		fetchConstString(ConstStringKey.BazarCategoryMiscellaneous);
-	});
 </script>
 
 <select bind:value {onchange} class="bazar-select">

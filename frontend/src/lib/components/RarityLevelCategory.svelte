@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import * as enums from '$lib/types/enums';
 	import DynamicSelect from './DynamicSelect.svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
-	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
+	import { get_const_string } from '$lib/services/constStringService.svelte';
 
 	type Props = {
 		value?: number;
@@ -11,17 +10,6 @@
 	};
 
 	let { value = $bindable(0), category }: Props = $props();
-
-	onMount(() => {
-		fetchConstString(ConstStringKey.BazarRarity0);
-		fetchConstString(ConstStringKey.BazarRarityUseful);
-		fetchConstString(ConstStringKey.BazarRarityGood);
-		fetchConstString(ConstStringKey.BazarRarityHighQuality);
-		fetchConstString(ConstStringKey.BazarRarityExcellent);
-		fetchConstString(ConstStringKey.BazarRarityAncient);
-		fetchConstString(ConstStringKey.BazarRarityMysterious);
-		fetchConstString(ConstStringKey.BazarRarityLegendary);
-	});
 
 	const rarityOptions = $derived([
 		{ label: get_const_string(ConstStringKey.All), value: 0 },

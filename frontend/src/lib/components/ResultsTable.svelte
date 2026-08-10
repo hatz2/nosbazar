@@ -2,9 +2,8 @@
 	import { get_display_icon_id, type EnrichedSearchResult } from '$lib/types/search';
 	import { lang } from '$lib/stores/lang.svelte';
 	import ItemIcon from './ItemIcon.svelte';
-	import { onMount } from 'svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
-	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
+	import { get_const_string } from '$lib/services/constStringService.svelte';
 	import Tooltip from './Tooltip.svelte';
 	import TooltipContent from './TooltipContent.svelte';
 	import { BAZAR_PAGES_PER_SEARCH, BAZAR_ROWS_PER_PAGE } from '$lib/constants';
@@ -21,16 +20,6 @@
 	const visibleResults = $derived.by(() => {
 		const visibleStart = ((visualIndex - 1) % BAZAR_PAGES_PER_SEARCH) * BAZAR_ROWS_PER_PAGE;
 		return results.slice(visibleStart, visibleStart + BAZAR_ROWS_PER_PAGE);
-	});
-
-	onMount(() => {
-		fetchConstString(ConstStringKey.Name);
-		fetchConstString(ConstStringKey.Price);
-		fetchConstString(ConstStringKey.Amount);
-		fetchConstString(ConstStringKey.PricePerUnit);
-		fetchConstString(ConstStringKey.TimePeriod);
-		fetchConstString(ConstStringKey.NoItemHasBeenFound);
-		fetchConstString(ConstStringKey.Searching3);
 	});
 
 	function formatTime(minutes: number) {

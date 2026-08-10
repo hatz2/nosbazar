@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import * as enums from '$lib/types/enums';
 	import DynamicSelect from './DynamicSelect.svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
-	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
+	import { get_const_string } from '$lib/services/constStringService.svelte';
 
 	type Props = {
 		value?: number;
@@ -11,25 +10,6 @@
 	};
 
 	let { value = $bindable(0), category }: Props = $props();
-
-	onMount(() => {
-		fetchConstString(ConstStringKey.Upgrade0);
-		fetchConstString(ConstStringKey.Upgrade1);
-		fetchConstString(ConstStringKey.Upgrade2);
-		fetchConstString(ConstStringKey.Upgrade3);
-		fetchConstString(ConstStringKey.Upgrade4);
-		fetchConstString(ConstStringKey.Upgrade5);
-		fetchConstString(ConstStringKey.Upgrade6);
-		fetchConstString(ConstStringKey.Upgrade7);
-		fetchConstString(ConstStringKey.Upgrade8);
-		fetchConstString(ConstStringKey.Upgrade9);
-		fetchConstString(ConstStringKey.Upgrade10);
-		fetchConstString(ConstStringKey.Upgrade11);
-		fetchConstString(ConstStringKey.Upgrade12);
-		fetchConstString(ConstStringKey.Upgrade13);
-		fetchConstString(ConstStringKey.Upgrade14);
-		fetchConstString(ConstStringKey.Upgrade15);
-	});
 
 	const upgradeLevelOptions = $derived([
 		{ label: get_const_string(ConstStringKey.All), value: 0 },

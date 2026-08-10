@@ -1,21 +1,13 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { SortFilter } from '$lib/types/enums';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
-	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
+	import { get_const_string } from '$lib/services/constStringService.svelte';
 
 	type Props = {
 		value?: number;
 	};
 
 	let { value = $bindable(0) }: Props = $props();
-
-	onMount(() => {
-		fetchConstString(ConstStringKey.SortByPriceAscending);
-		fetchConstString(ConstStringKey.SortByPriceDescending);
-		fetchConstString(ConstStringKey.SortByAmountAscending);
-		fetchConstString(ConstStringKey.SortByAmountDescending);
-	});
 </script>
 
 <select bind:value class="bazar-select">

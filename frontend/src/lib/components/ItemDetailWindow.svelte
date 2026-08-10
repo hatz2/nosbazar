@@ -26,9 +26,8 @@
 		shouldShowDescription,
 		shouldShowFlags
 	} from '$lib/types/search';
-	import { onMount } from 'svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
-	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
+	import { get_const_string } from '$lib/services/constStringService.svelte';
 	import RunesIcon from './RunesIcon.svelte';
 	import RunesDetailWindow from './RunesDetailWindow.svelte';
 
@@ -50,63 +49,6 @@
 		runes_window_top = e.pageY - 20;
 		runes_window_open = true;
 	}
-
-	onMount(() => {
-		fetchConstString(ConstStringKey.Lv);
-		fetchConstString(ConstStringKey.Level);
-		fetchConstString(ConstStringKey.Required);
-		fetchConstString(ConstStringKey.Times);
-		fetchConstString(ConstStringKey.Damage);
-		fetchConstString(ConstStringKey.HitRate);
-		fetchConstString(ConstStringKey.Concentration);
-		fetchConstString(ConstStringKey.Critical);
-		fetchConstString(ConstStringKey.Price);
-		fetchConstString(ConstStringKey.Maximum);
-		fetchConstString(ConstStringKey.Magic);
-		fetchConstString(ConstStringKey.Defence);
-		fetchConstString(ConstStringKey.Dodge);
-		fetchConstString(ConstStringKey.Melee);
-		fetchConstString(ConstStringKey.Ranged);
-		fetchConstString(ConstStringKey.Fire);
-		fetchConstString(ConstStringKey.Water);
-		fetchConstString(ConstStringKey.Light);
-		fetchConstString(ConstStringKey.Shadow);
-		fetchConstString(ConstStringKey.RarityLevel);
-		fetchConstString(ConstStringKey.OnlyForMales);
-		fetchConstString(ConstStringKey.OnlyForFemales);
-		fetchConstString(ConstStringKey.ChampionLevel);
-		fetchConstString(ConstStringKey.CriticalChance);
-		fetchConstString(ConstStringKey.Adventurer);
-		fetchConstString(ConstStringKey.Swordsman);
-		fetchConstString(ConstStringKey.Mage);
-		fetchConstString(ConstStringKey.Archer);
-		fetchConstString(ConstStringKey.MartialArtist);
-		fetchConstString(ConstStringKey.Only);
-		fetchConstString(ConstStringKey.Option);
-		fetchConstString(ConstStringKey.Piece);
-		fetchConstString(ConstStringKey.Sell);
-		fetchConstString(ConstStringKey.Trade);
-		fetchConstString(ConstStringKey.CellonLevel);
-		fetchConstString(ConstStringKey.Drop);
-		fetchConstString(ConstStringKey.False);
-		fetchConstString(ConstStringKey.Number);
-		fetchConstString(ConstStringKey.CellonHpMaxIncrease);
-		fetchConstString(ConstStringKey.CellonMpMaxIncrease);
-		fetchConstString(ConstStringKey.CellonHpRecovery);
-		fetchConstString(ConstStringKey.CellonMpRecovery);
-		fetchConstString(ConstStringKey.CellonCritDmgReduction);
-		fetchConstString(ConstStringKey.CellonMpConsumptionReduction);
-		fetchConstString(ConstStringKey.PartnerSkill);
-		fetchConstString(ConstStringKey.PartnerSkillLevel);
-		fetchConstString(ConstStringKey.PartnerAttackBonus);
-		fetchConstString(ConstStringKey.PartnerDefenceBonus);
-		fetchConstString(ConstStringKey.PartnerCritReduction);
-		fetchConstString(ConstStringKey.PartnerHpMpBonus);
-		fetchConstString(ConstStringKey.PartnerFireResBonus);
-		fetchConstString(ConstStringKey.PartnerWaterResBonus);
-		fetchConstString(ConstStringKey.PartnerLightResBonus);
-		fetchConstString(ConstStringKey.PartnerShadowResBonus);
-	});
 
 	function getRarityColor(item: EnrichedSearchResult): string {
 		if ('rare' in item.data) {

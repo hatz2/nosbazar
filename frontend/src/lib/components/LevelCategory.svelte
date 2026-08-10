@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import * as enums from '$lib/types/enums';
 	import DynamicSelect from './DynamicSelect.svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
-	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
+	import { get_const_string } from '$lib/services/constStringService.svelte';
 
 	type Props = {
 		value?: number;
@@ -11,20 +10,6 @@
 	};
 
 	let { value = $bindable(0), category }: Props = $props();
-
-	onMount(() => {
-		fetchConstString(ConstStringKey.BazarLevel1_10);
-		fetchConstString(ConstStringKey.BazarLevel11_20);
-		fetchConstString(ConstStringKey.BazarLevel21_30);
-		fetchConstString(ConstStringKey.BazarLevel31_40);
-		fetchConstString(ConstStringKey.BazarLevel41_50);
-		fetchConstString(ConstStringKey.BazarLevel51_60);
-		fetchConstString(ConstStringKey.BazarLevel61_70);
-		fetchConstString(ConstStringKey.BazarLevel71_80);
-		fetchConstString(ConstStringKey.BazarLevel81_90);
-		fetchConstString(ConstStringKey.BazarLevel91_99);
-		fetchConstString(ConstStringKey.All);
-	});
 
 	const equipmentOptions = $derived([
 		{ label: get_const_string(ConstStringKey.All), value: 0 },

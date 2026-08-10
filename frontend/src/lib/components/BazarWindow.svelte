@@ -25,9 +25,8 @@
 	import ResultsTable from './ResultsTable.svelte';
 	import ItemDetailWindow from './ItemDetailWindow.svelte';
 	import SortByFilter from './SortByFilter.svelte';
-	import { onMount } from 'svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
-	import { fetchConstString, get_const_string } from '$lib/services/constStringService.svelte';
+	import { get_const_string } from '$lib/services/constStringService.svelte';
 	import { BAZAR_PAGES_PER_SEARCH } from '$lib/constants';
 
 	type OpenWindow = {
@@ -83,16 +82,6 @@
 	});
 
 	let nextWindowId = $state(0);
-
-	onMount(() => {
-		fetchConstString(ConstStringKey.Name);
-		fetchConstString(ConstStringKey.Level);
-		fetchConstString(ConstStringKey.RarityLevel);
-		fetchConstString(ConstStringKey.UpgradeLevel);
-		fetchConstString(ConstStringKey.SortBy);
-		fetchConstString(ConstStringKey.NosBazar);
-		fetchConstString(ConstStringKey.Category);
-	});
 
 	async function do_search(force = false) {
 		const index = getPageIndex();
