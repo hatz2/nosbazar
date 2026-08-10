@@ -119,7 +119,7 @@ Linting via `eslint.config.js`, formatting via `.prettierrc`. Run lint/format be
 ## C++ conventions
 
 - **Headers**: use `#pragma once`, not include guards. Keep headers self-contained — include what you use.
-- **Naming**: `snake_case` for functions and variables, `PascalCase` for types and enums. Member variables use `snake_case` with no prefix.
+- **Naming**: `snake_case` for functions and variables, `PascalCase` for types and enums. Member variables use `snake_case` with no prefix. Never use leading or trailing underscores in variable names (e.g. no `_foo` or `foo_`).
 - **std::variant dispatch**: use `std::visit` with a lambda, not manual `if-holds-alternative` chains. See existing pattern in `rc_blist.cpp` `json()`.
 - **String handling**: prefer `std::string_view` for parameters and parsing tokens. Avoid `std::string` ownership where not needed.
 - **No raw loops over packets** — use the token-based parser pattern in `strings::parse.h` instead of manual string splitting.
