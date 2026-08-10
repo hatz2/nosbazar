@@ -9,20 +9,6 @@
 
 namespace {
 
-bool is_dev_mode()
-{
-	const char* override = std::getenv("NOSBAZAR_DEV");
-	if (override != nullptr) {
-		return std::string(override) == "1";
-	}
-
-#ifdef NOSBAZAR_DEV
-	return true;
-#else
-	return false;
-#endif
-}
-
 std::string get_required_env(const char* key, std::string_view fallback = {})
 {
 	const char* value = std::getenv(key);

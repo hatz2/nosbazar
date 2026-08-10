@@ -29,9 +29,6 @@ void setup_log_level()
 {
     spdlog::level::level_enum log_level = spdlog::level::info;
 
-#ifdef NOSBAZAR_DEV
-    log_level = spdlog::level::trace;
-#else
 	const char* level = std::getenv("LOG_LEVEL");
 	if (level == nullptr) {
         log_level = spdlog::level::info;
@@ -47,8 +44,6 @@ void setup_log_level()
             log_level = spdlog::level::info;
         }
     }
-
-#endif
 
     SPDLOG_INFO("Log level set to {}", spdlog::level::to_string_view(log_level));
     spdlog::set_level(log_level);
