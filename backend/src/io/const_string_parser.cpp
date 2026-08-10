@@ -1,5 +1,6 @@
 #include "const_string_parser.h"
 #include "nos_file_text_reader.h"
+#include <crypto/hash.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
 #include <strings/encoding.h>
@@ -23,6 +24,8 @@ void ConstStringParser::load_language(Language lang, const std::string& lang_cod
 		SPDLOG_WARN("conststring.dat not found in NScliData_{}.NOS", lang_code);
 		return;
 	}
+
+	raw_content.append(content);
 
 	strings::Encoding encoding = encoding_for(lang);
 	std::unordered_map<int, std::string> entries;
@@ -50,6 +53,14 @@ ConstStringParser::ConstStringParser()
 	for (const auto& [lang, code] : language_string) {
 		load_language(lang, code);
 	}
+
+	data_hash = crypto::sha1(raw_content);
+	SPDLOG_INFO("Const string data hash: {}", data_hash);
+}
+
+const std::string& ConstStringParser::get_data_hash() const
+{
+	return data_hash;
 }
 
 ConstStringParser& ConstStringParser::instance()

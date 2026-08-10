@@ -140,6 +140,7 @@ int main(int argc, char** argv) {
     CROW_ROUTE(app, "/api/icon/<uint>").methods("GET"_method)(nosbazar::api::handle_icon);
     CROW_ROUTE(app, "/api/servers").methods("GET"_method)(nosbazar::api::handle_servers);
     CROW_ROUTE(app, "/api/conststring/<uint>").methods("GET"_method)(nosbazar::api::handle_const_string);
+    CROW_ROUTE(app, "/api/conststring/version").methods("GET"_method)(nosbazar::api::handle_const_string_version);
     CROW_ROUTE(app, "/api/bcard/string").methods("GET"_method)(nosbazar::api::handle_bcard_string);
 
     app.port(8080).multithreaded().run();

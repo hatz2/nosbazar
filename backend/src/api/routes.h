@@ -12,5 +12,6 @@ crow::response handle_icon(const crow::request& req, uint32_t icon_id);
 crow::response handle_bcard_string(const crow::request& req);
 crow::response handle_servers(const crow::request& req);
 crow::response handle_const_string(const crow::request& req, uint32_t id);
+crow::response handle_const_string_version(const crow::request& req);
 
 } // namespace nosbazar::api

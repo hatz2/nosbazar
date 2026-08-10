@@ -26,9 +26,17 @@ the search and selectors to work — see the root
 [README](../README.md#how-to-run-locally) or
 [backend/README.md](../backend/README.md).
 
-> In production (adapter-node), the `/api` prefix must be forwarded to the
-> backend by a reverse proxy (e.g. Nginx/caddy) in front of the SvelteKit
-> server, since the Vite proxy only applies to the dev server.
+> In production (adapter-static), the `/api` prefix must be forwarded to the
+> backend by a reverse proxy (e.g. Nginx/caddy), since the Vite proxy only
+> applies to the dev server.
+
+## Const string caching
+
+Const string translations are cached in `localStorage` under
+`nosbazar-conststrings` so browser reloads reuse already-fetched strings. The
+cache is keyed by a SHA1 digest of the game's const string data, served by
+`GET /api/conststring/version`; when the game data changes the backend serves
+a new digest and the frontend discards the stale cache and re-fetches lazily.
 
 ## Checks
 

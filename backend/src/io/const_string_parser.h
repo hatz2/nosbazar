@@ -15,6 +15,8 @@ public:
 
 	nlohmann::json get_translations(int id) const;
 
+	const std::string& get_data_hash() const;
+
 private:
 	ConstStringParser();
 	ConstStringParser(const ConstStringParser&) = delete;
@@ -23,6 +25,8 @@ private:
 	void load_language(Language lang, const std::string& lang_code);
 
 	std::unordered_map<Language, std::unordered_map<int, std::string>> translations;
+	std::string raw_content;
+	std::string data_hash;
 };
 
 }

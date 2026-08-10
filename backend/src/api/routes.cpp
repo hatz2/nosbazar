@@ -139,6 +139,14 @@ crow::response handle_const_string(const crow::request& req, uint32_t id)
 	return crow::response(json_data.dump());
 }
 
+crow::response handle_const_string_version(const crow::request& req)
+{
+	nlohmann::json json_data = {
+		{"version", nosbazar::io::ConstStringParser::instance().get_data_hash()}
+	};
+	return crow::response(json_data.dump());
+}
+
 crow::response handle_bcard_string(const crow::request& req)
 {
     const char* vnum_str = req.url_params.get("vnum");
