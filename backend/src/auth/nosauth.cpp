@@ -58,7 +58,7 @@ nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const 
 	if (result) {
 		auto json_response = json::parse(result->body);
 
-		SPDLOG_DEBUG("authenticate: {}", json_response.dump(JSON_INDENT));
+		SPDLOG_TRACE("authenticate response: {}", json_response.dump(JSON_INDENT));
 
 		if (result->status_code == 409) {
 			const auto& error_types = json_response["errorTypes"];
@@ -116,7 +116,7 @@ json nosbazar::auth::NosAuth::get_accounts()
 	auto result = net::get(url, headers);
 
 	if (result) {
-		SPDLOG_DEBUG("get_accounts: {}", json::parse(result->body).dump(JSON_INDENT));
+		SPDLOG_TRACE("get_accounts response: {}", json::parse(result->body).dump(JSON_INDENT));
 
 		if (result->status_code != 200) {
 			return {};
@@ -181,7 +181,7 @@ bool nosbazar::auth::NosAuth::send_iovation(const std::string& account_id) const
 		return false;
 	}
 
-	SPDLOG_DEBUG("send_iovation: {}", json::parse(reply->body).dump(JSON_INDENT));
+	SPDLOG_TRACE("send_iovation response: {}", json::parse(reply->body).dump(JSON_INDENT));
 
 	if (reply->status_code != 200) {
 		return false;
@@ -236,7 +236,7 @@ std::optional<std::string> nosbazar::auth::NosAuth::get_session_token(const std:
 		return std::nullopt;
 	}
 
-	SPDLOG_DEBUG("get_session_token: {}", json::parse(reply->body).dump(JSON_INDENT));
+	SPDLOG_TRACE("get_session_token response: {}", json::parse(reply->body).dump(JSON_INDENT));
 
 	if (reply->status_code != 201) {
 		return std::nullopt;

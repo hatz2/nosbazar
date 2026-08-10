@@ -249,12 +249,12 @@ nosbazar::net::Session::Session(std::unique_ptr<TCPClient> client, packets::Publ
 
 void nosbazar::net::Session::on_connect()
 {
-    SPDLOG_DEBUG("Session::on_connect");
+    SPDLOG_TRACE("Session::on_connect");
 }
 
 void nosbazar::net::Session::on_disconnect()
 {
-    SPDLOG_DEBUG("Session::on_disconnect");
+    SPDLOG_TRACE("Session::on_disconnect");
 }
 
 void nosbazar::net::Session::on_packet(const std::string& packet)

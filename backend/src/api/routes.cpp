@@ -18,7 +18,7 @@ namespace nosbazar::api {
 
 crow::response handle_search(const crow::request& req)
 {
-    SPDLOG_DEBUG(req.body);
+    SPDLOG_TRACE("Search request body: {}", req.body);
 
     crow::json::rvalue json = crow::json::load(req.body);
 
@@ -59,7 +59,7 @@ crow::response handle_item_static(const crow::request& req, uint32_t vnum)
 
         return crow::response(result);
     } catch (const std::out_of_range& e) {
-        SPDLOG_WARN("Item not found for vnum: {}", vnum);
+        SPDLOG_INFO("Item not found for vnum: {}", vnum);
         return crow::response(404, "Item data not found.");
     } catch (const std::exception& e) {
         SPDLOG_ERROR("Internal error fetching item data for vnum {} : {}", vnum, e.what());
@@ -74,7 +74,7 @@ crow::response handle_monster_static(const crow::request& req, uint32_t vnum)
         nlohmann::json json_data = monster.json();
         return crow::response(json_data.dump(2));
     } catch (const std::out_of_range& e) {
-        SPDLOG_WARN("Monster not found for vnum: {}", vnum);
+        SPDLOG_INFO("Monster not found for vnum: {}", vnum);
         return crow::response(404, "Monster data not found.");
     } catch (const std::exception& e) {
         SPDLOG_ERROR("Internal error fetching monster data for vnum {} : {}", vnum, e.what());
@@ -89,7 +89,7 @@ crow::response handle_skill_static(const crow::request& req, uint32_t vnum)
 		nlohmann::json json_data = skill.json();
 		return crow::response(json_data.dump(2));
 	} catch (const std::out_of_range& e) {
-		SPDLOG_WARN("Skill not found for vnum: {}", vnum);
+		SPDLOG_INFO("Skill not found for vnum: {}", vnum);
 		return crow::response(404, "Skill data not found.");
 	} catch (const std::exception& e) {
 		SPDLOG_ERROR("Internal error fetching skill data for vnum {} : {}", vnum, e.what());
@@ -176,7 +176,7 @@ crow::response handle_bcard_string(const crow::request& req)
         nlohmann::json json_data = nosbazar::io::BCardParser::instance().format_bcard_string(vnum, bcard_sub, val_1, val_2);
         return crow::response(json_data.dump(2));
     } catch (const std::out_of_range& e) {
-        SPDLOG_WARN("BCard not found for vnum: {} sub: {}", vnum, bcard_sub);
+        SPDLOG_INFO("BCard not found for vnum: {} sub: {}", vnum, bcard_sub);
         return crow::response(404, "BCard data not found.");
     } catch (const std::exception& e) {
         SPDLOG_ERROR("Internal error formatting bcard: {}", e.what());

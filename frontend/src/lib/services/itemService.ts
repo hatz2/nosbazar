@@ -72,7 +72,6 @@ export const itemService = {
 				return null;
 			}
 			const data = await response.json();
-			console.log(data);
 			cache.set(vnum, data);
 			return data;
 		} catch (error) {

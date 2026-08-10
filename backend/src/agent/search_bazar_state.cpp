@@ -40,7 +40,7 @@ void nosbazar::agent::SearchBazarState::act(const game::Sensors& sensors)
 
 	timer.start();
 
-	SPDLOG_DEBUG("Sending {}", task->request.search_packet.string());
+	SPDLOG_TRACE("Sending {}", task->request.search_packet.string());
 	
 	session.send(task->request.search_packet.string());
 }
@@ -51,7 +51,7 @@ void nosbazar::agent::SearchBazarState::on_rc_blist(std::string_view packet)
 		return;
 	}
 
-	SPDLOG_DEBUG(packet);
+	SPDLOG_TRACE(packet);
 
 	// Send back the resposne
 	std::string response(packet);
