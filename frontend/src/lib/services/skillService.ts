@@ -1,3 +1,5 @@
+import { API_BASE } from '$lib/constants';
+
 export interface SkillStaticData {
 	vnum: number;
 	name: Record<string, string>;
@@ -12,7 +14,7 @@ export const skillService = {
 		}
 
 		try {
-			const response = await fetch(`http://localhost:8080/skill/static/${vnum}`);
+			const response = await fetch(`${API_BASE}/skill/static/${vnum}`);
 			if (!response.ok) {
 				console.warn(`Failed to fetch static data for skill ${vnum}: ${response.statusText}`);
 				return null;

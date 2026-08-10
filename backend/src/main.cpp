@@ -133,14 +133,14 @@ int main(int argc, char** argv) {
 
     crow::App<crow::CORSHandler> app;
 
-    CROW_ROUTE(app, "/search").methods("POST"_method)(nosbazar::api::handle_search);
-    CROW_ROUTE(app, "/items/static/<uint>").methods("GET"_method)(nosbazar::api::handle_item_static);
-    CROW_ROUTE(app, "/monster/static/<uint>").methods("GET"_method)(nosbazar::api::handle_monster_static);
-    CROW_ROUTE(app, "/skill/static/<uint>").methods("GET"_method)(nosbazar::api::handle_skill_static);
-    CROW_ROUTE(app, "/icon/<uint>").methods("GET"_method)(nosbazar::api::handle_icon);
-    CROW_ROUTE(app, "/servers").methods("GET"_method)(nosbazar::api::handle_servers);
-    CROW_ROUTE(app, "/conststring/<uint>").methods("GET"_method)(nosbazar::api::handle_const_string);
-    CROW_ROUTE(app, "/bcard/string").methods("GET"_method)(nosbazar::api::handle_bcard_string);
+    CROW_ROUTE(app, "/api/search").methods("POST"_method)(nosbazar::api::handle_search);
+    CROW_ROUTE(app, "/api/items/static/<uint>").methods("GET"_method)(nosbazar::api::handle_item_static);
+    CROW_ROUTE(app, "/api/monster/static/<uint>").methods("GET"_method)(nosbazar::api::handle_monster_static);
+    CROW_ROUTE(app, "/api/skill/static/<uint>").methods("GET"_method)(nosbazar::api::handle_skill_static);
+    CROW_ROUTE(app, "/api/icon/<uint>").methods("GET"_method)(nosbazar::api::handle_icon);
+    CROW_ROUTE(app, "/api/servers").methods("GET"_method)(nosbazar::api::handle_servers);
+    CROW_ROUTE(app, "/api/conststring/<uint>").methods("GET"_method)(nosbazar::api::handle_const_string);
+    CROW_ROUTE(app, "/api/bcard/string").methods("GET"_method)(nosbazar::api::handle_bcard_string);
 
     app.port(8080).multithreaded().run();
 

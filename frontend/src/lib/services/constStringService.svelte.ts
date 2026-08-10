@@ -1,6 +1,7 @@
 import type { LanguageCode } from '$lib/stores/lang.svelte';
 import type { ConstStringKey } from '$lib/types/constStringKeys';
 import { lang } from '$lib/stores/lang.svelte';
+import { API_BASE } from '$lib/constants';
 
 const ALL_LANGS: LanguageCode[] = ['ES', 'UK', 'FR', 'DE', 'TR', 'IT', 'PL', 'CZ'];
 const cache: Record<number, Record<LanguageCode, string> | undefined> = $state({});
@@ -17,7 +18,7 @@ export async function fetchConstString(id: ConstStringKey): Promise<void> {
 	if (cache[id] !== undefined) return;
 
 	try {
-		const response = await fetch(`http://localhost:8080/conststring/${id}`);
+		const response = await fetch(`${API_BASE}/conststring/${id}`);
 		if (!response.ok) {
 			console.warn(`Failed to fetch const string ${id}: ${response.statusText}`);
 			cache[id] = emptyTranslations();

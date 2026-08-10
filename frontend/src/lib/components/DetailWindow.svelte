@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import Draggable from './Draggable.svelte';
 	import CloseButton from './CloseButton.svelte';
+	import { API_BASE } from '$lib/constants';
 
 	type Props = {
 		left?: number;
@@ -29,7 +30,7 @@
 		</div>
 
 		{#if iconId !== undefined}
-			<img src="http://localhost:8080/icon/{iconId}" alt="Item icon" class="window-icon" />
+			<img src="{API_BASE}/icon/{iconId}" alt="Item icon" class="window-icon" />
 		{/if}
 
 		{@render children?.()}

@@ -12,6 +12,7 @@
 	import { itemService } from '$lib/services/itemService';
 	import { monsterService } from '$lib/services/monsterService';
 	import { skillService } from '$lib/services/skillService';
+	import { API_BASE } from '$lib/constants';
 	import BlueButton from './BlueButton.svelte';
 	import Category from './Category.svelte';
 	// import Draggable from './Draggable.svelte';
@@ -105,7 +106,7 @@
 		isSearching = true;
 		results = [];
 		try {
-			const response = await fetch('http://localhost:8080/search', {
+			const response = await fetch(`${API_BASE}/search`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { API_BASE } from '$lib/constants';
+
 	type Props = {
 		iconId?: number;
 	};
@@ -9,7 +11,7 @@
 {#if iconId !== undefined}
 	<span class="icon-wrapper">
 		<img
-			src="http://localhost:8080/icon/{iconId}"
+			src="{API_BASE}/icon/{iconId}"
 			alt="Item icon"
 			class="orange-outline"
 			draggable="false"

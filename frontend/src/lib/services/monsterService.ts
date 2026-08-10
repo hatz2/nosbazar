@@ -1,3 +1,5 @@
+import { API_BASE } from '$lib/constants';
+
 export interface MonsterStaticData {
 	vnum: number;
 	name: Record<string, string>;
@@ -13,7 +15,7 @@ export const monsterService = {
 		}
 
 		try {
-			const response = await fetch(`http://localhost:8080/monster/static/${vnum}`);
+			const response = await fetch(`${API_BASE}/monster/static/${vnum}`);
 			if (!response.ok) {
 				console.warn(`Failed to fetch static data for monster ${vnum}: ${response.statusText}`);
 				return null;

@@ -1,3 +1,5 @@
+import { API_BASE } from '$lib/constants';
+
 export interface ItemBuffEntry {
 	vnum: number;
 	bcard_display: Record<string, string>;
@@ -64,7 +66,7 @@ export const itemService = {
 		}
 
 		try {
-			const response = await fetch(`http://localhost:8080/items/static/${vnum}`);
+			const response = await fetch(`${API_BASE}/items/static/${vnum}`);
 			if (!response.ok) {
 				console.warn(`Failed to fetch static data for item ${vnum}: ${response.statusText}`);
 				return null;

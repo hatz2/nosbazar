@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { type EnrichedSearchResult } from '$lib/types/search';
-	import { RUNES_ICON_ID } from '$lib/constants';
+	import { RUNES_ICON_ID, API_BASE } from '$lib/constants';
 
 	type Props = {
 		item: EnrichedSearchResult;
@@ -21,7 +21,7 @@
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div style="left: {left}px; top: {top}px" oncontextmenu={handleContextMenu}>
 		<img
-			src="http://localhost:8080/icon/{RUNES_ICON_ID}"
+			src="{API_BASE}/icon/{RUNES_ICON_ID}"
 			alt="Runes icon"
 			class="orange-outline"
 			draggable="false"

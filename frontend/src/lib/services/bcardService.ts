@@ -1,4 +1,5 @@
 import type { LanguageCode } from '$lib/stores/lang.svelte';
+import { API_BASE } from '$lib/constants';
 
 const ALL_LANGS: LanguageCode[] = ['ES', 'UK', 'FR', 'DE', 'TR', 'IT', 'PL', 'CZ'];
 const cache = new Map<string, Record<LanguageCode, string>>();
@@ -25,7 +26,7 @@ export async function fetchBcardString(
 
 	try {
 		const response = await fetch(
-			`http://localhost:8080/bcard/string?vnum=${vnum}&sub=${sub}&val1=${val1}&val2=${val2}`
+			`${API_BASE}/bcard/string?vnum=${vnum}&sub=${sub}&val1=${val1}&val2=${val2}`
 		);
 		if (!response.ok) {
 			console.warn(`Failed to fetch bcard string ${key}: ${response.statusText}`);

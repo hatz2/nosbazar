@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import HeaderButton from '$lib/components/HeaderButton.svelte';
-	import { GITHUB_ICON_PATH } from '$lib/constants';
+	import { GITHUB_ICON_PATH, API_BASE } from '$lib/constants';
 
 	const version = '0.0.1';
 
@@ -9,7 +9,7 @@
 
 	onMount(async () => {
 		try {
-			const res = await fetch('http://localhost:8080/servers');
+			const res = await fetch(`${API_BASE}/servers`);
 			serverOnline = res.ok;
 		} catch {
 			serverOnline = false;

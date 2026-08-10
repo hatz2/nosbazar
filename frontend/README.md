@@ -1,7 +1,8 @@
 # NosBazar frontend
 
 SvelteKit web UI for the NosBazar bazaar search. It talks to the NosBazar
-backend HTTP API on `localhost:8080`.
+backend HTTP API. All API requests are made as same-origin relative URLs under
+the `/api` prefix, so no absolute `localhost` host is referenced by the client.
 
 ## Requirements
 
@@ -19,10 +20,15 @@ npm install
 npm run dev
 ```
 
-The app runs at `http://localhost:5173`. The backend must be running on
-`localhost:8080` for the search and selectors to work — see the root
+The app runs at `http://localhost:5173`. During development, Vite proxies
+`/api/*` requests to the backend on `localhost:8080`, which must be running for
+the search and selectors to work — see the root
 [README](../README.md#how-to-run-locally) or
 [backend/README.md](../backend/README.md).
+
+> In production (adapter-node), the `/api` prefix must be forwarded to the
+> backend by a reverse proxy (e.g. Nginx/caddy) in front of the SvelteKit
+> server, since the Vite proxy only applies to the dev server.
 
 ## Checks
 

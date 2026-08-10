@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Dropdown from '$lib/components/Dropdown.svelte';
+	import { API_BASE } from '$lib/constants';
 
 	type Server = {
 		id: number;
@@ -14,7 +15,7 @@
 
 	onMount(async () => {
 		try {
-			const res = await fetch('http://localhost:8080/servers');
+			const res = await fetch(`${API_BASE}/servers`);
 			servers = await res.json();
 		} catch (e) {
 			console.error('Failed to fetch servers', e);
