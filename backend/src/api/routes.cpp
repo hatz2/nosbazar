@@ -10,9 +10,13 @@
 #include <io/const_string_parser.h>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
+#include <algorithm>
+#include <limits>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <io/language.h>
 
 namespace nosbazar::api {
 
@@ -23,6 +27,40 @@ crow::response handle_search(const crow::request& req)
     crow::json::rvalue json = crow::json::load(req.body);
 
     int64_t server = json["server"].i();
+
+    std::vector<uint32_t> vnums;
+    for (auto& vnum : json["filters"]["vnum"].lo()) {
+        vnums.push_back(static_cast<uint32_t>(vnum.i()));
+    }
+
+    if (json.has("name") && json["name"].t() == crow::json::type::String) {
+        const std::string name = json["name"].s();
+        if (!name.empty()) {
+
+            io::Language lang = io::Language::english;
+            if (json.has("lang") && json["lang"].t() == crow::json::type::String) {
+                const std::string lang_code = json["lang"].s();
+                const auto lang_it = io::string_to_lang.find(lang_code);
+                if (lang_it != io::string_to_lang.end()) {
+                    lang = lang_it->second;
+                }
+            }
+
+            std::vector<nosbazar::io::ItemDatParser::ItemNameMatch> matches =
+                nosbazar::io::ItemDatParser::instance().search_by_name(
+                    lang, name, std::numeric_limits<size_t>::max());
+
+            if (matches.empty()) {
+                SPDLOG_INFO("Name filter '{}' matched no items", name);
+                return crow::response(R"({"items": []})");
+            }
+
+            for (const auto& match : matches) {
+                vnums.push_back(match.vnum);
+            }
+            SPDLOG_INFO("Name filter '{}' resolved to {} vnums", name, matches.size());
+        }
+    }
 
     auto task = std::make_shared<nosbazar::BazarSearch>();
 
@@ -36,8 +74,8 @@ crow::response handle_search(const crow::request& req)
         .order_filter = (int)json["filters"]["order"].i()
     };
 
-    for (auto& vnum : json["filters"]["vnum"].lo()) {
-        search_packet.vnums_filter.push_back(vnum.i());
+    for (uint32_t vnum : vnums) {
+        search_packet.vnums_filter.push_back(static_cast<uint16_t>(vnum));
     }
 
     task->request.search_packet = std::move(search_packet);
@@ -47,6 +85,44 @@ crow::response handle_search(const crow::request& req)
     std::string result = task->response.packet.get_future().get();
 
     return crow::response(result);
+}
+
+crow::response handle_item_name_search(const crow::request& req)
+{
+    const char* query_str = req.url_params.get("q");
+    if (query_str == nullptr || *query_str == '\0') {
+        return crow::response(400, "Missing required query param: q.");
+    }
+
+    io::Language lang = io::Language::english;
+    const char* lang_str = req.url_params.get("lang");
+    if (lang_str != nullptr) {
+        const auto lang_it = io::string_to_lang.find(lang_str);
+        if (lang_it != io::string_to_lang.end()) {
+            lang = lang_it->second;
+        }
+    }
+
+    size_t limit = 10;
+    const char* limit_str = req.url_params.get("limit");
+    if (limit_str != nullptr) {
+        try {
+            limit = std::stoul(limit_str);
+        } catch (const std::exception& e) {
+            return crow::response(400, "Invalid limit: must be a positive integer.");
+        }
+    }
+    limit = std::clamp(limit, size_t{1}, size_t{50});
+
+    std::vector<nosbazar::io::ItemDatParser::ItemNameMatch> matches =
+        nosbazar::io::ItemDatParser::instance().search_by_name(lang, query_str, limit);
+
+    nlohmann::json json_data = nlohmann::json::array();
+    for (const auto& match : matches) {
+        json_data.push_back({{"vnum", match.vnum}, {"name", match.name}, {"icon_id", match.icon_id}});
+    }
+
+    return crow::response(nlohmann::json{{"matches", json_data}}.dump());
 }
 
 crow::response handle_item_static(const crow::request& req, uint32_t vnum)

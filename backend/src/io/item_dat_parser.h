@@ -2,8 +2,11 @@
 
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include <array>
 #include <unordered_map>
+#include <mutex>
+#include <vector>
 #include <variant>
 #include <sstream>
 #include <nlohmann/json.hpp>
@@ -74,15 +77,34 @@ namespace nosbazar::io {
     public:
         static ItemDatParser& instance();
 
+        struct ItemNameMatch {
+            uint32_t vnum{};
+            std::string name;
+            uint32_t icon_id{};
+        };
+
         void parse(const std::string& file_content);
 
         const Item& item_data(uint32_t vnum) const;
 
+        std::vector<ItemNameMatch> search_by_name(Language lang, std::string_view query, size_t limit = 10) const;
+
     private:
+        struct ItemNameIndexEntry {
+            uint32_t vnum{};
+            std::string name;
+            std::string lower_name;
+            uint32_t icon_id{};
+        };
+
         ItemDatParser() = default;
         ItemDatParser(ItemDatParser&) = delete;
         void operator=(ItemDatParser&) = delete;
 
+        const std::vector<ItemNameIndexEntry>& ensure_name_index(Language lang) const;
+
         std::unordered_map<uint32_t, Item> items;
+        mutable std::mutex name_index_mutex;
+        mutable std::unordered_map<Language, std::vector<ItemNameIndexEntry>> name_indexes;
     };
 }

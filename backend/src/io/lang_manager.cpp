@@ -20,7 +20,7 @@ namespace nosbazar::io {
 			file_parsers.emplace(filename, std::move(parser));
 		}
 	}
-	std::string LangManager::LangFile::translation(const std::string& filename, const std::string& code_name)
+	std::string LangManager::LangFile::translation(const std::string& filename, const std::string& code_name) const
 	{
 		if (file_parsers.contains(filename)) {
 			auto& parser = file_parsers.at(filename);
@@ -30,18 +30,27 @@ namespace nosbazar::io {
 		return code_name;
 	}
 
+	std::optional<std::string_view> LangManager::LangFile::translation_if_present(const std::string& filename, const std::string& code_name) const
+	{
+		const auto iterator = file_parsers.find(filename);
+		if (iterator == file_parsers.end()) {
+			return std::nullopt;
+		}
+		return iterator->second->translation_if_present(code_name);
+	}
+
 	LangManager& LangManager::get_instance()
 	{
 		static LangManager instance;
 		return instance;
 	}
 
-	std::string LangManager::get_translation(Language lang, const std::string& filename, const std::string& code_name)
+	std::string LangManager::get_translation(Language lang, const std::string& filename, const std::string& code_name) const
 	{
 		return lang_files.at(lang)->translation(filename, code_name);
 	}
 
-	nlohmann::json LangManager::get_all_translations(const std::string& filename_template, const std::string& code_name)
+	nlohmann::json LangManager::get_all_translations(const std::string& filename_template, const std::string& code_name) const
 	{
 		nlohmann::json result;
 		for (const auto& [lang, code] : language_string) {
@@ -53,7 +62,7 @@ namespace nosbazar::io {
 		return result;
 	}
 
-	std::string LangManager::get_item_translation(Language lang, const std::string& code_name)
+	std::string LangManager::get_item_translation(Language lang, const std::string& code_name) const
 	{
 		std::string language = language_string.at(lang);
 		std::transform(language.begin(), language.end(), language.begin(), ::tolower);
@@ -61,12 +70,21 @@ namespace nosbazar::io {
 		return get_translation(lang, filename, code_name);
 	}
 
-	nlohmann::json LangManager::get_all_item_translations(const std::string& code_name)
+	std::string LangManager::get_item_translation_quiet(Language lang, const std::string& code_name) const
+	{
+		std::string language = language_string.at(lang);
+		std::transform(language.begin(), language.end(), language.begin(), ::tolower);
+		std::string filename = fmt::format("_code_{}_Item.txt", language);
+		const auto value = lang_files.at(lang)->translation_if_present(filename, code_name);
+		return value.has_value() ? std::string(value.value()) : std::string{};
+	}
+
+	nlohmann::json LangManager::get_all_item_translations(const std::string& code_name) const
 	{
 		return get_all_translations("_code_{}_Item.txt", code_name);
 	}
 
-	std::string LangManager::get_bcard_translation(Language lang, const std::string& code_name)
+	std::string LangManager::get_bcard_translation(Language lang, const std::string& code_name) const
 	{
 		std::string lang_lower = language_string.at(lang);
 		std::transform(lang_lower.begin(), lang_lower.end(), lang_lower.begin(), ::tolower);
@@ -74,12 +92,12 @@ namespace nosbazar::io {
 		return get_translation(lang, filename, code_name);
 	}
 
-	nlohmann::json LangManager::get_all_bcard_translations(const std::string& code_name)
+	nlohmann::json LangManager::get_all_bcard_translations(const std::string& code_name) const
 	{
 		return get_all_translations("_code_{}_BCard.txt", code_name);
 	}
 
-	std::string LangManager::get_monster_translation(Language lang, const std::string& code_name)
+	std::string LangManager::get_monster_translation(Language lang, const std::string& code_name) const
 	{
 		std::string lang_lower = language_string.at(lang);
 		std::transform(lang_lower.begin(), lang_lower.end(), lang_lower.begin(), ::tolower);
@@ -89,7 +107,7 @@ namespace nosbazar::io {
 		return result;
 	}
 
-	nlohmann::json LangManager::get_all_monster_translations(const std::string& code_name)
+	nlohmann::json LangManager::get_all_monster_translations(const std::string& code_name) const
 	{
 		nlohmann::json result;
 		for (const auto& [lang, code] : language_string) {
@@ -98,7 +116,7 @@ namespace nosbazar::io {
 		return result;
 	}
 
-	std::string LangManager::get_skill_translation(Language lang, const std::string& code_name)
+	std::string LangManager::get_skill_translation(Language lang, const std::string& code_name) const
 	{
 		std::string lang_lower = language_string.at(lang);
 		std::transform(lang_lower.begin(), lang_lower.end(), lang_lower.begin(), ::tolower);
@@ -106,7 +124,7 @@ namespace nosbazar::io {
 		return get_translation(lang, filename, code_name);
 	}
 
-	nlohmann::json LangManager::get_all_skill_translations(const std::string& code_name)
+	nlohmann::json LangManager::get_all_skill_translations(const std::string& code_name) const
 	{
 		return get_all_translations("_code_{}_Skill.txt", code_name);
 	}

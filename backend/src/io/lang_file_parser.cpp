@@ -31,14 +31,23 @@ namespace nosbazar::io {
 		}
 	}
 
-	const std::string& LangFileParser::translation(const std::string& code_name) const
+const std::string& LangFileParser::translation(const std::string& code_name) const
 	{
 		if (translations.contains(code_name)) {
 			return translations.at(code_name);
 		}
 		else {
-		SPDLOG_ERROR("Could not find translation for key: {}", code_name);
+			SPDLOG_ERROR("Could not find translation for key: {}", code_name);
 			return code_name;
 		}
+	}
+
+	std::optional<std::string_view> LangFileParser::translation_if_present(const std::string& code_name) const
+	{
+		const auto iterator = translations.find(code_name);
+		if (iterator == translations.end()) {
+			return std::nullopt;
+		}
+		return std::string_view(iterator->second);
 	}
 }

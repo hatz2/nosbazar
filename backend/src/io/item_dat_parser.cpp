@@ -1,9 +1,24 @@
 #include "item_dat_parser.h"
 #include <io/bcard_parser.h>
 #include <sstream>
+#include <algorithm>
 #include <game/enums.h>
 #include <utility>
+#include <unicode/unistr.h>
 #include <spdlog/spdlog.h>
+
+namespace {
+
+std::string lowercase_utf8(std::string_view text)
+{
+	icu::UnicodeString unicode(text.data(), static_cast<int32_t>(text.size()), "UTF-8");
+	unicode.toLower();
+	std::string result;
+	unicode.toUTF8String(result);
+	return result;
+}
+
+}
 
 nosbazar::io::ItemDatParser& nosbazar::io::ItemDatParser::instance()
 {
@@ -98,6 +113,75 @@ void nosbazar::io::ItemDatParser::parse(const std::string& file_content)
 const nosbazar::io::Item& nosbazar::io::ItemDatParser::item_data(uint32_t vnum) const
 {
 	return items.at(vnum);
+}
+
+const std::vector<nosbazar::io::ItemDatParser::ItemNameIndexEntry>& nosbazar::io::ItemDatParser::ensure_name_index(Language lang) const
+{
+	std::lock_guard<std::mutex> lock(name_index_mutex);
+
+	const auto cached = name_indexes.find(lang);
+	if (cached != name_indexes.end()) {
+		return cached->second;
+	}
+
+	std::vector<ItemNameIndexEntry> entries;
+	entries.reserve(items.size());
+	for (const auto& [vnum, item] : items) {
+		ItemNameIndexEntry entry;
+		entry.vnum = vnum;
+		entry.icon_id = item.icon_id;
+		entry.name = LangManager::get_instance().get_item_translation_quiet(lang, item.item_name_code);
+		if (entry.name.empty()) {
+			continue;
+		}
+		entry.lower_name = lowercase_utf8(entry.name);
+		entries.push_back(std::move(entry));
+	}
+
+	std::sort(entries.begin(), entries.end(), [](const ItemNameIndexEntry& a, const ItemNameIndexEntry& b) {
+		return a.vnum < b.vnum;
+	});
+
+	return name_indexes.emplace(lang, std::move(entries)).first->second;
+}
+
+std::vector<nosbazar::io::ItemDatParser::ItemNameMatch> nosbazar::io::ItemDatParser::search_by_name(
+	Language lang, std::string_view query, size_t limit) const
+{
+	const std::vector<ItemNameIndexEntry>& index = ensure_name_index(lang);
+	const std::string lowered_query = lowercase_utf8(query);
+
+	std::vector<ItemNameMatch> prefix_matches;
+	std::vector<ItemNameMatch> contains_matches;
+
+	for (const ItemNameIndexEntry& entry : index) {
+		if (entry.lower_name.find(lowered_query) == std::string::npos) {
+			continue;
+		}
+
+		ItemNameMatch match{entry.vnum, entry.name, entry.icon_id};
+		if (entry.lower_name.starts_with(lowered_query)) {
+			prefix_matches.push_back(std::move(match));
+		} else {
+			contains_matches.push_back(std::move(match));
+		}
+	}
+
+	std::vector<ItemNameMatch> result;
+	result.reserve(std::min(limit, prefix_matches.size() + contains_matches.size()));
+	for (const ItemNameMatch& match : prefix_matches) {
+		if (result.size() >= limit) {
+			break;
+		}
+		result.push_back(match);
+	}
+	for (const ItemNameMatch& match : contains_matches) {
+		if (result.size() >= limit) {
+			break;
+		}
+		result.push_back(match);
+	}
+	return result;
 }
 
 nlohmann::json nosbazar::io::Item::json() const {

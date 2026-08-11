@@ -10,27 +10,29 @@ namespace nosbazar::io {
 	public:
 		static LangManager& get_instance();
 
-		std::string get_item_translation(Language lang, const std::string& code_name);
+		std::string get_item_translation(Language lang, const std::string& code_name) const;
 
-		nlohmann::json get_all_item_translations(const std::string& code_name);
+		std::string get_item_translation_quiet(Language lang, const std::string& code_name) const;
 
-		std::string get_bcard_translation(Language lang, const std::string& code_name);
+		nlohmann::json get_all_item_translations(const std::string& code_name) const;
 
-		nlohmann::json get_all_bcard_translations(const std::string& code_name);
+		std::string get_bcard_translation(Language lang, const std::string& code_name) const;
 
-		std::string get_monster_translation(Language lang, const std::string& code_name);
+		nlohmann::json get_all_bcard_translations(const std::string& code_name) const;
 
-		nlohmann::json get_all_monster_translations(const std::string& code_name);
+		std::string get_monster_translation(Language lang, const std::string& code_name) const;
 
-		std::string get_skill_translation(Language lang, const std::string& code_name);
+		nlohmann::json get_all_monster_translations(const std::string& code_name) const;
 
-		nlohmann::json get_all_skill_translations(const std::string& code_name);
+		std::string get_skill_translation(Language lang, const std::string& code_name) const;
+
+		nlohmann::json get_all_skill_translations(const std::string& code_name) const;
 
 	private:
 
-		std::string get_translation(Language lang, const std::string& filename, const std::string& code_name);
+		std::string get_translation(Language lang, const std::string& filename, const std::string& code_name) const;
 
-		nlohmann::json get_all_translations(const std::string& filename_template, const std::string& code_name);
+		nlohmann::json get_all_translations(const std::string& filename_template, const std::string& code_name) const;
 		/**
 		 * @brief Helper class that represents a single NSlangData_XX.NOS file.
 		 */
@@ -38,7 +40,9 @@ namespace nosbazar::io {
 		public:
 			LangFile(Language lang);
 
-			std::string translation(const std::string& filename, const std::string& code_name);
+			std::string translation(const std::string& filename, const std::string& code_name) const;
+
+			std::optional<std::string_view> translation_if_present(const std::string& filename, const std::string& code_name) const;
 
 		private:
 			std::unordered_map<std::string /* filename */, std::unique_ptr<LangFileParser>> file_parsers;

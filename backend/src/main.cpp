@@ -130,6 +130,7 @@ int main(int argc, char** argv) {
 
     CROW_ROUTE(app, "/api/search").methods("POST"_method)(nosbazar::api::handle_search);
     CROW_ROUTE(app, "/api/items/static/<uint>").methods("GET"_method)(nosbazar::api::handle_item_static);
+    CROW_ROUTE(app, "/api/items/name-search").methods("GET"_method)(nosbazar::api::handle_item_name_search);
     CROW_ROUTE(app, "/api/monster/static/<uint>").methods("GET"_method)(nosbazar::api::handle_monster_static);
     CROW_ROUTE(app, "/api/skill/static/<uint>").methods("GET"_method)(nosbazar::api::handle_skill_static);
     CROW_ROUTE(app, "/api/icon/<uint>").methods("GET"_method)(nosbazar::api::handle_icon);
