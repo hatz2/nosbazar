@@ -251,7 +251,6 @@ void nosbazar::Clientless::init_pulse_timer()
         [this]() {
             pulse_time += pulse_secs;
             world_session->send(fmt::format("pulse {} 0", pulse_time));
-            SPDLOG_DEBUG("Sending pulse");
         }
     );
 }
