@@ -13,6 +13,7 @@
 	import { monsterService } from '$lib/services/monsterService';
 	import { skillService } from '$lib/services/skillService';
 	import { API_BASE } from '$lib/constants';
+	import { lang } from '$lib/stores/lang.svelte';
 	import BlueButton from './BlueButton.svelte';
 	import Category from './Category.svelte';
 	// import Draggable from './Draggable.svelte';
@@ -25,6 +26,7 @@
 	import ResultsTable from './ResultsTable.svelte';
 	import ItemDetailWindow from './ItemDetailWindow.svelte';
 	import SortByFilter from './SortByFilter.svelte';
+	import ItemSearchInput from './ItemSearchInput.svelte';
 	import { ConstStringKey } from '$lib/types/constStringKeys';
 	import { get_const_string } from '$lib/services/constStringService.svelte';
 	import { BAZAR_PAGES_PER_SEARCH } from '$lib/constants';
@@ -66,6 +68,7 @@
 	});
 	let results = $state<EnrichedSearchResult[]>([]);
 	let openWindows = $state<OpenWindow[]>([]);
+	let nameQuery = $state('');
 
 	function getPageIndex() {
 		return Math.floor((visualIndex - 1) / BAZAR_PAGES_PER_SEARCH);
@@ -95,22 +98,28 @@
 		isSearching = true;
 		results = [];
 		try {
+			const name = nameQuery.trim();
+			const body: Record<string, unknown> = {
+				server,
+				filters: {
+					index,
+					category,
+					sub_category: subCategory,
+					level,
+					rare: rarityLevel,
+					upgrade: upgradeLevel,
+					order,
+					vnum: []
+				},
+				lang: lang.current
+			};
+			if (name) {
+				body.name = name;
+			}
 			const response = await fetch(`${API_BASE}/search`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					server,
-					filters: {
-						index,
-						category,
-						sub_category: subCategory,
-						level,
-						rare: rarityLevel,
-						upgrade: upgradeLevel,
-						order,
-						vnum: []
-					}
-				})
+				body: JSON.stringify(body)
 			});
 			const data = await response.json();
 			const rawItems = (data.items ?? []) as SearchResult[];
@@ -260,7 +269,7 @@
 				<span></span>
 				<span></span>
 
-				<input type="text" />
+				<ItemSearchInput bind:query={nameQuery} onsearch={on_search_clicked} />
 				<Category bind:value={category}></Category>
 				<SubCategory bind:value={subCategory} {category}></SubCategory>
 				<BlueButton
