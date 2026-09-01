@@ -37,8 +37,8 @@
 	}
 
 	.header-button:hover {
-		color: #628dbd;
-		border-color: #628dbd;
+		color: var(--color-blue-light);
+		border-color: var(--color-blue-light);
 	}
 
 	.header-button svg {

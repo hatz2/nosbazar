@@ -1,3 +1,7 @@
+:root {
+    --color-blue-light: #628dbd;
+}
+
 body {
     font-family: Tahoma, Arial, sans-serif;
     font-size: 10pt;

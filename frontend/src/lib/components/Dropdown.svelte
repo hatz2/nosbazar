@@ -105,7 +105,7 @@
 	}
 
 	.dropdown-toggle:hover {
-		border-color: #628dbd;
+		border-color: var(--color-blue-light);
 	}
 
 	.caret {
