@@ -115,7 +115,7 @@
 	}
 
 	.footer-link:hover {
-		color: #f6b626;
+		color: #628dbd;
 	}
 
 	.version {

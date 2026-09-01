@@ -9,17 +9,17 @@
 			name: 'GitHub',
 			href: '#',
 			iconPath: GITHUB_ICON_PATH
-		},
-		{
-			name: 'Discord',
-			href: '#',
-			iconPath: DISCORD_ICON_PATH
-		},
-		{
-			name: 'Ko-fi',
-			href: '#',
-			iconPath: KOFI_ICON_PATH
 		}
+		// {
+		// 	name: 'Discord',
+		// 	href: '#',
+		// 	iconPath: DISCORD_ICON_PATH
+		// },
+		// {
+		// 	name: 'Donate',
+		// 	href: '#',
+		// 	iconPath: KOFI_ICON_PATH
+		// }
 	];
 
 	let { server = $bindable() } = $props<{
