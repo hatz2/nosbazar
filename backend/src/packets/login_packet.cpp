@@ -38,11 +38,11 @@ namespace nosbazar::packets::login {
 		session_id = strings::token<unsigned int>(packet);
 
 		// Read world servers
-		std::string world_server_data;
-		do {
-			world_server_data = strings::token<std::string>(packet);
+		std::string world_server_data = strings::token<std::string>(packet);
+		while (world_server_data != "-1:-1:-1:10000.10000.1") {
 			servers.emplace_back(world_server_data);
-		} while (world_server_data != "-1:-1:-1:10000.10000.1");
+			world_server_data = strings::token<std::string>(packet);
+		};
 	}
 
 	std::optional<WorldServer> nosbazar::packets::login::NsTeSTPacket::find_world_server(int id, int channel)
