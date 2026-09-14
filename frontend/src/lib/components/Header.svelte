@@ -30,8 +30,8 @@
 
 <header class="top-bar">
 	<div class="top-row">
-		<div style="display: flex;">
-			<img src={favicon} alt="Logo icon" />
+		<div class="brand-row">
+			<img class="logo" src={favicon} alt="Logo icon" />
 			<div class="brand">
 				<h1 class="app-title">NosBazar</h1>
 				<p class="app-subtitle">Online bazar search for the MMORPG NosTale</p>
@@ -69,6 +69,21 @@
 		align-items: center;
 		gap: 0.75rem;
 		width: 100%;
+	}
+
+	.brand-row {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.logo {
+		flex-shrink: 0;
+		align-self: center;
+		width: auto;
+		height: auto;
+		max-width: 100%;
+		object-fit: contain;
 	}
 
 	.brand {
