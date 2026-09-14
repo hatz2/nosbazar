@@ -125,7 +125,6 @@ bool nosbazar::Clientless::phase_world()
 void nosbazar::Clientless::phase_game()
 {
     // Make domain instances
-    //game_state = std::make_unique<GameState>(bus);
     ServerRegistry::instance().register_server(login_result->world_server_id, login_result->world_server_name);
 
     agent = std::make_unique<agent::Agent>(*world_session, packet_publisher, login_result->world_server_id);

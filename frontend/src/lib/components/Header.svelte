@@ -3,11 +3,12 @@
 	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
 	import ServerSelector from '$lib/components/ServerSelector.svelte';
 	import { DISCORD_ICON_PATH, GITHUB_ICON_PATH, KOFI_ICON_PATH } from '$lib/constants';
+	import favicon from '$lib/assets/favicon.png';
 
 	const links = [
 		{
 			name: 'GitHub',
-			href: '#',
+			href: 'https://github.com/hatz2/nosbazar',
 			iconPath: GITHUB_ICON_PATH
 		}
 		// {
@@ -29,10 +30,14 @@
 
 <header class="top-bar">
 	<div class="top-row">
-		<div class="brand">
-			<h1 class="app-title">NosBazar</h1>
-			<p class="app-subtitle">Online bazar search for the MMORPG NosTale</p>
+		<div style="display: flex;">
+			<img src={favicon} alt="Logo icon" />
+			<div class="brand">
+				<h1 class="app-title">NosBazar</h1>
+				<p class="app-subtitle">Online bazar search for the MMORPG NosTale</p>
+			</div>
 		</div>
+
 		<div class="spacer"></div>
 		<nav class="links">
 			{#each links as link (link.name)}
