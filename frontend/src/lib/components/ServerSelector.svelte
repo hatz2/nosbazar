@@ -11,12 +11,33 @@
 	let { value = $bindable<number>() } = $props();
 	let servers: Server[] = $state([]);
 
+	const STORAGE_KEY = 'selected-server';
+
+	function readServerFromStorage(): number | undefined {
+		if (typeof localStorage === 'undefined') {
+			return undefined;
+		}
+		const raw = localStorage.getItem(STORAGE_KEY);
+		if (raw === null) {
+			return undefined;
+		}
+		const id = parseInt(raw, 10);
+		return Number.isNaN(id) ? undefined : id;
+	}
+
 	const selected = $derived(servers.find((s) => s.id === value));
 
 	onMount(async () => {
 		try {
+			const saved = readServerFromStorage();
 			const res = await fetch(`${API_BASE}/servers`);
 			servers = await res.json();
+
+			if (saved !== undefined && servers.some((s) => s.id === saved)) {
+				value = saved;
+			} else if (servers.length > 0 && !servers.some((s) => s.id === value)) {
+				value = servers[0].id;
+			}
 		} catch (e) {
 			console.error('Failed to fetch servers', e);
 		}
@@ -25,6 +46,12 @@
 	$effect(() => {
 		if (servers.length > 0 && !servers.some((s) => s.id === value)) {
 			value = servers[0].id;
+		}
+	});
+
+	$effect(() => {
+		if (typeof localStorage !== 'undefined' && value !== undefined) {
+			localStorage.setItem(STORAGE_KEY, String(value));
 		}
 	});
 </script>
