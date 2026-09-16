@@ -34,6 +34,8 @@ namespace nosbazar {
         bool phase_login();
         bool phase_world();
         void phase_game();
+        void reset_attempt_state();
+        bool sleep_retry_delay();
 
         void on_nstest(std::string_view packet);
         

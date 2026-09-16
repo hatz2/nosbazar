@@ -8,6 +8,9 @@
 #include "strings/hex.h"
 #include "strings/parse.h"
 #include <algorithm>
+#include <chrono>
+#include <exception>
+#include <thread>
 #include <spdlog/spdlog.h>
 #include <random/random.h>
 
@@ -17,6 +20,12 @@ nosbazar::Clientless::Clientless(std::string account_id, std::shared_ptr<auth::N
     , sensors(std::make_unique<game::Sensors>(packet_publisher))
     , agent(nullptr)
 {
+    packet_publisher.subscribe("NsTeST", [this](const std::string& p) { on_nstest(p); });
+    packet_publisher.subscribe("clist", [this](auto& packet) { on_clist(packet); });
+    packet_publisher.subscribe("clist_end", [this](auto& packet) { on_clist_end(packet); });
+    packet_publisher.subscribe("OK", [this](auto& packet) { on_ok(packet); });
+    packet_publisher.subscribe("infoi", [this](auto& packet) { on_infoi(packet); });
+    packet_publisher.subscribe("success", [this](auto& packet) { on_success(packet); });
     init_pulse_timer();
 }
 
@@ -32,24 +41,73 @@ void nosbazar::Clientless::stop()
 
 nosbazar::Clientless::ExitCode nosbazar::Clientless::run()
 {
-    if (!phase_authenticate()) {
-        SPDLOG_ERROR("Auth phase failed");
-        return ExitCode::auth_failed;
+    ExitCode last_error = ExitCode::ok;
+
+    while (running) {
+        reset_attempt_state();
+
+        try {
+            if (!phase_authenticate()) {
+                SPDLOG_ERROR("Auth phase failed, retrying in {} seconds", env.login_retry_delay_seconds);
+                last_error = ExitCode::auth_failed;
+                if (!sleep_retry_delay()) {
+                    break;
+                }
+                continue;
+            }
+
+            if (!phase_login()) {
+                SPDLOG_ERROR("Login phase failed, retrying in {} seconds", env.login_retry_delay_seconds);
+                last_error = ExitCode::login_failed;
+                if (!sleep_retry_delay()) {
+                    break;
+                }
+                continue;
+            }
+
+            if (!phase_world()) {
+                SPDLOG_ERROR("World phase failed, retrying in {} seconds", env.login_retry_delay_seconds);
+                last_error = ExitCode::world_failed;
+                if (!sleep_retry_delay()) {
+                    break;
+                }
+                continue;
+            }
+
+            phase_game();
+            return ExitCode::ok;
+        }
+        catch (const std::exception& e) {
+            SPDLOG_ERROR("Clientless attempt failed with exception: {}, retrying in {} seconds", e.what(), env.login_retry_delay_seconds);
+            last_error = ExitCode::login_failed;
+            if (!sleep_retry_delay()) {
+                break;
+            }
+        }
     }
 
-    if (!phase_login()) {
-        SPDLOG_ERROR("Login phase failed");
-        return ExitCode::login_failed;
+    return last_error;
+}
+
+void nosbazar::Clientless::reset_attempt_state()
+{
+    login_session.reset();
+    world_session.reset();
+    login_result.reset();
+    first_char_index = -1;
+    login_context.restart();
+    world_context.restart();
+}
+
+bool nosbazar::Clientless::sleep_retry_delay()
+{
+    int remaining = env.login_retry_delay_seconds;
+    while (remaining > 0 && running) {
+        int chunk = std::min(remaining, 1);
+        std::this_thread::sleep_for(std::chrono::seconds(chunk));
+        remaining -= chunk;
     }
-
-    if (!phase_world()) {
-        SPDLOG_ERROR("World phase failed");
-        return ExitCode::world_failed;
-    }
-
-    phase_game();
-
-    return ExitCode::ok;
+    return running;
 }
 
 bool nosbazar::Clientless::phase_authenticate()
@@ -70,7 +128,6 @@ bool nosbazar::Clientless::phase_login()
     client->connect(env.login_server_ip, env.login_server_port);
 
     login_session = std::make_unique<net::LoginSession>(std::move(client), packet_publisher);
-    packet_publisher.subscribe("NsTeST", [this](const std::string& p) { on_nstest(p); });
 
     std::string hex_token = strings::hexlify(session_token);
     std::string client_version = nosclient::get_nostale_client_version();
@@ -103,13 +160,6 @@ bool nosbazar::Clientless::phase_world()
     client->connect(lr.world_ip, lr.world_port);
 
     world_session = std::make_shared<net::WorldSession>(std::move(client), packet_publisher, lr.session_id);
-
-    // Subscribe to packets
-    packet_publisher.subscribe("clist", [this](auto& packet) { on_clist(packet); });
-    packet_publisher.subscribe("clist_end", [this](auto& packet) { on_clist_end(packet); });
-    packet_publisher.subscribe("OK", [this](auto& packet) { on_ok(packet); });
-    packet_publisher.subscribe("infoi", [this](auto& packet) { on_infoi(packet); });
-    packet_publisher.subscribe("success", [this](auto& packet) { on_success(packet); });
 
     // Initial packets sent to the server
     world_session->send(fmt::format("{}", lr.session_id));

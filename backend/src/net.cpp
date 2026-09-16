@@ -176,7 +176,9 @@ void nosbazar::net::TCPClient::connect(const std::string& ip, unsigned short por
 
     if (ec) {
         SPDLOG_ERROR("TCPClient::connect error: {}", ec.message());
-        observer.on_disconnect();
+        if (observer.on_disconnect) {
+            observer.on_disconnect();
+        }
         return;
     }
 

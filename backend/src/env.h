@@ -31,6 +31,7 @@ struct Env {
 	std::string login_server_ip;
 	uint16_t login_server_port;
 	uint16_t max_clients;
+	int login_retry_delay_seconds;
 
 	Env() {
 
@@ -42,5 +43,6 @@ struct Env {
 		login_server_ip = get_required_env("LOGIN_SERVER_IP");
 		login_server_port = std::stoi(get_required_env("LOGIN_SERVER_PORT"));
 		max_clients = std::stoi(get_required_env("MAX_CLIENTS", "5"));
+		login_retry_delay_seconds = std::stoi(get_required_env("LOGIN_RETRY_DELAY_SECONDS", "300"));
 	}
 };
