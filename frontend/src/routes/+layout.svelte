@@ -7,6 +7,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<title>NosBazar</title>
 </svelte:head>
 
 <div class="page">
