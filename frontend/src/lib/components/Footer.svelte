@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import HeaderButton from '$lib/components/HeaderButton.svelte';
-	import { GITHUB_ICON_PATH, API_BASE } from '$lib/constants';
+	import { GITHUB_ICON_PATH, API_BASE, GITHUB_LINK } from '$lib/constants';
 
 	const version = '0.0.1';
 
@@ -39,7 +39,7 @@
 					? 'Server online'
 					: 'Server offline'}
 		</span>
-		<HeaderButton href="#" label="GitHub" iconPath={GITHUB_ICON_PATH} />
+		<HeaderButton href={GITHUB_LINK} label="GitHub" iconPath={GITHUB_ICON_PATH} />
 		<a
 			class="footer-link"
 			href="https://nostale.gameforge.com"

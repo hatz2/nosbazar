@@ -2,13 +2,13 @@
 	import HeaderButton from '$lib/components/HeaderButton.svelte';
 	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
 	import ServerSelector from '$lib/components/ServerSelector.svelte';
-	import { DISCORD_ICON_PATH, GITHUB_ICON_PATH, KOFI_ICON_PATH } from '$lib/constants';
+	import { DISCORD_ICON_PATH, GITHUB_ICON_PATH, GITHUB_LINK, KOFI_ICON_PATH } from '$lib/constants';
 	import favicon from '$lib/assets/favicon.png';
 
 	const links = [
 		{
 			name: 'GitHub',
-			href: 'https://github.com/hatz2/nosbazar',
+			href: GITHUB_LINK,
 			iconPath: GITHUB_ICON_PATH
 		}
 		// {
