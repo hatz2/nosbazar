@@ -45,6 +45,7 @@ void setup_log_level()
         }
     }
 
+    spdlog::set_level(spdlog::level::info);
     SPDLOG_INFO("Log level set to {}", spdlog::level::to_string_view(log_level));
     spdlog::set_level(log_level);
 }
