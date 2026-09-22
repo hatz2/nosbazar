@@ -185,7 +185,7 @@ void nosbazar::net::TCPClient::connect(const std::string& ip, unsigned short por
     do_recv();
 }
 
-void nosbazar::net::TCPClient::send(const std::vector<uint8_t>& data)
+bool nosbazar::net::TCPClient::send(const std::vector<uint8_t>& data)
 {
     asio::error_code ec;
     size_t res = asio::write(socket, asio::buffer(data), ec);
@@ -197,12 +197,14 @@ void nosbazar::net::TCPClient::send(const std::vector<uint8_t>& data)
     if (res != data.size()) {
         SPDLOG_ERROR("TCPClient::send tried to write {} bytes but only {} bytes were written", data.size(), res);
     }
+
+    return !ec && res == data.size();
 }
 
-void nosbazar::net::TCPClient::send(const std::string& data)
+bool nosbazar::net::TCPClient::send(const std::string& data)
 {
     std::vector<uint8_t> raw(data.begin(), data.end());
-    send(std::move(raw));
+    return send(std::move(raw));
 }
 
 void nosbazar::net::TCPClient::disconnect()
@@ -313,7 +315,10 @@ void nosbazar::net::WorldSession::send(const std::string& packet)
     std::string packet_with_count = fmt::format("{} {}", packet_counter++, packet);
     std::vector<uint8_t> raw(packet_with_count.begin(), packet_with_count.end());
     std::vector<uint8_t> encrypted = noscrypto::Client::world_encrypt(raw, session_id, !first_packet_sent);
-    client->send(encrypted);
+
+    if (!client->send(encrypted)) {
+        SPDLOG_ERROR("Could not send packet {}", packet_with_count);
+    }
 
     first_packet_sent = true;
 }

@@ -52,9 +52,9 @@ namespace nosbazar::net {
 
 		void connect(const std::string& ip, unsigned short port);
 
-		void send(const std::vector<uint8_t>& data);
+		bool send(const std::vector<uint8_t>& data);
 
-		void send(const std::string& data);
+		bool send(const std::string& data);
 
 		void disconnect();
 
