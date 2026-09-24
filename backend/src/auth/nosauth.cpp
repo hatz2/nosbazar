@@ -53,6 +53,8 @@ nosbazar::auth::NosAuth::AuthResult nosbazar::auth::NosAuth::authenticate(const 
 		{"password", params.password}
 	};
 
+	SPDLOG_INFO(body.dump(4));
+
 	auto result = net::post(url, body.dump(), headers);
 
 	if (result) {
