@@ -10,6 +10,7 @@ namespace nosbazar::time {
 		IntervalTimer(asio::io_context& io, asio::steady_timer::duration interval, std::function<void()> callback);
 
 		void start();
+		void stop();
 
 	private:
 

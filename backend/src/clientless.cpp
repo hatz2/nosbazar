@@ -159,7 +159,7 @@ bool nosbazar::Clientless::phase_world()
     auto client = std::make_unique<net::TCPClient>(world_context);
     client->connect(lr.world_ip, lr.world_port);
 
-    world_session = std::make_shared<net::WorldSession>(std::move(client), packet_publisher, lr.session_id);
+    world_session = std::make_shared<net::WorldSession>(world_context, std::move(client), packet_publisher, lr.session_id);
 
     // Initial packets sent to the server
     world_session->send(fmt::format("{}", lr.session_id));

@@ -13,10 +13,18 @@ void nosbazar::time::IntervalTimer::start()
 	schedule();
 }
 
+void nosbazar::time::IntervalTimer::stop()
+{
+	timer.cancel();
+}
+
 void nosbazar::time::IntervalTimer::schedule()
 {
 	timer.expires_after(interval);
 	timer.async_wait([this](std::error_code ec) {
+		if (ec == asio::error::operation_aborted) {
+			return;
+		}
 		if (ec) {
 			SPDLOG_ERROR(ec.message());
 			return;

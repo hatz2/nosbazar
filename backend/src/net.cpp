@@ -300,27 +300,40 @@ void nosbazar::net::LoginSession::on_recv(std::vector<uint8_t> data)
     }
 }
 
-nosbazar::net::WorldSession::WorldSession(std::unique_ptr<TCPClient> client, packets::Publisher& publisher, uint16_t session_id)
+nosbazar::net::WorldSession::WorldSession(asio::io_context& io, std::unique_ptr<TCPClient> client, packets::Publisher& publisher, uint16_t session_id)
     : Session(std::move(client), publisher)
     , session_id(session_id)
     , acumulator(0xFF)
     , packet_counter(random::random_int(static_cast<uint16_t>(0), static_cast<uint16_t>(UINT16_MAX)))
+    , keepalive_timer(io, keepalive_poll, [this]() { on_keep_alive_poll(); })
 {
+    last_send_timer.start();
+    keepalive_timer.start();
+}
+
+nosbazar::net::WorldSession::~WorldSession()
+{
+    keepalive_timer.stop();
 }
 
 void nosbazar::net::WorldSession::send(const std::string& packet)
 {
+    
     on_send(packet);
 
-    std::string packet_with_count = fmt::format("{} {}", packet_counter++, packet);
+    std::string packet_with_count = fmt::format("{} {}", packet_counter, packet);
     std::vector<uint8_t> raw(packet_with_count.begin(), packet_with_count.end());
     std::vector<uint8_t> encrypted = noscrypto::Client::world_encrypt(raw, session_id, !first_packet_sent);
 
+    //SPDLOG_TRACE("{} trying to send {}", session_id, packet_with_count);
     if (!client->send(encrypted)) {
         SPDLOG_ERROR("Could not send packet {}", packet_with_count);
     }
 
     first_packet_sent = true;
+
+    increment_packet_counter();
+    last_send_timer.start();
 }
 
 void nosbazar::net::WorldSession::on_recv(std::vector<uint8_t> data)
@@ -340,6 +353,20 @@ void nosbazar::net::WorldSession::on_recv(std::vector<uint8_t> data)
 
         on_packet(packet);
     }
+}
+
+void nosbazar::net::WorldSession::increment_packet_counter()
+{
+    packet_counter = (packet_counter + 1) % UINT16_MAX;
+}
+
+void nosbazar::net::WorldSession::on_keep_alive_poll()
+{
+    constexpr int64_t timeout_ms = std::chrono::duration_cast<std::chrono::milliseconds>(keepalive_timeout).count();
+    if (last_send_timer.elapsed() >= timeout_ms) {
+        //SPDLOG_TRACE("Keep-alive: no packet sent in {}s, sending 0", keepalive_timeout.count());
+        send("0");
+    } 
 }
 
 nosbazar::net::PacketAcumulator::PacketAcumulator(uint8_t delimiter) : delimiter(delimiter)

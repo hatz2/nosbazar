@@ -6,10 +6,13 @@
 #include <expected>
 #include <vector>
 #include <asio.hpp>
+#include <chrono>
 #include <span>
 #include <queue>
 #include <unordered_map>
 #include <packets/packet_publisher.h>
+#include <time/elapsed_timer.h>
+#include <time/interval_timer.h>
 
 namespace nosbazar::net {
 	struct Response {
@@ -102,18 +105,27 @@ namespace nosbazar::net {
 
 	class WorldSession : public Session {
 	public:
-		explicit WorldSession(std::unique_ptr<TCPClient> client, packets::Publisher& publisher, uint16_t session_id);
+		explicit WorldSession(asio::io_context& io, std::unique_ptr<TCPClient> client, packets::Publisher& publisher, uint16_t session_id);
+
+		~WorldSession();
 
 		void send(const std::string& packet) override;
 
 	protected:
 		void on_recv(std::vector<uint8_t> data) override;
 	private:
-		
+		void increment_packet_counter();
+		void on_keep_alive_poll();
+
+		static constexpr std::chrono::seconds keepalive_timeout{10};
+		static constexpr std::chrono::seconds keepalive_poll{1};
+
 		PacketAcumulator acumulator;
 		uint16_t session_id;
 		uint16_t packet_counter;
 		bool first_packet_sent{false};
+		time::ElapsedTimer last_send_timer;
+		time::IntervalTimer keepalive_timer;
 	};
 
 

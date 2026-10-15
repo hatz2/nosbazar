@@ -210,7 +210,7 @@ std::optional<std::string> nosbazar::auth::NosAuth::get_session_token(const std:
 		return std::nullopt;
 	}
 
-	std::this_thread::sleep_for(std::chrono::seconds(1));
+	std::this_thread::sleep_for(std::chrono::seconds(2));
 
 	std::vector<std::string> headers = {
 		"Content-Type: application/json",
