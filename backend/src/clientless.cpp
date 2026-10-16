@@ -74,7 +74,6 @@ nosbazar::Clientless::ExitCode nosbazar::Clientless::run()
                 continue;
             }
 
-            phase_game();
             return ExitCode::ok;
         }
         catch (const std::exception& e) {
@@ -95,6 +94,7 @@ void nosbazar::Clientless::reset_attempt_state()
     world_session.reset();
     login_result.reset();
     first_char_index = -1;
+    game_phase_started = false;
     login_context.restart();
     world_context.restart();
 }
@@ -174,6 +174,12 @@ bool nosbazar::Clientless::phase_world()
 
 void nosbazar::Clientless::phase_game()
 {
+    if (game_phase_started || !world_session || !login_result) {
+        return;
+    }
+    game_phase_started = true;
+    SPDLOG_INFO("Server ready - starting game phase");
+
     // Make domain instances
     ServerRegistry::instance().register_server(login_result->world_server_id, login_result->world_server_name);
 
@@ -262,7 +268,6 @@ void nosbazar::Clientless::on_clist_end(std::string_view packet)
 
 void nosbazar::Clientless::on_ok(std::string_view packet)
 {
-    SPDLOG_INFO("Server ready - starting game phase");
     phase_game();
 }
 

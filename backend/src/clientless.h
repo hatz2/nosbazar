@@ -72,6 +72,7 @@ namespace nosbazar {
         std::optional<LoginResult> login_result;
 
         int first_char_index{ -1 };
+        bool game_phase_started{false};
 
         void init_pulse_timer();
         uint32_t pulse_time{0};
