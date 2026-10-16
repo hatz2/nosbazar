@@ -118,8 +118,14 @@ Linting via `eslint.config.js`, formatting via `.prettierrc`. Run lint/format be
 
 ## C++ conventions
 
+- **C++ Core Guidelines**: follow the [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) when writing or refactoring C++. Apply them alongside the project-specific conventions below; explain any necessary deviations rather than silently ignoring a guideline. Do not rewrite unrelated existing code solely for guideline compliance.
+- **Ownership and lifetime**: use RAII for resources, prefer values and `std::unique_ptr`, and use `std::shared_ptr` only for genuinely shared ownership. Raw pointers and references are non-owning; make their lifetime requirements explicit. Avoid owning `new`/`delete` and dangling views or callback captures.
+- **Interfaces and invariants**: keep interfaces small, establish valid object invariants during initialization, prefer the rule of zero, and use `const` where mutation is not needed. Polymorphic base destructors must be public and virtual or protected and non-virtual.
+- **Type and error safety**: initialize variables, avoid unchecked narrowing and casts, validate external input, and use explicit result types for expected failures (`std::expected`, `std::optional`, or error codes). Destructors must not throw.
+- **Concurrency**: avoid data races, minimize shared mutable state, use scoped locking, and never invoke unknown callbacks while holding a lock. Make asynchronous cancellation, resource lifetime, and shutdown ownership explicit.
 - **Headers**: use `#pragma once`, not include guards. Keep headers self-contained — include what you use.
 - **Naming**: `snake_case` for functions and variables, `PascalCase` for types and enums. Member variables use `snake_case` with no prefix. Never use leading or trailing underscores in variable names (e.g. no `_foo` or `foo_`).
+- **Control-flow formatting**: always use braces for `if`, `else`, and `for` statements, even for a single statement. Put the body on a new line; never write single-line `if` or `for` statements.
 - **std::variant dispatch**: use `std::visit` with a lambda, not manual `if-holds-alternative` chains. See existing pattern in `rc_blist.cpp` `json()`.
 - **String handling**: prefer `std::string_view` for parameters and parsing tokens. Avoid `std::string` ownership where not needed.
 - **No raw loops over packets** — use the token-based parser pattern in `strings::parse.h` instead of manual string splitting.
