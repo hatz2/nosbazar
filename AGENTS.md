@@ -54,6 +54,13 @@ Third-party code lives in `third_party/astar/`.
 
 ---
 
+## Shared agent skills
+
+- Reusable workflows live in `.agents/skills/`, shared by Codex and OpenCode.
+- Maintain workflow content in `.agents/skills/`, not in tool-specific copies. See `.agents/README.md` for discovery and maintenance details.
+
+---
+
 ## Environment & secrets
 
 - `.env` at the backend root provides game credentials and server config. It is **gitignored** (`*.env` in `.gitignore`). The build copies it into the output directory via a CMake post-build step.

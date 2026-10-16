@@ -5,6 +5,9 @@ description: CMake preset build commands for the C++ backend
 
 ## Build from `backend/`
 
+Follow the repository's `AGENTS.md`. Agents must not compile the backend;
+the commands below are a reference for the user, not permission to execute them.
+
 ```bash
 # Configure
 cmake --preset x64-debug       # Windows MSVC + Ninja

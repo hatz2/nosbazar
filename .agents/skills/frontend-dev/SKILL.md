@@ -5,6 +5,8 @@ description: Frontend dev commands for SvelteKit project
 
 ## Commands (from `frontend/`)
 
+Follow the repository's `AGENTS.md` before using these commands.
+
 | Command | Purpose |
 |---------|---------|
 | `npm run dev` | Dev server on `:5173` |
