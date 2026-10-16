@@ -10,6 +10,8 @@ namespace nosbazar::agent {
 	class SearchBazarState : public State {
 	public:
 		explicit SearchBazarState(net::WorldSession& session, packets::Publisher& publisher, GameServer server);
+		SearchBazarState(const SearchBazarState&) = delete;
+		SearchBazarState& operator=(const SearchBazarState&) = delete;
 
 		bool should_execute(const game::Sensors& sensors) override;
 		void act(const game::Sensors& sensors) override;
@@ -22,6 +24,7 @@ namespace nosbazar::agent {
 		time::ElapsedTimer timer;
 		std::shared_ptr<BazarSearch> task;
 		GameServer server;
+		packets::Publisher::Subscription subscription;
 
 	};
 }

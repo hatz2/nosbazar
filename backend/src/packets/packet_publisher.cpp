@@ -3,6 +3,40 @@
 #include <utility>
 #include <strings/parse.h>
 
+nosbazar::packets::Publisher::Subscription::Subscription(Publisher& publisher, SubscriptionId id) noexcept
+	: publisher(&publisher), id(id)
+{
+}
+
+nosbazar::packets::Publisher::Subscription::Subscription(Subscription&& other) noexcept
+	: publisher(std::exchange(other.publisher, nullptr)), id(std::exchange(other.id, 0))
+{
+}
+
+nosbazar::packets::Publisher::Subscription& nosbazar::packets::Publisher::Subscription::operator=(Subscription&& other) noexcept
+{
+	if (this != &other) {
+		reset();
+		publisher = std::exchange(other.publisher, nullptr);
+		id = std::exchange(other.id, 0);
+	}
+	return *this;
+}
+
+nosbazar::packets::Publisher::Subscription::~Subscription()
+{
+	reset();
+}
+
+void nosbazar::packets::Publisher::Subscription::reset() noexcept
+{
+	auto* owner = std::exchange(publisher, nullptr);
+	const auto subscription_id = std::exchange(id, 0);
+	if (owner != nullptr) {
+		owner->unsubscribe(subscription_id);
+	}
+}
+
 nosbazar::packets::Publisher::SubscriptionId nosbazar::packets::Publisher::subscribe(std::string_view opcode, Callback callback)
 {
 	const auto id = next_subscription_id++;
@@ -10,7 +44,12 @@ nosbazar::packets::Publisher::SubscriptionId nosbazar::packets::Publisher::subsc
 	return id;
 }
 
-void nosbazar::packets::Publisher::unsubscribe(SubscriptionId id)
+nosbazar::packets::Publisher::Subscription nosbazar::packets::Publisher::subscribe_scoped(std::string_view opcode, Callback callback)
+{
+	return Subscription(*this, subscribe(opcode, std::move(callback)));
+}
+
+void nosbazar::packets::Publisher::unsubscribe(SubscriptionId id) noexcept
 {
 	for (auto it = listeners.begin(); it != listeners.end(); ++it) {
 		auto& entries = it->second;

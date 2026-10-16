@@ -2,9 +2,10 @@
 #include <spdlog/spdlog.h>
 #include <packets/rc_blist.h>
 
-nosbazar::agent::SearchBazarState::SearchBazarState(net::WorldSession& session, packets::Publisher& publisher, GameServer server) : session(session), server(server)
+nosbazar::agent::SearchBazarState::SearchBazarState(net::WorldSession& session, packets::Publisher& publisher, GameServer server)
+	: session(session), server(server),
+	  subscription(publisher.subscribe_scoped("rc_blist", [this](const auto& packet) { on_rc_blist(packet); }))
 {
-	publisher.subscribe("rc_blist", [this](auto& packet) { on_rc_blist(packet); });
 }
 
 bool nosbazar::agent::SearchBazarState::should_execute(const game::Sensors& sensors)
