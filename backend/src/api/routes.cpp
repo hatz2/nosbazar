@@ -18,6 +18,10 @@
 
 #include <io/language.h>
 
+namespace {
+    constexpr int max_vnum_search = 50;
+}
+
 namespace nosbazar::api {
 
 crow::response handle_search(const crow::request& req)
@@ -58,7 +62,14 @@ crow::response handle_search(const crow::request& req)
             for (const auto& match : matches) {
                 vnums.push_back(match.vnum);
             }
+
             SPDLOG_INFO("Name filter '{}' resolved to {} vnums", name, matches.size());
+
+            if (vnums.size() > max_vnum_search) {
+                std::string result = "Exceeded maximum number of items requested for name: \"" + name + "\"";
+                SPDLOG_WARN(result.c_str());
+                return crow::response(500, result);
+            }
         }
     }
 

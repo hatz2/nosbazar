@@ -121,6 +121,13 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(body)
 			});
+
+			if (response.status == 500) {
+				const text = await response.text();
+				alert(text);
+				return;
+			}
+
 			const data = await response.json();
 			const rawItems = (data.items ?? []) as SearchResult[];
 

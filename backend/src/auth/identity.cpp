@@ -22,9 +22,10 @@ namespace nosbazar::auth {
 	void Identity::update()
 	{
 		load_from_disk();
-		update_vector();
 		update_server_time();
 		update_creation();
+		update_vector();
+		
 		update_timings();
 		save();
 	}

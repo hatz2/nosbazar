@@ -197,6 +197,7 @@ bool nosbazar::auth::NosAuth::send_iovation(const std::string& account_id) const
 std::optional<std::string> nosbazar::auth::NosAuth::get_session_token(const std::string& account_id)
 {
 	std::lock_guard<std::mutex> lock(session_mutex);
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	std::string_view url = "https://spark.gameforge.com/api/v1/auth/thin/codes";
 
