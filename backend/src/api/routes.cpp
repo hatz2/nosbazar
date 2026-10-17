@@ -14,6 +14,7 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <io/language.h>
@@ -91,11 +92,24 @@ crow::response handle_search(const crow::request& req)
 
     task->request.search_packet = std::move(search_packet);
 
+    auto response_future = task->get_future();
     nosbazar::BazarSearchManager::queue(server).push(task);
 
-    std::string result = task->response.packet.get_future().get();
+    auto result = response_future.get();
+    if (!result) {
+        const bool disconnected = result.error() == BazarSearchError::disconnected;
+        nlohmann::json body = {
+            {"error", {
+                {"code", disconnected ? "disconnected" : "invalid_response"},
+                {"message", disconnected ? "The game connection was lost." : "The game response could not be decoded."}
+            }}
+        };
+        crow::response response(disconnected ? 503 : 502, body.dump());
+        response.set_header("Content-Type", "application/json");
+        return response;
+    }
 
-    return crow::response(result);
+    return crow::response(std::move(*result));
 }
 
 crow::response handle_item_name_search(const crow::request& req)

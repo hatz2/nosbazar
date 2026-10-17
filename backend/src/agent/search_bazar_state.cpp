@@ -1,11 +1,20 @@
 #include "search_bazar_state.h"
 #include <spdlog/spdlog.h>
 #include <packets/rc_blist.h>
+#include <exception>
 
 nosbazar::agent::SearchBazarState::SearchBazarState(net::WorldSession& session, packets::Publisher& publisher, GameServer server)
 	: session(session), server(server),
 	  subscription(publisher.subscribe_scoped("rc_blist", [this](const auto& packet) { on_rc_blist(packet); }))
 {
+}
+
+nosbazar::agent::SearchBazarState::~SearchBazarState()
+{
+	subscription.reset();
+	if (task) {
+		task->fail(BazarSearchError::disconnected);
+	}
 }
 
 bool nosbazar::agent::SearchBazarState::should_execute(const game::Sensors& sensors)
@@ -54,16 +63,13 @@ void nosbazar::agent::SearchBazarState::on_rc_blist(std::string_view packet)
 
 	SPDLOG_TRACE(packet);
 
-	// Send back the resposne
-	std::string response(packet);
-
-	packets::RcBlist rc_packet(packet);
-
-	nlohmann::json json_response = rc_packet.json();
-
-	std::string result = json_response.dump(4);
-
-	task->response.packet.set_value(result);
+	try {
+		packets::RcBlist rc_packet(packet);
+		task->succeed(rc_packet.json().dump(4));
+	} catch (const std::exception& error) {
+		SPDLOG_WARN("Failed to decode bazaar response: {}", error.what());
+		task->fail(BazarSearchError::invalid_response);
+	}
 
 	// Mark task as completed for us
 	task.reset();

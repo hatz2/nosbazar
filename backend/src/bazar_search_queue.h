@@ -1,12 +1,13 @@
 #pragma once
 
 #include <future>
+#include <expected>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <queue>
-#include <vector>
+#include <string>
 #include <packets/c_blist.h>
-#include <io/lang_manager.h>
 
 namespace nosbazar {
 	using GameServer = int;
@@ -16,14 +17,27 @@ namespace nosbazar {
 		packets::CBlist search_packet;
 	};
 
-	struct BazarResponse {
-		// TODO: Define fields
-		std::promise<std::string> packet;
+	enum class BazarSearchError {
+		disconnected,
+		invalid_response
 	};
 
-	struct BazarSearch {
+	using BazarSearchResult = std::expected<std::string, BazarSearchError>;
+
+	class BazarSearch {
+	public:
 		BazarRequest request;
-		BazarResponse response;
+
+		// Retrieve once, before enqueueing. Only the first completion succeeds.
+		std::future<BazarSearchResult> get_future();
+		bool succeed(std::string response);
+		bool fail(BazarSearchError error);
+
+	private:
+		bool complete(BazarSearchResult result);
+		std::mutex mutex;
+		std::promise<BazarSearchResult> promise;
+		bool completed{false};
 	};
 
 	class BazarSearchQueue {

@@ -2,12 +2,14 @@
 
 #include <game/sensors.h>
 #include <vector>
+#include <memory>
 #include <ctime>
 #include <chrono>
 
 namespace nosbazar::agent {
 	class State {
 	public:
+		virtual ~State() = default;
 		virtual bool should_execute(const game::Sensors& sensors) = 0;
 		virtual void act(const game::Sensors& sensors) = 0;
 	};

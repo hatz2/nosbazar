@@ -10,6 +10,7 @@ namespace nosbazar::agent {
 	class SearchBazarState : public State {
 	public:
 		explicit SearchBazarState(net::WorldSession& session, packets::Publisher& publisher, GameServer server);
+		~SearchBazarState() override;
 		SearchBazarState(const SearchBazarState&) = delete;
 		SearchBazarState& operator=(const SearchBazarState&) = delete;
 
