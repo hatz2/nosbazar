@@ -4,7 +4,6 @@
 #include "app_state.h"
 #include "packets/login_packet.h"
 #include "world_server_assigner.h"
-#include "server_registry.h"
 #include "strings/hex.h"
 #include "strings/parse.h"
 #include <algorithm>
@@ -125,6 +124,7 @@ void nosbazar::Clientless::cleanup_attempt()
 {
     // Keep callback owners alive until all canceled operations have completed.
     world_disconnected = true;
+    unregister_worker();
     pulse_timer->stop();
     if (agent_timer) {
         try {
@@ -242,11 +242,20 @@ void nosbazar::Clientless::on_world_disconnect()
         return;
     }
     world_disconnected = true;
+    unregister_worker();
     pulse_timer->stop();
     if (agent_timer) {
         agent_timer->cancel();
     }
     SPDLOG_WARN("World session disconnected for account {}", account_id);
+}
+
+void nosbazar::Clientless::unregister_worker()
+{
+    if (server_worker) {
+        ServerRegistry::instance().unregister_worker(*server_worker);
+        server_worker.reset();
+    }
 }
 
 void nosbazar::Clientless::phase_game()
@@ -256,9 +265,6 @@ void nosbazar::Clientless::phase_game()
     }
     game_phase_started = true;
     SPDLOG_INFO("Server ready - starting game phase");
-
-    // Make domain instances
-    ServerRegistry::instance().register_server(login_result->world_server_id, login_result->world_server_name);
 
     agent = std::make_unique<agent::Agent>(*world_session, packet_publisher, login_result->world_server_id);
 
@@ -288,6 +294,9 @@ void nosbazar::Clientless::phase_game()
     };
 
     schedule_tick();
+
+    server_worker = ServerRegistry::instance().register_worker(
+        login_result->world_server_id, login_result->world_server_name);
 
     // world_context.run() is already running from phase_world()
     // no need to call it again

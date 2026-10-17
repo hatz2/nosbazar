@@ -21,6 +21,30 @@
 
 namespace {
     constexpr int max_vnum_search = 50;
+
+    crow::response search_error(nosbazar::BazarSearchError error)
+    {
+        int status = 503;
+        const char* code = "server_unavailable";
+        const char* message = "No search worker is available for this server.";
+        switch (error) {
+        case nosbazar::BazarSearchError::unavailable:
+            break;
+        case nosbazar::BazarSearchError::disconnected:
+            code = "disconnected";
+            message = "The game connection was lost.";
+            break;
+        case nosbazar::BazarSearchError::invalid_response:
+            status = 502;
+            code = "invalid_response";
+            message = "The game response could not be decoded.";
+            break;
+        }
+        nlohmann::json body = {{"error", {{"code", code}, {"message", message}}}};
+        crow::response response(status, body.dump());
+        response.set_header("Content-Type", "application/json");
+        return response;
+    }
 }
 
 namespace nosbazar::api {
@@ -31,7 +55,14 @@ crow::response handle_search(const crow::request& req)
 
     crow::json::rvalue json = crow::json::load(req.body);
 
-    int64_t server = json["server"].i();
+    const int64_t server_id = json["server"].i();
+    if (server_id < 0 || server_id > std::numeric_limits<GameServer>::max()) {
+        return search_error(BazarSearchError::unavailable);
+    }
+    const auto server = static_cast<GameServer>(server_id);
+    if (!ServerRegistry::instance().is_available(server)) {
+        return search_error(BazarSearchError::unavailable);
+    }
 
     std::vector<uint32_t> vnums;
     for (auto& vnum : json["filters"]["vnum"].lo()) {
@@ -93,20 +124,13 @@ crow::response handle_search(const crow::request& req)
     task->request.search_packet = std::move(search_packet);
 
     auto response_future = task->get_future();
-    nosbazar::BazarSearchManager::queue(server).push(task);
+    if (!nosbazar::BazarSearchManager::submit(server, task)) {
+        task->fail(BazarSearchError::unavailable);
+    }
 
     auto result = response_future.get();
     if (!result) {
-        const bool disconnected = result.error() == BazarSearchError::disconnected;
-        nlohmann::json body = {
-            {"error", {
-                {"code", disconnected ? "disconnected" : "invalid_response"},
-                {"message", disconnected ? "The game connection was lost." : "The game response could not be decoded."}
-            }}
-        };
-        crow::response response(disconnected ? 503 : 502, body.dump());
-        response.set_header("Content-Type", "application/json");
-        return response;
+        return search_error(result.error());
     }
 
     return crow::response(std::move(*result));

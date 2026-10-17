@@ -19,7 +19,8 @@ namespace nosbazar {
 
 	enum class BazarSearchError {
 		disconnected,
-		invalid_response
+		invalid_response,
+		unavailable
 	};
 
 	using BazarSearchResult = std::expected<std::string, BazarSearchError>;
@@ -42,18 +43,21 @@ namespace nosbazar {
 
 	class BazarSearchQueue {
 	public:
-		void push(std::shared_ptr<BazarSearch> search);
+		bool push(std::shared_ptr<BazarSearch> search);
 		std::shared_ptr<BazarSearch> pop();
 		bool empty();
+		void set_available(bool available);
 
 	private:
 		std::mutex mutex;
 		std::queue<std::shared_ptr<BazarSearch>> queue;
+		bool available{false};
 	};
 
 	class BazarSearchManager {
 	public:
 		static BazarSearchQueue& queue(const GameServer server);
+		static bool submit(GameServer server, std::shared_ptr<BazarSearch> search);
 
 	private:
 		static BazarSearchManager& instance();

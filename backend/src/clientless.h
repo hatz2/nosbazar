@@ -7,9 +7,11 @@
 #include "net.h"
 #include "env.h"
 #include "packets/packet_publisher.h"
+#include "server_registry.h"
 #include "time/interval_timer.h"
 #include <game/sensors.h>
 #include <agent/agent.h>
+#include <optional>
 
 namespace nosbazar {
 	class Clientless {
@@ -41,6 +43,7 @@ namespace nosbazar {
         void cleanup_attempt();
         bool sleep_retry_delay();
         void on_world_disconnect();
+        void unregister_worker();
 
         void on_nstest(std::string_view packet);
         
@@ -80,6 +83,7 @@ namespace nosbazar {
         bool game_phase_started{false};
         bool world_disconnected{false};
         std::atomic_bool stop_requested{false};
+        std::optional<ServerRegistry::WorkerId> server_worker;
 
         void init_pulse_timer();
         uint32_t pulse_time{0};

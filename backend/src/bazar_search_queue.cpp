@@ -28,10 +28,31 @@ bool nosbazar::BazarSearch::complete(BazarSearchResult result)
 	return true;
 }
 
-void nosbazar::BazarSearchQueue::push(std::shared_ptr<BazarSearch> search)
+bool nosbazar::BazarSearchQueue::push(std::shared_ptr<BazarSearch> search)
 {
+	// Admission and last-worker removal use the same queue mutex.
 	const std::lock_guard<std::mutex> lock(mutex);
+	if (!available) {
+		return false;
+	}
 	queue.push(std::move(search));
+	return true;
+}
+
+void nosbazar::BazarSearchQueue::set_available(bool value)
+{
+	std::queue<std::shared_ptr<BazarSearch>> pending;
+	{
+		const std::lock_guard<std::mutex> lock(mutex);
+		available = value;
+		if (!available) {
+			queue.swap(pending);
+		}
+	}
+	while (!pending.empty()) {
+		pending.front()->fail(BazarSearchError::unavailable);
+		pending.pop();
+	}
 }
 
 std::shared_ptr<nosbazar::BazarSearch> nosbazar::BazarSearchQueue::pop()
@@ -64,4 +85,12 @@ nosbazar::BazarSearchQueue& nosbazar::BazarSearchManager::queue(const GameServer
 	auto& manager = instance();
 	const std::lock_guard<std::mutex> lock(manager.mutex);
 	return manager.server_queues[server];
+}
+
+bool nosbazar::BazarSearchManager::submit(GameServer server, std::shared_ptr<BazarSearch> search)
+{
+	auto& manager = instance();
+	const std::lock_guard<std::mutex> lock(manager.mutex);
+	const auto it = manager.server_queues.find(server);
+	return it != manager.server_queues.end() && it->second.push(std::move(search));
 }
