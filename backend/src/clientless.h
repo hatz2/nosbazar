@@ -36,6 +36,7 @@ namespace nosbazar {
         void phase_game();
         void reset_attempt_state();
         bool sleep_retry_delay();
+        void on_world_disconnect();
 
         void on_nstest(std::string_view packet);
         
@@ -73,6 +74,7 @@ namespace nosbazar {
 
         int first_char_index{ -1 };
         bool game_phase_started{false};
+        bool world_disconnected{false};
 
         void init_pulse_timer();
         uint32_t pulse_time{0};

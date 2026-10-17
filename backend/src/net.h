@@ -9,6 +9,9 @@
 #include <chrono>
 #include <span>
 #include <queue>
+#include <array>
+#include <functional>
+#include <memory>
 #include <unordered_map>
 #include <packets/packet_publisher.h>
 #include <time/elapsed_timer.h>
@@ -53,7 +56,7 @@ namespace nosbazar::net {
 
 		explicit TCPClient(asio::io_context& context);
 
-		void connect(const std::string& ip, unsigned short port);
+		bool connect(const std::string& ip, unsigned short port);
 
 		bool send(const std::vector<uint8_t>& data);
 
@@ -67,17 +70,22 @@ namespace nosbazar::net {
 		std::reference_wrapper<asio::io_context> context;
 		asio::ip::tcp::socket socket;
 		std::array<uint8_t, 4096> read_buffer;
+		bool disconnected{false};
 	};
 
 	class Session {
 	public:
 		explicit Session(std::unique_ptr<TCPClient> client, packets::Publisher& publisher);
+		virtual ~Session() = default;
+
+		bool connect(const std::string& ip, unsigned short port);
+		void set_disconnect_callback(std::function<void()> callback);
 
 		virtual void send(const std::string& packet) = 0;
 
 	protected:
 		void on_connect();
-		void on_disconnect();
+		virtual void on_disconnect();
 		virtual void on_recv(std::vector<uint8_t> data) = 0;
 		void on_packet(const std::string& packet);
 		void on_send(const std::string& packet);
@@ -87,7 +95,7 @@ namespace nosbazar::net {
 
 	private:
 		packets::Publisher& publisher;
-		TCPClient::Observer observer;
+		std::function<void()> disconnect_callback;
 	};
 
 	class LoginSession : public Session {
@@ -107,12 +115,13 @@ namespace nosbazar::net {
 	public:
 		explicit WorldSession(asio::io_context& io, std::unique_ptr<TCPClient> client, packets::Publisher& publisher, uint16_t session_id);
 
-		~WorldSession();
+		~WorldSession() override;
 
 		void send(const std::string& packet) override;
 
 	protected:
 		void on_recv(std::vector<uint8_t> data) override;
+		void on_disconnect() override;
 	private:
 		void increment_packet_counter();
 		void on_keep_alive_poll();

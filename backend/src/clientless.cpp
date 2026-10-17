@@ -95,6 +95,7 @@ void nosbazar::Clientless::reset_attempt_state()
     login_result.reset();
     first_char_index = -1;
     game_phase_started = false;
+    world_disconnected = false;
     login_context.restart();
     world_context.restart();
 }
@@ -125,9 +126,11 @@ bool nosbazar::Clientless::phase_authenticate()
 bool nosbazar::Clientless::phase_login()
 {
     auto client = std::make_unique<net::TCPClient>(login_context);
-    client->connect(env.login_server_ip, env.login_server_port);
 
     login_session = std::make_unique<net::LoginSession>(std::move(client), packet_publisher);
+    if (!login_session->connect(env.login_server_ip, env.login_server_port)) {
+        return false;
+    }
 
     std::string hex_token = strings::hexlify(session_token);
     std::string client_version = nosclient::get_nostale_client_version();
@@ -157,9 +160,12 @@ bool nosbazar::Clientless::phase_world()
     LoginResult& lr = login_result.value();
 
     auto client = std::make_unique<net::TCPClient>(world_context);
-    client->connect(lr.world_ip, lr.world_port);
 
     world_session = std::make_shared<net::WorldSession>(world_context, std::move(client), packet_publisher, lr.session_id);
+    world_session->set_disconnect_callback([this]() { on_world_disconnect(); });
+    if (!world_session->connect(lr.world_ip, lr.world_port)) {
+        return false;
+    }
 
     // Initial packets sent to the server
     world_session->send(fmt::format("{}", lr.session_id));
@@ -169,12 +175,25 @@ bool nosbazar::Clientless::phase_world()
 
     world_context.run();  // block untill we get kicked out of the world server
 
-    return true;
+    return !world_disconnected;
+}
+
+void nosbazar::Clientless::on_world_disconnect()
+{
+    if (world_disconnected) {
+        return;
+    }
+    world_disconnected = true;
+    pulse_timer->stop();
+    if (agent_timer) {
+        agent_timer->cancel();
+    }
+    SPDLOG_WARN("World session disconnected for account {}", account_id);
 }
 
 void nosbazar::Clientless::phase_game()
 {
-    if (game_phase_started || !world_session || !login_result) {
+    if (game_phase_started || world_disconnected || !world_session || !login_result) {
         return;
     }
     game_phase_started = true;
@@ -192,9 +211,12 @@ void nosbazar::Clientless::phase_game()
     agent_timer = std::make_unique<asio::steady_timer>(world_context);
 
     schedule_tick = [&]() {
+        if (world_disconnected || !running) {
+            return;
+        }
         agent_timer->expires_after(std::chrono::milliseconds(10));
         agent_timer->async_wait([&](const asio::error_code& ec) {
-            if (!ec && !running) {
+            if (ec == asio::error::operation_aborted || world_disconnected || !running) {
                 return;
             }
             if (!ec) {

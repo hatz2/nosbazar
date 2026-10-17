@@ -3,6 +3,7 @@
 #include <noscrypto.h>
 #include <strings/parse.h>
 #include <random/random.h>
+#include <utility>
 
 using namespace nosbazar::net;
 
@@ -165,7 +166,7 @@ nosbazar::net::TCPClient::TCPClient(asio::io_context& context)
 
 }
 
-void nosbazar::net::TCPClient::connect(const std::string& ip, unsigned short port)
+bool nosbazar::net::TCPClient::connect(const std::string& ip, unsigned short port)
 {
     asio::ip::address addr = asio::ip::make_address(ip);
     auto endpoint = asio::ip::tcp::endpoint(addr, port);
@@ -176,17 +177,19 @@ void nosbazar::net::TCPClient::connect(const std::string& ip, unsigned short por
 
     if (ec) {
         SPDLOG_ERROR("TCPClient::connect error: {}", ec.message());
-        if (observer.on_disconnect) {
-            observer.on_disconnect();
-        }
-        return;
+        disconnect();
+        return false;
     }
 
     do_recv();
+    return true;
 }
 
 bool nosbazar::net::TCPClient::send(const std::vector<uint8_t>& data)
 {
+    if (disconnected) {
+        return false;
+    }
     asio::error_code ec;
     size_t res = asio::write(socket, asio::buffer(data), ec);
 
@@ -198,7 +201,11 @@ bool nosbazar::net::TCPClient::send(const std::vector<uint8_t>& data)
         SPDLOG_ERROR("TCPClient::send tried to write {} bytes but only {} bytes were written", data.size(), res);
     }
 
-    return !ec && res == data.size();
+    if (ec || res != data.size()) {
+        disconnect();
+        return false;
+    }
+    return true;
 }
 
 bool nosbazar::net::TCPClient::send(const std::string& data)
@@ -209,23 +216,36 @@ bool nosbazar::net::TCPClient::send(const std::string& data)
 
 void nosbazar::net::TCPClient::disconnect()
 {
-    socket.close();
+    if (disconnected) {
+        return;
+    }
+    disconnected = true;
+    asio::error_code ignored;
+    socket.close(ignored);
+    if (observer.on_disconnect) {
+        observer.on_disconnect();
+    }
 }
 
 void nosbazar::net::TCPClient::do_recv()
 {
     socket.async_read_some(asio::buffer(read_buffer), [this](std::error_code ec, std::size_t length) -> void {
+        if (disconnected) {
+            return;
+        }
         if (ec) {
             if (ec != asio::error::eof) {
                 SPDLOG_ERROR("TCPClient::do_recv: {}", ec.message());
             }
             
-            observer.on_disconnect();
+            disconnect();
         }
         else {
             std::vector<uint8_t> data(read_buffer.begin(), read_buffer.begin() + length);
             observer.on_receive(std::move(data));
-            do_recv();
+            if (!disconnected) {
+                do_recv();
+            }
         }
     });
 }
@@ -256,9 +276,22 @@ void nosbazar::net::Session::on_connect()
     SPDLOG_TRACE("Session::on_connect");
 }
 
+bool nosbazar::net::Session::connect(const std::string& ip, unsigned short port)
+{
+    return client->connect(ip, port);
+}
+
+void nosbazar::net::Session::set_disconnect_callback(std::function<void()> callback)
+{
+    disconnect_callback = std::move(callback);
+}
+
 void nosbazar::net::Session::on_disconnect()
 {
     SPDLOG_TRACE("Session::on_disconnect");
+    if (disconnect_callback) {
+        disconnect_callback();
+    }
 }
 
 void nosbazar::net::Session::on_packet(const std::string& packet)
@@ -314,6 +347,12 @@ nosbazar::net::WorldSession::WorldSession(asio::io_context& io, std::unique_ptr<
 nosbazar::net::WorldSession::~WorldSession()
 {
     keepalive_timer.stop();
+}
+
+void nosbazar::net::WorldSession::on_disconnect()
+{
+    keepalive_timer.stop();
+    Session::on_disconnect();
 }
 
 void nosbazar::net::WorldSession::send(const std::string& packet)
