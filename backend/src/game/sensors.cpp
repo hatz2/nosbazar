@@ -13,9 +13,9 @@
 namespace nosbazar::game {
 	SelfPlayer::SelfPlayer(packets::Publisher& publisher)
 	{
-		publisher.subscribe(packets::At::opcode, [this](auto& packet) { on_at(packet); });
-		publisher.subscribe(packets::Cond::opcode, [this](auto& packet) { on_cond(packet); });
-		publisher.subscribe(packets::Walk::opcode, [this](auto& packet) { on_walk(packet); });
+		subscriptions.push_back(publisher.subscribe_scoped(packets::At::opcode, [this](auto& packet) { on_at(packet); }));
+		subscriptions.push_back(publisher.subscribe_scoped(packets::Cond::opcode, [this](auto& packet) { on_cond(packet); }));
+		subscriptions.push_back(publisher.subscribe_scoped(packets::Walk::opcode, [this](auto& packet) { on_walk(packet); }));
 	}
 
 	bool SelfPlayer::wants_to_walk() const
@@ -73,9 +73,9 @@ namespace nosbazar::game {
 
 	Scene::Scene(packets::Publisher& publisher)
 	{
-		publisher.subscribe(packets::In::opcode, [this](auto& packet) { on_in(packet); });
-		publisher.subscribe(packets::CMap::opcode, [this](auto& packet) { on_cmap(packet); });
-		publisher.subscribe(packets::Gp::opcode, [this](auto& packet) { on_gp(packet); });
+		subscriptions.push_back(publisher.subscribe_scoped(packets::In::opcode, [this](auto& packet) { on_in(packet); }));
+		subscriptions.push_back(publisher.subscribe_scoped(packets::CMap::opcode, [this](auto& packet) { on_cmap(packet); }));
+		subscriptions.push_back(publisher.subscribe_scoped(packets::Gp::opcode, [this](auto& packet) { on_gp(packet); }));
 	}
 
 	std::optional<Portal> Scene::find_bazar_portal() const
@@ -154,8 +154,8 @@ namespace nosbazar::game {
 	Sensors::Sensors(packets::Publisher& publisher)
 		: scene(std::make_unique<Scene>(publisher))
 		, self_player(std::make_unique<SelfPlayer>(publisher))
+		, subscription(publisher.subscribe_scoped("wopen", [this](auto& packet) { on_wopen(packet); }))
 	{
-		publisher.subscribe("wopen", [this](auto& packet) { on_wopen(packet); });
 	}
 
 	void Sensors::on_wopen(std::string_view packet)

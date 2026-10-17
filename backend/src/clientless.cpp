@@ -11,13 +11,13 @@
 #include <chrono>
 #include <exception>
 #include <thread>
+#include <system_error>
 #include <spdlog/spdlog.h>
 #include <random/random.h>
 
 nosbazar::Clientless::Clientless(std::string account_id, std::shared_ptr<auth::NosAuth> nosauth)
 	: account_id(std::move(account_id))
 	, nosauth(std::move(nosauth))
-    , sensors(std::make_unique<game::Sensors>(packet_publisher))
     , agent(nullptr)
 {
     packet_publisher.subscribe("NsTeST", [this](const std::string& p) { on_nstest(p); });
@@ -31,22 +31,38 @@ nosbazar::Clientless::Clientless(std::string account_id, std::shared_ptr<auth::N
 
 nosbazar::Clientless::~Clientless()
 {
+    cleanup_attempt();
 }
 
 void nosbazar::Clientless::stop()
 {
-	login_context.stop();
-	world_context.stop();
+    if (stop_requested.exchange(true)) {
+        return;
+    }
+    // Cancel on the client thread; do not stop contexts before handlers drain.
+    asio::post(login_context, [this]() {
+        if (login_session) {
+            login_session->disconnect();
+        }
+    });
+    asio::post(world_context, [this]() {
+        if (world_session) {
+            world_session->disconnect();
+        }
+    });
 }
 
 nosbazar::Clientless::ExitCode nosbazar::Clientless::run()
 {
     ExitCode last_error = ExitCode::ok;
 
-    while (running) {
+    while (running && !stop_requested) {
         reset_attempt_state();
 
         try {
+            if (!running || stop_requested) {
+                break;
+            }
             if (!phase_authenticate()) {
                 SPDLOG_ERROR("Auth phase failed, retrying in {} seconds", env.login_retry_delay_seconds);
                 last_error = ExitCode::auth_failed;
@@ -56,6 +72,9 @@ nosbazar::Clientless::ExitCode nosbazar::Clientless::run()
                 continue;
             }
 
+            if (!running || stop_requested) {
+                break;
+            }
             if (!phase_login()) {
                 SPDLOG_ERROR("Login phase failed, retrying in {} seconds", env.login_retry_delay_seconds);
                 last_error = ExitCode::login_failed;
@@ -65,6 +84,9 @@ nosbazar::Clientless::ExitCode nosbazar::Clientless::run()
                 continue;
             }
 
+            if (!running || stop_requested) {
+                break;
+            }
             if (!phase_world()) {
                 SPDLOG_ERROR("World phase failed, retrying in {} seconds", env.login_retry_delay_seconds);
                 last_error = ExitCode::world_failed;
@@ -74,6 +96,7 @@ nosbazar::Clientless::ExitCode nosbazar::Clientless::run()
                 continue;
             }
 
+            cleanup_attempt();
             return ExitCode::ok;
         }
         catch (const std::exception& e) {
@@ -85,30 +108,65 @@ nosbazar::Clientless::ExitCode nosbazar::Clientless::run()
         }
     }
 
-    return last_error;
+    cleanup_attempt();
+    return stop_requested ? ExitCode::ok : last_error;
 }
 
 void nosbazar::Clientless::reset_attempt_state()
 {
-    login_session.reset();
-    world_session.reset();
-    login_result.reset();
-    first_char_index = -1;
-    game_phase_started = false;
+    cleanup_attempt();
     world_disconnected = false;
+    sensors = std::make_unique<game::Sensors>(packet_publisher);
     login_context.restart();
     world_context.restart();
 }
 
+void nosbazar::Clientless::cleanup_attempt()
+{
+    // Keep callback owners alive until all canceled operations have completed.
+    world_disconnected = true;
+    pulse_timer->stop();
+    if (agent_timer) {
+        try {
+            agent_timer->cancel();
+        } catch (const std::system_error&) {
+            // The disconnect guard prevents a pending tick from rearming itself.
+        }
+    }
+    if (login_session) {
+        login_session->disconnect();
+    }
+    if (world_session) {
+        world_session->disconnect();
+    }
+    login_context.restart();
+    login_context.run();
+    world_context.restart();
+    world_context.run();
+
+    agent.reset();
+    sensors.reset();
+    agent_timer.reset();
+    schedule_tick = {};
+    login_session.reset();
+    world_session.reset();
+    login_result.reset();
+    session_token.clear();
+    first_char_index = -1;
+    pulse_time = 0;
+    game_phase_started = false;
+}
+
 bool nosbazar::Clientless::sleep_retry_delay()
 {
+    cleanup_attempt();
     int remaining = env.login_retry_delay_seconds;
-    while (remaining > 0 && running) {
+    while (remaining > 0 && running && !stop_requested) {
         int chunk = std::min(remaining, 1);
         std::this_thread::sleep_for(std::chrono::seconds(chunk));
         remaining -= chunk;
     }
-    return running;
+    return running && !stop_requested;
 }
 
 bool nosbazar::Clientless::phase_authenticate()

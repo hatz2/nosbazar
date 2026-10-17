@@ -4,6 +4,7 @@
 #include <memory>
 #include <unordered_map>
 #include <optional>
+#include <vector>
 
 namespace nosbazar::game {
 	struct SelfPlayer {
@@ -16,6 +17,8 @@ namespace nosbazar::game {
 		int speed{};
 
 		explicit SelfPlayer(packets::Publisher& publisher);
+		SelfPlayer(const SelfPlayer&) = delete;
+		SelfPlayer& operator=(const SelfPlayer&) = delete;
 
 		bool wants_to_walk() const;
 
@@ -27,6 +30,7 @@ namespace nosbazar::game {
 		void on_at(std::string_view packet);
 		void on_cond(std::string_view packet);
 		void on_walk(std::string_view packet);
+		std::vector<packets::Publisher::Subscription> subscriptions;
 	};
 
 	struct Npc {
@@ -47,6 +51,8 @@ namespace nosbazar::game {
 		std::vector<Portal> portals;
 
 		explicit Scene(packets::Publisher& publisher);
+		Scene(const Scene&) = delete;
+		Scene& operator=(const Scene&) = delete;
 
 		std::optional<Portal> find_bazar_portal() const;
 
@@ -56,11 +62,14 @@ namespace nosbazar::game {
 		void on_in(std::string_view packet);
 		void on_cmap(std::string_view packet);
 		void on_gp(std::string_view packet);
+		std::vector<packets::Publisher::Subscription> subscriptions;
 	};
 
 	class Sensors {
 	public:
 		explicit Sensors(packets::Publisher& publisher);
+		Sensors(const Sensors&) = delete;
+		Sensors& operator=(const Sensors&) = delete;
 
 		std::unique_ptr<Scene> scene;
 		std::unique_ptr<SelfPlayer> self_player;
@@ -68,5 +77,6 @@ namespace nosbazar::game {
 
 	private:
 		void on_wopen(std::string_view packet);
+		packets::Publisher::Subscription subscription;
 	};
 }

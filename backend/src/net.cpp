@@ -286,6 +286,11 @@ void nosbazar::net::Session::set_disconnect_callback(std::function<void()> callb
     disconnect_callback = std::move(callback);
 }
 
+void nosbazar::net::Session::disconnect()
+{
+    client->disconnect();
+}
+
 void nosbazar::net::Session::on_disconnect()
 {
     SPDLOG_TRACE("Session::on_disconnect");

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <atomic>
 #include "auth/nosauth.h"
 #include <asio.hpp>
 #include "net.h"
@@ -24,6 +25,7 @@ namespace nosbazar {
 
         explicit Clientless(std::string account_id, std::shared_ptr<auth::NosAuth> nosauth);
 
+        // run() must have returned before this object is destroyed.
         ~Clientless();
 
         ExitCode run();
@@ -35,6 +37,8 @@ namespace nosbazar {
         bool phase_world();
         void phase_game();
         void reset_attempt_state();
+        // Called outside packet/timer callbacks, with no io_context run() active.
+        void cleanup_attempt();
         bool sleep_retry_delay();
         void on_world_disconnect();
 
@@ -75,6 +79,7 @@ namespace nosbazar {
         int first_char_index{ -1 };
         bool game_phase_started{false};
         bool world_disconnected{false};
+        std::atomic_bool stop_requested{false};
 
         void init_pulse_timer();
         uint32_t pulse_time{0};

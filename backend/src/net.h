@@ -80,6 +80,7 @@ namespace nosbazar::net {
 
 		bool connect(const std::string& ip, unsigned short port);
 		void set_disconnect_callback(std::function<void()> callback);
+		void disconnect();
 
 		virtual void send(const std::string& packet) = 0;
 
