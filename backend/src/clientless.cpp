@@ -284,6 +284,10 @@ void nosbazar::Clientless::phase_game()
                 return;
             }
             if (!ec) {
+                if (!server_worker && !stop_requested && agent->is_bazar_ready(*sensors)) {
+                    server_worker = ServerRegistry::instance().register_worker(
+                        login_result->world_server_id, login_result->world_server_name);
+                }
                 agent->run(*sensors);
                 schedule_tick();
             }
@@ -294,9 +298,6 @@ void nosbazar::Clientless::phase_game()
     };
 
     schedule_tick();
-
-    server_worker = ServerRegistry::instance().register_worker(
-        login_result->world_server_id, login_result->world_server_name);
 
     // world_context.run() is already running from phase_world()
     // no need to call it again

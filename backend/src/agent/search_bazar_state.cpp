@@ -19,35 +19,44 @@ nosbazar::agent::SearchBazarState::~SearchBazarState()
 
 bool nosbazar::agent::SearchBazarState::should_execute(const game::Sensors& sensors)
 {
-	if (timer.elapsed() < search_delay_ms) {
+	if (exchange != Exchange::ready || !sensors.is_bazar_opened || timer.elapsed() < search_delay_ms) {
 		return false;
 	}
+	return !BazarSearchManager::queue(server).empty();
+}
 
-	if (task) {
-		return true;
+bool nosbazar::agent::SearchBazarState::needs_open() const
+{
+	return exchange == Exchange::unopened;
+}
+
+bool nosbazar::agent::SearchBazarState::is_initialized() const
+{
+	return exchange == Exchange::ready || exchange == Exchange::searching;
+}
+
+void nosbazar::agent::SearchBazarState::begin_open()
+{
+	if (!needs_open()) {
+		return;
 	}
-
-	BazarSearchQueue& queue = BazarSearchManager::queue(server);
-
-	if (queue.empty()) {
-		return false;
-	}
-
-
-	task = queue.pop();
-	return true;
+	exchange = Exchange::opening;
+	timer.start();
+	session.send(packets::CBlist{}.string());
 }
 
 void nosbazar::agent::SearchBazarState::act(const game::Sensors& sensors)
 {
-	if (timer.elapsed() < search_delay_ms) {
+	if (exchange != Exchange::ready || !sensors.is_bazar_opened || timer.elapsed() < search_delay_ms) {
 		return;
 	}
 
+	task = BazarSearchManager::queue(server).pop();
 	if (!task) {
 		return;
 	}
 
+	exchange = Exchange::searching;
 	timer.start();
 
 	SPDLOG_TRACE("Sending {}", task->request.search_packet.string());
@@ -57,7 +66,12 @@ void nosbazar::agent::SearchBazarState::act(const game::Sensors& sensors)
 
 void nosbazar::agent::SearchBazarState::on_rc_blist(std::string_view packet)
 {
-	if (!task) {
+	if (exchange == Exchange::opening) {
+		// Consume the opening query separately; it never completes a user task.
+		exchange = Exchange::ready;
+		return;
+	}
+	if (exchange != Exchange::searching || !task) {
 		return;
 	}
 
@@ -73,4 +87,5 @@ void nosbazar::agent::SearchBazarState::on_rc_blist(std::string_view packet)
 
 	// Mark task as completed for us
 	task.reset();
+	exchange = Exchange::ready;
 }

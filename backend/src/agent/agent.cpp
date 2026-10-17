@@ -5,14 +5,15 @@
 #include "search_bazar_state.h"
 
 nosbazar::agent::Agent::Agent(net::WorldSession& session, packets::Publisher& publisher, GameServer server)
+	: search_state(std::make_shared<SearchBazarState>(session, publisher, server))
 {
 	std::vector<std::shared_ptr<State>> states = {
 		std::make_shared<WalkState>(session),
 		std::make_shared<BazarPortalEnterState>(session),
 		std::make_shared<BazarNpcWalkState>(),
 		std::make_shared<BazarPortalWalkState>(),
-		std::make_shared<OpenBazarState>(session),
-		std::make_shared<SearchBazarState>(session, publisher, server)
+		std::make_shared<OpenBazarState>(session, *search_state),
+		search_state
 	};
 
 	state_machine = std::make_unique<StateMachine>(states);
@@ -21,4 +22,9 @@ nosbazar::agent::Agent::Agent(net::WorldSession& session, packets::Publisher& pu
 void nosbazar::agent::Agent::run(const game::Sensors& sensors)
 {
 	state_machine->act(sensors);
+}
+
+bool nosbazar::agent::Agent::is_bazar_ready(const game::Sensors& sensors) const
+{
+	return sensors.is_bazar_opened && search_state->is_initialized();
 }

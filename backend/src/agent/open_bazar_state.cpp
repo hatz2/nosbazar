@@ -1,15 +1,20 @@
 #include "open_bazar_state.h"
+#include "search_bazar_state.h"
 #include <distances.h>
 #include <fmt/format.h>
 
-nosbazar::agent::OpenBazarState::OpenBazarState(net::WorldSession& session) : session(session)
+nosbazar::agent::OpenBazarState::OpenBazarState(net::WorldSession& session, SearchBazarState& search)
+	: session(session), search(search)
 {
 }
 
 bool nosbazar::agent::OpenBazarState::should_execute(const game::Sensors& sensors)
 {
-	if (sensors.is_bazar_opened) {
+	if (!search.needs_open()) {
 		return false;
+	}
+	if (sensors.is_bazar_opened) {
+		return true;
 	}
 
 	constexpr double distance_to_npc = 2.5;
@@ -31,9 +36,11 @@ void nosbazar::agent::OpenBazarState::act(const game::Sensors& sensors)
 		return;
 	}
 
-	session.send(fmt::format("npc_req 2 {}", npc_id));
-	session.send(fmt::format("n_run 60 0 2 {}", npc_id));
-	session.send("c_blist  0 0 0 0 0 0 0 0 0");
+	if (!sensors.is_bazar_opened) {
+		session.send(fmt::format("npc_req 2 {}", npc_id));
+		session.send(fmt::format("n_run 60 0 2 {}", npc_id));
+	}
+	search.begin_open();
 
 	timer.start();
 }
