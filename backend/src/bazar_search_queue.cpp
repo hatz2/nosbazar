@@ -71,30 +71,57 @@ bool nosbazar::BazarSearch::response_expired()
 	return response_timed_out;
 }
 
-bool nosbazar::BazarSearchQueue::push(std::shared_ptr<BazarSearch> search)
+bool nosbazar::BazarSearch::is_pending()
 {
-	// Admission and last-worker removal use the same queue mutex.
 	const std::lock_guard<std::mutex> lock(mutex);
+	expire_locked(Clock::now());
+	return !completed && !dispatched;
+}
+
+nosbazar::BazarSearchQueue::BazarSearchQueue(std::mutex& mutex, std::size_t& pending_total)
+	: mutex(mutex), pending_total(pending_total)
+{
+}
+
+nosbazar::BazarSearchQueue::~BazarSearchQueue()
+{
+	set_available(false);
+}
+
+void nosbazar::BazarSearchQueue::prune_locked()
+{
+	pending_total -= std::erase_if(queue, [](const auto& search) { return !search->is_pending(); });
+}
+
+std::expected<void, nosbazar::BazarSearchError> nosbazar::BazarSearchQueue::push_locked(std::shared_ptr<BazarSearch> search)
+{
 	if (!available) {
-		return false;
+		return std::unexpected(BazarSearchError::unavailable);
 	}
-	queue.push(std::move(search));
-	return true;
+	if (!search->is_pending()) {
+		return std::unexpected(BazarSearchError::queue_timeout);
+	}
+	if (queue.size() >= max_pending_per_server || pending_total >= max_pending_global) {
+		return std::unexpected(BazarSearchError::queue_full);
+	}
+	queue.push_back(std::move(search));
+	++pending_total;
+	return {};
 }
 
 void nosbazar::BazarSearchQueue::set_available(bool value)
 {
-	std::queue<std::shared_ptr<BazarSearch>> pending;
+	std::deque<std::shared_ptr<BazarSearch>> pending;
 	{
 		const std::lock_guard<std::mutex> lock(mutex);
 		available = value;
 		if (!available) {
+			pending_total -= queue.size();
 			queue.swap(pending);
 		}
 	}
-	while (!pending.empty()) {
-		pending.front()->fail(BazarSearchError::unavailable);
-		pending.pop();
+	for (const auto& search : pending) {
+		search->fail(BazarSearchError::unavailable);
 	}
 }
 
@@ -103,7 +130,8 @@ std::shared_ptr<nosbazar::BazarSearch> nosbazar::BazarSearchQueue::pop()
 	const std::lock_guard<std::mutex> lock(mutex);
 	while (!queue.empty()) {
 		std::shared_ptr<BazarSearch> search = std::move(queue.front());
-		queue.pop();
+		queue.pop_front();
+		--pending_total;
 		if (search->start()) {
 			return search;
 		}
@@ -114,6 +142,7 @@ std::shared_ptr<nosbazar::BazarSearch> nosbazar::BazarSearchQueue::pop()
 bool nosbazar::BazarSearchQueue::empty()
 {
 	const std::lock_guard<std::mutex> lock(mutex);
+	prune_locked();
 	return queue.empty();
 }
 
@@ -127,13 +156,20 @@ nosbazar::BazarSearchQueue& nosbazar::BazarSearchManager::queue(const GameServer
 {
 	auto& manager = instance();
 	const std::lock_guard<std::mutex> lock(manager.mutex);
-	return manager.server_queues[server];
+	return manager.server_queues.try_emplace(server, manager.mutex, manager.pending_total).first->second;
 }
 
-bool nosbazar::BazarSearchManager::submit(GameServer server, std::shared_ptr<BazarSearch> search)
+std::expected<void, nosbazar::BazarSearchError> nosbazar::BazarSearchManager::submit(GameServer server, std::shared_ptr<BazarSearch> search)
 {
 	auto& manager = instance();
 	const std::lock_guard<std::mutex> lock(manager.mutex);
 	const auto it = manager.server_queues.find(server);
-	return it != manager.server_queues.end() && it->second.push(std::move(search));
+	if (it == manager.server_queues.end()) {
+		return std::unexpected(BazarSearchError::unavailable);
+	}
+	// One shared lock covers pruning, both limits, and admission.
+	for (auto& [id, queue] : manager.server_queues) {
+		queue.prune_locked();
+	}
+	return it->second.push_locked(std::move(search));
 }

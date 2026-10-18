@@ -59,6 +59,11 @@ namespace {
             code = "search_timeout";
             message = "The game server did not respond in time.";
             break;
+        case nosbazar::BazarSearchError::queue_full:
+            status = 429;
+            code = "queue_full";
+            message = "The search queue is full. Please try again later.";
+            break;
         }
         nlohmann::json body = {{"error", {{"code", code}, {"message", message}}}};
         crow::response response(status, body.dump());
@@ -106,8 +111,9 @@ crow::response handle_search(const crow::request& req)
     task->request.search_packet = std::move(search_packet);
 
     auto response_future = task->get_future();
-    if (!nosbazar::BazarSearchManager::submit(request->server, task)) {
-        task->fail(BazarSearchError::unavailable);
+    const auto admission = nosbazar::BazarSearchManager::submit(request->server, task);
+    if (!admission) {
+        task->fail(admission.error());
     }
 
     while (response_future.wait_for(std::chrono::milliseconds(100)) != std::future_status::ready) {

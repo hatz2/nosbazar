@@ -2,11 +2,12 @@
 
 #include <future>
 #include <chrono>
+#include <cstddef>
 #include <expected>
 #include <map>
 #include <memory>
 #include <mutex>
-#include <queue>
+#include <deque>
 #include <string>
 #include <packets/c_blist.h>
 
@@ -23,7 +24,8 @@ namespace nosbazar {
 		invalid_response,
 		unavailable,
 		queue_timeout,
-		response_timeout
+		response_timeout,
+		queue_full
 	};
 
 	using BazarSearchResult = std::expected<std::string, BazarSearchError>;
@@ -42,6 +44,7 @@ namespace nosbazar {
 		bool start();
 		void expire();
 		bool response_expired();
+		bool is_pending();
 
 	private:
 		using Clock = std::chrono::steady_clock;
@@ -58,21 +61,31 @@ namespace nosbazar {
 
 	class BazarSearchQueue {
 	public:
-		bool push(std::shared_ptr<BazarSearch> search);
+		static constexpr std::size_t max_pending_per_server = 8;
+		static constexpr std::size_t max_pending_global = 32;
+		// The manager owns the shared lock and count, and outlives its queues.
+		BazarSearchQueue(std::mutex& mutex, std::size_t& pending_total);
+		BazarSearchQueue(const BazarSearchQueue&) = delete;
+		BazarSearchQueue& operator=(const BazarSearchQueue&) = delete;
+		~BazarSearchQueue();
 		std::shared_ptr<BazarSearch> pop();
 		bool empty();
 		void set_available(bool available);
 
 	private:
-		std::mutex mutex;
-		std::queue<std::shared_ptr<BazarSearch>> queue;
+		friend class BazarSearchManager;
+		std::expected<void, BazarSearchError> push_locked(std::shared_ptr<BazarSearch> search);
+		void prune_locked();
+		std::mutex& mutex;
+		std::size_t& pending_total;
+		std::deque<std::shared_ptr<BazarSearch>> queue;
 		bool available{false};
 	};
 
 	class BazarSearchManager {
 	public:
 		static BazarSearchQueue& queue(const GameServer server);
-		static bool submit(GameServer server, std::shared_ptr<BazarSearch> search);
+		static std::expected<void, BazarSearchError> submit(GameServer server, std::shared_ptr<BazarSearch> search);
 
 	private:
 		static BazarSearchManager& instance();
@@ -82,6 +95,7 @@ namespace nosbazar {
 		void operator=(const BazarSearchManager&) = delete;
 
 		std::mutex mutex;
+		std::size_t pending_total{};
 		std::map<GameServer, BazarSearchQueue> server_queues;
 	};
 }
