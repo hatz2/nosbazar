@@ -148,6 +148,9 @@ const std::vector<nosbazar::io::ItemDatParser::ItemNameIndexEntry>& nosbazar::io
 std::vector<nosbazar::io::ItemDatParser::ItemNameMatch> nosbazar::io::ItemDatParser::search_by_name(
 	Language lang, std::string_view query, size_t limit) const
 {
+	if (limit == 0) {
+		return {};
+	}
 	const std::vector<ItemNameIndexEntry>& index = ensure_name_index(lang);
 	const std::string lowered_query = lowercase_utf8(query);
 
@@ -162,7 +165,10 @@ std::vector<nosbazar::io::ItemDatParser::ItemNameMatch> nosbazar::io::ItemDatPar
 		ItemNameMatch match{entry.vnum, entry.name, entry.icon_id};
 		if (entry.lower_name.starts_with(lowered_query)) {
 			prefix_matches.push_back(std::move(match));
-		} else {
+			if (prefix_matches.size() >= limit) {
+				break;
+			}
+		} else if (contains_matches.size() < limit) {
 			contains_matches.push_back(std::move(match));
 		}
 	}

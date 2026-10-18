@@ -122,9 +122,26 @@
 				body: JSON.stringify(body)
 			});
 
-			if (response.status == 500) {
+			if (!response.ok) {
 				const text = await response.text();
-				alert(text);
+				let message = text || `Search failed (${response.status})`;
+				try {
+					const body: unknown = JSON.parse(text);
+					if (
+						typeof body === 'object' &&
+						body !== null &&
+						'error' in body &&
+						typeof body.error === 'object' &&
+						body.error !== null &&
+						'message' in body.error &&
+						typeof body.error.message === 'string'
+					) {
+						message = body.error.message;
+					}
+				} catch {
+					// Preserve plain-text errors returned by the server or proxy.
+				}
+				alert(message);
 				return;
 			}
 

@@ -1,7 +1,7 @@
 #include "api/routes.h"
+#include "api/search_request.h"
 #include "server_registry.h"
 #include <bazar_search_queue.h>
-#include <packets/c_blist.h>
 #include <io/item_dat_parser.h>
 #include <io/bcard_parser.h>
 #include <io/monster_dat_parser.h>
@@ -11,6 +11,7 @@
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 #include <algorithm>
+#include <cstdint>
 #include <limits>
 #include <memory>
 #include <string>
@@ -20,7 +21,15 @@
 #include <io/language.h>
 
 namespace {
-    constexpr int max_vnum_search = 50;
+    crow::response validation_error(const nosbazar::api::SearchValidationError& error)
+    {
+        nlohmann::json body = {{"error", {
+            {"code", "invalid_request"}, {"field", error.field}, {"message", error.message}
+        }}};
+        crow::response response(400, body.dump());
+        response.set_header("Content-Type", "application/json");
+        return response;
+    }
 
     crow::response search_error(nosbazar::BazarSearchError error)
     {
@@ -53,78 +62,40 @@ crow::response handle_search(const crow::request& req)
 {
     SPDLOG_TRACE("Search request body: {}", req.body);
 
-    crow::json::rvalue json = crow::json::load(req.body);
-
-    const int64_t server_id = json["server"].i();
-    if (server_id < 0 || server_id > std::numeric_limits<GameServer>::max()) {
-        return search_error(BazarSearchError::unavailable);
+    auto request = parse_search_request(req.body);
+    if (!request) {
+        return validation_error(request.error());
     }
-    const auto server = static_cast<GameServer>(server_id);
-    if (!ServerRegistry::instance().is_available(server)) {
+    if (!ServerRegistry::instance().is_available(request->server)) {
         return search_error(BazarSearchError::unavailable);
     }
 
-    std::vector<uint32_t> vnums;
-    for (auto& vnum : json["filters"]["vnum"].lo()) {
-        vnums.push_back(static_cast<uint32_t>(vnum.i()));
-    }
+    auto& search_packet = request->search_packet;
+    if (!request->name.empty()) {
+        const auto matches = io::ItemDatParser::instance().search_by_name(
+            request->language, request->name, max_vnum_search - search_packet.vnums_filter.size() + 1);
 
-    if (json.has("name") && json["name"].t() == crow::json::type::String) {
-        const std::string name = json["name"].s();
-        if (!name.empty()) {
-
-            io::Language lang = io::Language::english;
-            if (json.has("lang") && json["lang"].t() == crow::json::type::String) {
-                const std::string lang_code = json["lang"].s();
-                const auto lang_it = io::string_to_lang.find(lang_code);
-                if (lang_it != io::string_to_lang.end()) {
-                    lang = lang_it->second;
-                }
-            }
-
-            std::vector<nosbazar::io::ItemDatParser::ItemNameMatch> matches =
-                nosbazar::io::ItemDatParser::instance().search_by_name(
-                    lang, name, std::numeric_limits<size_t>::max());
-
-            if (matches.empty()) {
-                SPDLOG_INFO("Name filter '{}' matched no items", name);
-                return crow::response(R"({"items": []})");
-            }
-
-            for (const auto& match : matches) {
-                vnums.push_back(match.vnum);
-            }
-
-            SPDLOG_INFO("Name filter '{}' resolved to {} vnums", name, matches.size());
-
-            if (vnums.size() > max_vnum_search) {
-                std::string result = "Exceeded maximum number of items requested for name: \"" + name + "\"";
-                SPDLOG_WARN(result.c_str());
-                return crow::response(500, result);
-            }
+        if (matches.empty()) {
+            SPDLOG_INFO("Name filter '{}' matched no items", request->name);
+            return crow::response(R"({"items": []})");
         }
+        if (search_packet.vnums_filter.size() + matches.size() > max_vnum_search) {
+            return validation_error({"name", "The name and item ID filters exceed the maximum of 50 items."});
+        }
+        for (const auto& match : matches) {
+            if (match.vnum > std::numeric_limits<std::uint16_t>::max()) {
+                return validation_error({"name", "The name matched an item ID outside the supported range."});
+            }
+            search_packet.vnums_filter.push_back(static_cast<std::uint16_t>(match.vnum));
+        }
+        SPDLOG_INFO("Name filter '{}' resolved to {} vnums", request->name, matches.size());
     }
 
     auto task = std::make_shared<nosbazar::BazarSearch>();
-
-    nosbazar::packets::CBlist search_packet{
-        .index = (int)json["filters"]["index"].i(),
-        .type_filter = (int)json["filters"]["category"].i(),
-        .sub_type_filter = (int)json["filters"]["sub_category"].i(),
-        .level_filter = (int)json["filters"]["level"].i(),
-        .rare_filter = (int)json["filters"]["rare"].i(),
-        .upgrade_filter = (int)json["filters"]["upgrade"].i(),
-        .order_filter = (int)json["filters"]["order"].i()
-    };
-
-    for (uint32_t vnum : vnums) {
-        search_packet.vnums_filter.push_back(static_cast<uint16_t>(vnum));
-    }
-
     task->request.search_packet = std::move(search_packet);
 
     auto response_future = task->get_future();
-    if (!nosbazar::BazarSearchManager::submit(server, task)) {
+    if (!nosbazar::BazarSearchManager::submit(request->server, task)) {
         task->fail(BazarSearchError::unavailable);
     }
 
