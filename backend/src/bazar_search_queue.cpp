@@ -78,6 +78,13 @@ bool nosbazar::BazarSearch::is_pending()
 	return !completed && !dispatched;
 }
 
+bool nosbazar::BazarSearch::is_completed()
+{
+	const std::lock_guard<std::mutex> lock(mutex);
+	expire_locked(Clock::now());
+	return completed;
+}
+
 nosbazar::BazarSearchQueue::BazarSearchQueue(std::mutex& mutex, std::size_t& pending_total)
 	: mutex(mutex), pending_total(pending_total)
 {
@@ -163,6 +170,9 @@ std::expected<void, nosbazar::BazarSearchError> nosbazar::BazarSearchManager::su
 {
 	auto& manager = instance();
 	const std::lock_guard<std::mutex> lock(manager.mutex);
+	if (manager.stopping) {
+		return std::unexpected(BazarSearchError::service_stopping);
+	}
 	const auto it = manager.server_queues.find(server);
 	if (it == manager.server_queues.end()) {
 		return std::unexpected(BazarSearchError::unavailable);
@@ -171,5 +181,34 @@ std::expected<void, nosbazar::BazarSearchError> nosbazar::BazarSearchManager::su
 	for (auto& [id, queue] : manager.server_queues) {
 		queue.prune_locked();
 	}
-	return it->second.push_locked(std::move(search));
+	std::erase_if(manager.searches, [](const auto& task) { return task->is_completed(); });
+	// Retain accepted tasks after dequeueing so shutdown also releases active waits.
+	manager.searches.push_back(search);
+	auto admission = it->second.push_locked(std::move(search));
+	if (!admission) {
+		manager.searches.pop_back();
+	}
+	return admission;
+}
+
+void nosbazar::BazarSearchManager::shutdown()
+{
+	auto& manager = instance();
+	std::vector<std::shared_ptr<BazarSearch>> searches;
+	{
+		const std::lock_guard<std::mutex> lock(manager.mutex);
+		if (manager.stopping) {
+			return;
+		}
+		manager.stopping = true;
+		searches.swap(manager.searches);
+		for (auto& [server, queue] : manager.server_queues) {
+			queue.available = false;
+			queue.queue.clear();
+		}
+		manager.pending_total = 0;
+	}
+	for (const auto& search : searches) {
+		search->fail(BazarSearchError::service_stopping);
+	}
 }

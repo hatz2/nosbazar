@@ -1,6 +1,7 @@
 #include "api/routes.h"
 #include "api/search_request.h"
 #include "server_registry.h"
+#include "app_state.h"
 #include <bazar_search_queue.h>
 #include <io/item_dat_parser.h>
 #include <io/bcard_parser.h>
@@ -64,6 +65,10 @@ namespace {
             code = "queue_full";
             message = "The search queue is full. Please try again later.";
             break;
+        case nosbazar::BazarSearchError::service_stopping:
+            code = "service_stopping";
+            message = "The service is stopping.";
+            break;
         }
         nlohmann::json body = {{"error", {{"code", code}, {"message", message}}}};
         crow::response response(status, body.dump());
@@ -76,6 +81,9 @@ namespace nosbazar::api {
 
 crow::response handle_search(const crow::request& req)
 {
+    if (!nosbazar::running) {
+        return search_error(BazarSearchError::service_stopping);
+    }
     SPDLOG_TRACE("Search request body: {}", req.body);
 
     auto request = parse_search_request(req.body);

@@ -9,6 +9,7 @@
 #include <mutex>
 #include <deque>
 #include <string>
+#include <vector>
 #include <packets/c_blist.h>
 
 namespace nosbazar {
@@ -25,7 +26,8 @@ namespace nosbazar {
 		unavailable,
 		queue_timeout,
 		response_timeout,
-		queue_full
+		queue_full,
+		service_stopping
 	};
 
 	using BazarSearchResult = std::expected<std::string, BazarSearchError>;
@@ -45,6 +47,7 @@ namespace nosbazar {
 		void expire();
 		bool response_expired();
 		bool is_pending();
+		bool is_completed();
 
 	private:
 		using Clock = std::chrono::steady_clock;
@@ -86,6 +89,7 @@ namespace nosbazar {
 	public:
 		static BazarSearchQueue& queue(const GameServer server);
 		static std::expected<void, BazarSearchError> submit(GameServer server, std::shared_ptr<BazarSearch> search);
+		static void shutdown();
 
 	private:
 		static BazarSearchManager& instance();
@@ -97,5 +101,7 @@ namespace nosbazar {
 		std::mutex mutex;
 		std::size_t pending_total{};
 		std::map<GameServer, BazarSearchQueue> server_queues;
+		std::vector<std::shared_ptr<BazarSearch>> searches;
+		bool stopping{false};
 	};
 }

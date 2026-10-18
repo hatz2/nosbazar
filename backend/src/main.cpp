@@ -22,8 +22,22 @@
 #include <algorithm>
 #include <string>
 #include "api/routes.h"
+#include "bazar_search_queue.h"
+#include <atomic>
+#include <chrono>
+#include <csignal>
+#include <exception>
+#include <stop_token>
 
 namespace {
+
+static_assert(std::atomic_bool::is_always_lock_free);
+std::atomic_bool shutdown_requested{false};
+
+void request_shutdown(int) noexcept
+{
+    shutdown_requested.store(true, std::memory_order_relaxed);
+}
 
 void setup_log_level()
 {
@@ -71,7 +85,7 @@ void initialize_game_data()
     nosbazar::MapGridRepository::instance();
 }
 
-bool authenticate_and_spawn_clients(Env& env, std::vector<std::shared_ptr<nosbazar::Clientless>>& clients, std::vector<std::thread>& threads)
+bool authenticate_and_spawn_clients(Env& env, std::vector<std::shared_ptr<nosbazar::Clientless>>& clients, std::vector<std::jthread>& threads)
 {
     auto identity = std::make_shared<nosbazar::auth::Identity>(env.identity_path);
     auto auth = std::make_shared<nosbazar::auth::NosAuth>(identity);
@@ -104,7 +118,8 @@ bool authenticate_and_spawn_clients(Env& env, std::vector<std::shared_ptr<nosbaz
         const std::string& id = entry.key();
         auto client = std::make_shared<nosbazar::Clientless>(id, auth);
         clients.push_back(client);
-        threads.emplace_back([client]() {
+        threads.emplace_back([client](std::stop_token stop) {
+            std::stop_callback cancel(stop, [client]() { client->stop(); });
             return static_cast<int>(client->run());
         });
         ++count;
@@ -122,7 +137,7 @@ int main(int argc, char** argv) {
 	initialize_game_data();
 
 	std::vector<std::shared_ptr<nosbazar::Clientless>> clients;
-	std::vector<std::thread> threads;
+	std::vector<std::jthread> threads;
 	if (!authenticate_and_spawn_clients(env, clients, threads)) {
         return EXIT_FAILURE;
     }
@@ -140,17 +155,46 @@ int main(int argc, char** argv) {
     CROW_ROUTE(app, "/api/conststring/version").methods("GET"_method)(nosbazar::api::handle_const_string_version);
     CROW_ROUTE(app, "/api/bcard/string").methods("GET"_method)(nosbazar::api::handle_bcard_string);
 
-    app.port(8080).multithreaded().run();
+    auto stop_clients = [&clients]() {
+        nosbazar::BazarSearchManager::shutdown();
+        nosbazar::running = false;
+        for (auto& client : clients) {
+            client->stop();
+        }
+    };
 
-	nosbazar::running = false;
-	for (auto& client : clients) {
-		client->stop();
-	}
+    // Release blocked search handlers before Crow stops its HTTP worker contexts.
+    app.signal_clear();
+    std::signal(SIGINT, request_shutdown);
+    std::signal(SIGTERM, request_shutdown);
+    bool shutdown_started = false;
+    app.tick(std::chrono::milliseconds(100), [&]() {
+        if (!shutdown_requested.load(std::memory_order_relaxed)) {
+            return;
+        }
+        if (!shutdown_started) {
+            shutdown_started = true;
+            stop_clients();
+            return;
+        }
+        // Give released handlers one tick to send their failure responses.
+        app.stop();
+    });
+
+    int exit_code = EXIT_SUCCESS;
+    try {
+        app.port(8080).multithreaded().run();
+    } catch (const std::exception& error) {
+        SPDLOG_ERROR("HTTP server failed: {}", error.what());
+        exit_code = EXIT_FAILURE;
+    }
+    stop_clients();
+    app.stop();
 	for (auto& thread : threads) {
 		if (thread.joinable()) {
 			thread.join();
 		}
 	}
 
-	return 0;
+	return exit_code;
 }
