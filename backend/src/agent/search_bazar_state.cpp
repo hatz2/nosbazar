@@ -2,6 +2,10 @@
 #include <spdlog/spdlog.h>
 #include <packets/rc_blist.h>
 #include <exception>
+#include <charconv>
+#include <cstdint>
+#include <system_error>
+#include <strings/parse.h>
 
 nosbazar::agent::SearchBazarState::SearchBazarState(net::WorldSession& session, packets::Publisher& publisher, GameServer server)
 	: session(session), server(server),
@@ -41,6 +45,7 @@ void nosbazar::agent::SearchBazarState::begin_open()
 		return;
 	}
 	exchange = Exchange::opening;
+	opening_deadline = std::chrono::steady_clock::now() + BazarSearch::response_timeout;
 	timer.start();
 	session.send(packets::CBlist{}.string());
 }
@@ -61,11 +66,50 @@ void nosbazar::agent::SearchBazarState::act(const game::Sensors& sensors)
 
 	SPDLOG_TRACE("Sending {}", task->request.search_packet.string());
 	
-	session.send(task->request.search_packet.string());
+	if (poll()) {
+		session.send(task->request.search_packet.string());
+	}
+}
+
+bool nosbazar::agent::SearchBazarState::poll()
+{
+	if ((exchange == Exchange::opening && std::chrono::steady_clock::now() >= opening_deadline) ||
+		(exchange == Exchange::searching && task->response_expired())) {
+		fail_exchange(BazarSearchError::response_timeout);
+	}
+	return exchange != Exchange::failed;
+}
+
+void nosbazar::agent::SearchBazarState::fail_exchange(BazarSearchError error)
+{
+	if (exchange == Exchange::failed) {
+		return;
+	}
+	exchange = Exchange::failed;
+	if (task) {
+		task->fail(error);
+		task.reset();
+	}
+	// A timed-out response cannot be correlated with later searches on this socket.
+	SPDLOG_WARN("Invalid or expired bazaar exchange on server {}; reconnecting", server);
+	session.disconnect();
 }
 
 void nosbazar::agent::SearchBazarState::on_rc_blist(std::string_view packet)
 {
+	if (!poll() || (exchange != Exchange::opening && exchange != Exchange::searching)) {
+		return;
+	}
+	auto tokens = packet;
+	strings::token<std::string_view>(tokens);
+	const auto page_token = strings::token<std::string_view>(tokens);
+	std::uint64_t page{};
+	const auto [end, error] = std::from_chars(page_token.data(), page_token.data() + page_token.size(), page);
+	const auto expected_page = task ? static_cast<std::uint64_t>(task->request.search_packet.index) : 0;
+	if (error != std::errc{} || end != page_token.data() + page_token.size() || page != expected_page) {
+		fail_exchange(BazarSearchError::invalid_response);
+		return;
+	}
 	if (exchange == Exchange::opening) {
 		// Consume the opening query separately; it never completes a user task.
 		exchange = Exchange::ready;
@@ -79,10 +123,14 @@ void nosbazar::agent::SearchBazarState::on_rc_blist(std::string_view packet)
 
 	try {
 		packets::RcBlist rc_packet(packet);
-		task->succeed(rc_packet.json().dump(4));
+		if (!task->succeed(rc_packet.json().dump(4))) {
+			fail_exchange(BazarSearchError::response_timeout);
+			return;
+		}
 	} catch (const std::exception& error) {
 		SPDLOG_WARN("Failed to decode bazaar response: {}", error.what());
-		task->fail(BazarSearchError::invalid_response);
+		fail_exchange(BazarSearchError::invalid_response);
+		return;
 	}
 
 	// Mark task as completed for us

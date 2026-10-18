@@ -20,12 +20,55 @@ bool nosbazar::BazarSearch::fail(BazarSearchError error)
 bool nosbazar::BazarSearch::complete(BazarSearchResult result)
 {
 	const std::lock_guard<std::mutex> lock(mutex);
+	if (expire_locked(Clock::now())) {
+		return false;
+	}
+	return complete_locked(std::move(result));
+}
+
+bool nosbazar::BazarSearch::complete_locked(BazarSearchResult result)
+{
 	if (completed) {
 		return false;
 	}
 	promise.set_value(std::move(result));
 	completed = true;
 	return true;
+}
+
+bool nosbazar::BazarSearch::expire_locked(Clock::time_point now)
+{
+	if (completed || now < deadline) {
+		return false;
+	}
+	response_timed_out = dispatched;
+	return complete_locked(std::unexpected(dispatched ? BazarSearchError::response_timeout : BazarSearchError::queue_timeout));
+}
+
+bool nosbazar::BazarSearch::start()
+{
+	const std::lock_guard<std::mutex> lock(mutex);
+	const auto now = Clock::now();
+	expire_locked(now);
+	if (completed || dispatched) {
+		return false;
+	}
+	dispatched = true;
+	deadline = now + response_timeout;
+	return true;
+}
+
+void nosbazar::BazarSearch::expire()
+{
+	const std::lock_guard<std::mutex> lock(mutex);
+	expire_locked(Clock::now());
+}
+
+bool nosbazar::BazarSearch::response_expired()
+{
+	const std::lock_guard<std::mutex> lock(mutex);
+	expire_locked(Clock::now());
+	return response_timed_out;
 }
 
 bool nosbazar::BazarSearchQueue::push(std::shared_ptr<BazarSearch> search)
@@ -58,14 +101,14 @@ void nosbazar::BazarSearchQueue::set_available(bool value)
 std::shared_ptr<nosbazar::BazarSearch> nosbazar::BazarSearchQueue::pop()
 {
 	const std::lock_guard<std::mutex> lock(mutex);
-	if (queue.empty()) {
-		return nullptr;
-	}
-	else {
+	while (!queue.empty()) {
 		std::shared_ptr<BazarSearch> search = std::move(queue.front());
 		queue.pop();
-		return search;
+		if (search->start()) {
+			return search;
+		}
 	}
+	return nullptr;
 }
 
 bool nosbazar::BazarSearchQueue::empty()

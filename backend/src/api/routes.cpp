@@ -16,6 +16,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <chrono>
 #include <vector>
 
 #include <io/language.h>
@@ -47,6 +48,16 @@ namespace {
             status = 502;
             code = "invalid_response";
             message = "The game response could not be decoded.";
+            break;
+        case nosbazar::BazarSearchError::queue_timeout:
+            status = 504;
+            code = "queue_timeout";
+            message = "The search expired before it could be sent.";
+            break;
+        case nosbazar::BazarSearchError::response_timeout:
+            status = 504;
+            code = "search_timeout";
+            message = "The game server did not respond in time.";
             break;
         }
         nlohmann::json body = {{"error", {{"code", code}, {"message", message}}}};
@@ -99,6 +110,9 @@ crow::response handle_search(const crow::request& req)
         task->fail(BazarSearchError::unavailable);
     }
 
+    while (response_future.wait_for(std::chrono::milliseconds(100)) != std::future_status::ready) {
+        task->expire();
+    }
     auto result = response_future.get();
     if (!result) {
         return search_error(result.error());

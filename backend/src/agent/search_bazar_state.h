@@ -5,6 +5,7 @@
 #include <time/elapsed_timer.h>
 #include <packets/packet_publisher.h>
 #include <bazar_search_queue.h>
+#include <chrono>
 
 namespace nosbazar::agent {
 	class SearchBazarState : public State {
@@ -17,13 +18,16 @@ namespace nosbazar::agent {
 		bool needs_open() const;
 		bool is_initialized() const;
 		void begin_open();
+		// Check deadlines even when another agent behavior has priority.
+		bool poll();
 
 		bool should_execute(const game::Sensors& sensors) override;
 		void act(const game::Sensors& sensors) override;
 
 	private:
-		enum class Exchange { unopened, opening, ready, searching };
+		enum class Exchange { unopened, opening, ready, searching, failed };
 		void on_rc_blist(std::string_view packet);
+		void fail_exchange(BazarSearchError error);
 
 		static constexpr int search_delay_ms = 3500;
 		net::WorldSession& session;
@@ -31,6 +35,7 @@ namespace nosbazar::agent {
 		std::shared_ptr<BazarSearch> task;
 		GameServer server;
 		Exchange exchange{Exchange::unopened};
+		std::chrono::steady_clock::time_point opening_deadline{};
 		packets::Publisher::Subscription subscription;
 
 	};

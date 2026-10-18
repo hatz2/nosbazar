@@ -21,7 +21,9 @@ nosbazar::agent::Agent::Agent(net::WorldSession& session, packets::Publisher& pu
 
 void nosbazar::agent::Agent::run(const game::Sensors& sensors)
 {
-	state_machine->act(sensors);
+	if (search_state->poll()) {
+		state_machine->act(sensors);
+	}
 }
 
 bool nosbazar::agent::Agent::is_bazar_ready(const game::Sensors& sensors) const
