@@ -3,8 +3,6 @@
 	import HeaderButton from '$lib/components/HeaderButton.svelte';
 	import { GITHUB_ICON_PATH, API_BASE, GITHUB_LINK } from '$lib/constants';
 
-	const version = '0.0.1';
-
 	let serverOnline = $state<boolean | null>(null);
 
 	onMount(async () => {
@@ -48,7 +46,6 @@
 		>
 			Official NosTale website
 		</a>
-		<span class="version">Version {version}</span>
 	</div>
 	<p class="privacy">No cookies are used and no tracking is performed.</p>
 </footer>
@@ -116,10 +113,5 @@
 
 	.footer-link:hover {
 		color: var(--color-blue-light);
-	}
-
-	.version {
-		color: #9a9a9a;
-		font-size: 0.875rem;
 	}
 </style>

@@ -5,6 +5,8 @@ import { API_BASE } from '$lib/constants';
 
 const ALL_LANGS: LanguageCode[] = ['ES', 'UK', 'FR', 'DE', 'TR', 'IT', 'PL', 'CZ'];
 const STORAGE_KEY = 'nosbazar-conststrings';
+const MAX_FETCH_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 500;
 
 type StoredCache = {
 	version?: string;
@@ -34,7 +36,9 @@ function loadFromStorage(): void {
 		storedVersion = stored.version;
 		knownVersion = stored.version;
 		for (const [key, translations] of Object.entries(stored.translations ?? {})) {
-			cache[Number(key)] = { ...emptyTranslations(), ...translations };
+			if (ALL_LANGS.some((language) => translations[language])) {
+				cache[Number(key)] = { ...emptyTranslations(), ...translations };
+			}
 		}
 	} catch (error) {
 		console.warn('Failed to load cached const strings:', error);
@@ -65,8 +69,9 @@ async function checkVersion(): Promise<void> {
 	try {
 		const response = await fetch(`${API_BASE}/conststring/version`);
 		if (!response.ok) return;
-		const data = (await response.json()) as { version?: string };
-		const serverVersion = data.version;
+		const data = (await response.json()) as { version?: unknown } | null;
+		const serverVersion = data?.version;
+		if (typeof serverVersion !== 'string' || serverVersion.length === 0) return;
 
 		knownVersion = serverVersion;
 		if (storedVersion !== serverVersion) {
@@ -80,33 +85,42 @@ async function checkVersion(): Promise<void> {
 }
 
 loadFromStorage();
-checkVersion();
+const initialization = checkVersion();
 
 export async function fetchConstString(id: ConstStringKey): Promise<void> {
 	if (cache[id] !== undefined) return;
 	if (inFlight[id]) return inFlight[id];
 
-	const requestGeneration = generation;
 	const promise = (async () => {
 		try {
-			const response = await fetch(`${API_BASE}/conststring/${id}`);
-			if (!response.ok) {
-				console.warn(`Failed to fetch const string ${id}: ${response.statusText}`);
-				if (requestGeneration === generation) {
-					cache[id] = emptyTranslations();
-				}
-				return;
-			}
+			// Resolve cache invalidation before starting any translation requests.
+			await initialization;
+			if (cache[id] !== undefined) return;
+			const requestGeneration = generation;
 
-			const data = (await response.json()) as Record<string, string>;
-			if (requestGeneration === generation) {
-				cache[id] = { ...emptyTranslations(), ...data };
-				saveToStorage();
-			}
-		} catch (error) {
-			console.error(`Error fetching const string ${id}:`, error);
-			if (requestGeneration === generation) {
-				cache[id] = emptyTranslations();
+			for (let attempt = 0; attempt < MAX_FETCH_ATTEMPTS; attempt += 1) {
+				try {
+					const response = await fetch(`${API_BASE}/conststring/${id}`);
+					if (response.ok) {
+						const data = (await response.json()) as Record<string, string>;
+						if (requestGeneration === generation) {
+							cache[id] = { ...emptyTranslations(), ...data };
+							saveToStorage();
+						}
+						return;
+					}
+
+					console.warn(`Failed to fetch const string ${id}: ${response.statusText}`);
+					if (response.status < 500 && response.status !== 408 && response.status !== 429) {
+						return;
+					}
+				} catch (error) {
+					console.error(`Error fetching const string ${id}:`, error);
+				}
+
+				if (attempt + 1 < MAX_FETCH_ATTEMPTS) {
+					await new Promise<void>((resolve) => setTimeout(resolve, RETRY_DELAY_MS * 2 ** attempt));
+				}
 			}
 		} finally {
 			delete inFlight[id];
